@@ -63,7 +63,7 @@ month_input = st.text_input("월을 입력하세요 (예: 02)")
 # 파일 다운로드 경로
 file_dir = "./file"
 file_path = None
-file_url_template = "https://github.com/ucarsystem/driver_dashboard/raw/main/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
+file_url_template = "https://github.com/ucarsystem/driver_dashboard/raw/main/file/인천%20개인별%20대시보드_{year_input}년{month_input}월.xlsx"
 
 # 파일이 없거나 손상된 경우 다운로드
 def download_excel():
