@@ -18,17 +18,58 @@ plt.rc('font', family=font_prop.get_name())  # Windows의 경우
 plt.rc('axes', unicode_minus=False)
 
 
+# # 파일 다운로드 경로
+# file_dir = "./file"
+# file_path = None
+# file_url_template = "https://github.com/ucarsystem/driver_dashboard/raw/main/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
+
+# # 파일이 없거나 손상된 경우 다운로드
+# def download_excel():
+#     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+#         with st.spinner("데이터 파일 다운로드 중..."):
+#             response = requests.get(file_url_template)
+#             with open(file_path, "wb") as f:
+#                 f.write(response.content)
+#         st.success("파일 다운로드 완료!")
+
+# download_excel()
+
+# # 엑셀 파일 로드
+# def load_excel():
+#     try:
+#         xls = pd.ExcelFile(file_path)
+#         return pd.read_excel(xls, sheet_name="최종(개인별)", header=None)
+#     except Exception as e:
+#         st.error(f"엑셀 파일을 불러오는 중 오류 발생: {e}")
+#         return None
+
+# df_final = load_excel()
+
+
+# Streamlit UI 구성
+st.title("🚗 운전자별 대시보드")
+company_input = st.text_input("운수사를 입력하세요")
+user_id_input = st.text_input("운전자 ID를 입력하세요")
+st.markdown("""
+    <a href='https://driverid-xgkps9rbvh4iph8yrcvovb.streamlit.app/' target='_blank' 
+    style='display: inline-block; padding: 10px 20px; background-color: green; color: white; font-weight: bold; 
+    text-align: center; text-decoration: none; border-radius: 5px;'>ID 조회하기</a>
+""", unsafe_allow_html=True)
+user_name_input = st.text_input("운전자 이름을 입력하세요")
+
+year_input = st.text_input("년도를 입력하세요 (예: 24)")
+month_input = st.text_input("월을 입력하세요 (예: 02)")
+
 # 파일 다운로드 경로
 file_dir = "./file"
 file_path = None
-
-file_url = "https://github.com/ucarsystem/driver_dashboard/file/main/인천%20개인별%20대시보드.xlsx"
+file_url_template = "https://github.com/ucarsystem/driver_dashboard/raw/main/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
 
 # 파일이 없거나 손상된 경우 다운로드
 def download_excel():
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
         with st.spinner("데이터 파일 다운로드 중..."):
-            response = requests.get(file_url)
+            response = requests.get(file_url_template)
             with open(file_path, "wb") as f:
                 f.write(response.content)
         st.success("파일 다운로드 완료!")
@@ -45,21 +86,6 @@ def load_excel():
         return None
 
 df_final = load_excel()
-
-
-# Streamlit UI 구성
-st.title("🚗 운전자별 대시보드")
-company_input = st.text_input("운수사를 입력하세요")
-user_id_input = st.text_input("운전자 ID를 입력하세요")
-st.markdown("""
-    <a href='https://driverid-xgkps9rbvh4iph8yrcvovb.streamlit.app/' target='_blank' 
-    style='display: inline-block; padding: 10px 20px; background-color: green; color: white; font-weight: bold; 
-    text-align: center; text-decoration: none; border-radius: 5px;'>ID 조회하기</a>
-""", unsafe_allow_html=True)
-user_name_input = st.text_input("운전자 이름을 입력하세요")
-
-year_input = st.text_input("년도를 입력하세요 (예: 24)")
-month_input = st.text_input("월을 입력하세요 (예: 02)")
 
 if st.button("조회하기") and company_input and user_id_input and user_name_input and year_input and month_input:
     file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
