@@ -14,6 +14,8 @@ font_prop = fm.FontProperties(fname=font_path)
 plt.rc('font', family=font_prop.get_name())  # Windows의 경우
 plt.rc('axes', unicode_minus=False)
 
+base_dir = os.path.dirname(os.path.abspath(__file__))  
+
 # 파일 다운로드 경로
 file_dir = "./file"
 file_image_dir = "./"
@@ -201,6 +203,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             
             st.subheader(f"📉 {bc5}월 vs {ba5}월 비교")
+            st.write(f"엑셀 파일 경로: {base_dir}")
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
             image_path = os.path.join(file_image_dir, f"g2/{final_code}.png")
