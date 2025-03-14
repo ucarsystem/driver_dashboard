@@ -16,6 +16,7 @@ plt.rc('axes', unicode_minus=False)
 
 # 파일 다운로드 경로
 file_dir = "./file"
+file_image_dir = "./"
 file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
 
 def load_excel(file_path):
@@ -42,7 +43,7 @@ filtered_companies = [c for c in company_list if company_input in c] if len(comp
 
 if filtered_companies:
     company_input = st.selectbox("운수사를 선택하세요", filtered_companies, index=0)
-    
+
 user_id_input = st.text_input("운전자 ID를 입력하세요")
 st.markdown("""
     <a href='https://driverid-xgkps9rbvh4iph8yrcvovb.streamlit.app/' target='_blank' 
@@ -204,7 +205,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.subheader(f"📉 {bc5}월 vs {ba5}월 비교")
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path = os.path.join("g2", f"{final_code}.png")
+            image_path = os.path.join(file_image_dir, f"g2/{final_code}.png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path):
