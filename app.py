@@ -68,7 +68,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_final.iloc[5, 34] = user_id_input  # AI6 운전자id
             df_final.iloc[5, 35] = user_name_input  # AJ6 운전자명
             # 데이터 가져오기 (데이터 정의)
-            final_code = f"{company_input}&{user_id_input}&{user_name_input}" #AK6 운수사&운전자id&운전자명
+            final_code = f"{company_input}{user_id_input}{user_name_input}" #AK6 운수사&운전자id&운전자명
             user_grade = df_final.iloc[11, 33]  # AH12 이달의 등급
 
             vehicle_columns = df_final.iloc[17, 39:50].tolist() #차량별 항목별 수치
