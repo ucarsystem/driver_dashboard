@@ -193,38 +193,38 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.subheader("📊 노선 내 나의 수치")
 
                 # g1 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path = os.path.join("g1", f"{final_code}.png")
+            image_path1 = os.path.join("g1", f"{final_code}.png")
 
                 # 이미지 불러오기
-            if os.path.exists(image_path):
-                st.image(image_path, caption=f"{user_name_input}({user_id_input})님의 노선 내 수치", use_container_width=True)
+            if os.path.exists(image_path1):
+                st.image(image_path1, caption=f"{user_name_input}({user_id_input})님의 노선 내 수치", use_container_width=True)
             else:
-                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path}")
+                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path1}")
 
             
             st.subheader(f"📉 {bc5}월 vs {ba5}월 비교")
             st.write(f"엑셀 파일 경로: {base_dir}")
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path = os.path.join(file_image_dir, f"g2/{final_code}.png")
+            image_path2 = os.path.join("g2(전달내비교)", f"{final_code}.png")
 
                 # 이미지 불러오기
-            if os.path.exists(image_path):
-                st.image(image_path, caption=f"{user_name_input}({user_id_input})님의 전월대비 수치 비교", use_container_width=True)
+            if os.path.exists(image_path2):
+                st.image(image_path2, caption=f"{user_name_input}({user_id_input})님의 전월대비 수치 비교", use_container_width=True)
             else:
-                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path}")
+                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path2}")
 
 
             
             st.subheader(f"📅 나만의 등급 달력_{ba5}월")
                 # g3 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path = os.path.join("g3", f"{final_code}.png")
+            image_path3 = os.path.join("g3", f"{final_code}.png")
 
                 # 이미지 불러오기
-            if os.path.exists(image_path):
-                st.image(image_path, caption=f"{user_name_input}({user_id_input})님의 이번달 등급 달력", use_container_width=True)
+            if os.path.exists(image_path3):
+                st.image(image_path3, caption=f"{user_name_input}({user_id_input})님의 이번달 등급 달력", use_container_width=True)
             else:
-                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path}")
+                st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path3}")
             
             
             st.subheader("📊 월별 등급 추이")
