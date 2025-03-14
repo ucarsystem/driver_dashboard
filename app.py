@@ -38,11 +38,9 @@ else:
 
 # Streamlit UI 구성
 st.title("🚗 운전자별 대시보드")
-company_input = st.text_input("운수사를 입력하세요")
-filtered_companies = [c for c in company_list if company_input in c] if len(company_input) >= 2 else []
 
-if filtered_companies:
-    company_input = st.selectbox("운수사를 선택하세요", filtered_companies, index=0)
+#운수사목록
+company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
 
 user_id_input = st.text_input("운전자 ID를 입력하세요")
 st.markdown("""
