@@ -192,8 +192,38 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             
             st.subheader("📊 노선 내 나의 수치")
 
-                # g1 폴더 내 AK6 이름의 PNG 파일 경로
+                # g1 폴더 내 AK6(운수사&운전자id&운전자이름) 이름의 PNG 파일 경로 
             image_path1 = os.path.join("g1(노선내)", f"{final_code}.png")
+
+            route_avg = [98, 1.0, 41.2, 0.41, 15.24]  # 노선 평균 (AO6, AQ6, AR6, AS6, AT6)
+            my_stats = [87, 0.7, 39.5, 0.32, 30.57]  # 내 수치 (AO7, AQ7, AR7, AS7, AT7)
+            labels = ["달성율", "웜업", "공회전", "급가속", "급감속"]
+            x = np.arange(len(labels))
+            fig, ax = plt.subplots(figsize=(12, 3))  # 가로로 길게 설정
+            bar_width = 0.35  # 막대 너비 조정
+            colors = ["gray", "darkblue"]  # 노선 평균 (회색), 내 수치 (남색)
+
+            # 노선 평균 (회색)
+            bars1 = ax.bar(x - bar_width/2, route_avg, bar_width, label="노선평균", color=colors[0])
+
+            # 내 수치 (남색)
+            bars2 = ax.bar(x + bar_width/2, my_stats, bar_width, label="내 수치", color=colors[1])
+
+            # 상단에 수치 추가
+            for bar1, bar2, value1, value2 in zip(bars1, bars2, route_avg, my_stats):
+                ax.text(bar1.get_x() + bar1.get_width()/2, bar1.get_height(), f"{value1:.1f}", ha='center', va='bottom', fontsize=10, color="black")
+                ax.text(bar2.get_x() + bar2.get_width()/2, bar2.get_height(), f"{value2:.1f}", ha='center', va='bottom', fontsize=10, color="black")
+
+            # 그래프 설정
+            ax.set_xticks(x)
+            ax.set_xticklabels(labels, fontsize=12)
+            ax.legend()
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+
+            # Streamlit에서 그래프 표시
+            st.pyplot(fig)
+            
 
                 # 이미지 불러오기
             if os.path.exists(image_path1):
@@ -202,7 +232,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path1}")
 
             
-            st.subheader(f"📉 {bc5}월 vs {ba5}월 비교")
+            st.subheader(f"📉 {bc5}월 vs {ba5}월 비교") #전월 vs 이번월
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
             image_path2 = os.path.join("g2(전달내비교)", f"{final_code}.png")
