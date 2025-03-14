@@ -24,11 +24,25 @@ def load_excel(file_path):
     except Exception as e:
         st.error(f"엑셀 파일을 불러오는 중 오류 발생: {e}")
         return None
+    
+# 📂 운수사 목록 파일 불러오기
+company_file_path = os.path.join(file_dir, "company_info.xlsx")
+
+if os.path.exists(company_file_path):
+    df_company = pd.read_excel(company_file_path, header=None)
+    company_list = df_company[0].dropna().tolist()  # 운수사 리스트 생성
+else:
+    company_list = []
 
 
 # Streamlit UI 구성
 st.title("🚗 운전자별 대시보드")
 company_input = st.text_input("운수사를 입력하세요")
+filtered_companies = [c for c in company_list if company_input in c] if len(company_input) >= 2 else []
+
+if filtered_companies:
+    company_input = st.selectbox("운수사를 선택하세요", filtered_companies, index=0)
+    
 user_id_input = st.text_input("운전자 ID를 입력하세요")
 st.markdown("""
     <a href='https://driverid-xgkps9rbvh4iph8yrcvovb.streamlit.app/' target='_blank' 
@@ -53,7 +67,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_final.iloc[5, 34] = user_id_input  # AI6 운전자id
             df_final.iloc[5, 35] = user_name_input  # AJ6 운전자명
             # 데이터 가져오기 (데이터 정의)
-            final_code = company_input&user_id_input&user_name_input #AK6 운수사&운전자id&운전자명
+            final_code = f"{company_input}&{user_id_input}&{user_name_input}" #AK6 운수사&운전자id&운전자명
             user_grade = df_final.iloc[11, 33]  # AH12 이달의 등급
 
             vehicle_columns = df_final.iloc[17, 39:50].tolist() #차량별 항목별 수치
