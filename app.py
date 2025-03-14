@@ -53,7 +53,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_final.iloc[5, 34] = user_id_input  # AI6 운전자id
             df_final.iloc[5, 35] = user_name_input  # AJ6 운전자명
             # 데이터 가져오기 (데이터 정의)
-            final_code = df_final.iloc[5, 36] #AK6 운수사&운전자id&운전자명
+            final_code = company_input&user_id_input&user_name_input #AK6 운수사&운전자id&운전자명
             user_grade = df_final.iloc[11, 33]  # AH12 이달의 등급
 
             vehicle_columns = df_final.iloc[17, 39:50].tolist() #차량별 항목별 수치
@@ -82,7 +82,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 <div style='font-size: 24px; font-weight: bold;'>
                     <b>{user_name_input}({user_id_input})</b><br>
                     <span style='font-size: 22px;'>소속: <b>{company_input}</b></span><br>
-                    <span style='color: {'green' if user_grade in ['S', 'A'] else 'blue' if user_grade in ['C', 'D'] else 'red'};
+                    <span style='color: {'green' if user_grade in ['S', 'A'] else '#003366' if user_grade in ['C', 'D'] else 'red'};
                     font-size: 60px; font-weight: bold;'>{user_grade}</span><br>
                     <small style='font-size: 20px;'>이달의 등급</small>
                 </div>
@@ -126,7 +126,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             
             # 추가 조건에 따른 멘트 생성
             grade_target = "C" if ap12 in ["F", "D"] else "B" if ap12 == "C" else "A" if ap12 == "B" else "S"
-            grade_color = "green" if grade_target in ["S", "A"] else "blue" if grade_target in ["B", "C"] else "red"
+            grade_color = "green" if grade_target in ["S", "A"] else "#003366" if grade_target in ["B", "C"] else "red"
 
             additional_text = f"""
             <br>
@@ -164,7 +164,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             vehicle_data["달성율"] = vehicle_data["달성율"].astype(float).apply(lambda x: f"{x * 100:.0f}%")
 
             def highlight_grade(val):
-                color = "green" if val in ["S", "A"] else "blue" if val in ["C", "D"] else "red"
+                color = "green" if val in ["S", "A"] else "#003366" if val in ["C", "D"] else "red"
                 return f'color: {color}; font-weight: bold'
             
             st.dataframe(vehicle_data.style.applymap(highlight_grade, subset=["등급"])\
@@ -228,7 +228,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             #등급별 색깔 함수
             def get_grade_color(grade):
-                return "green" if grade in ["S","A"] else "blue" if grade in ["B", "C"] else "red"
+                return "green" if grade in ["S","A"] else "#003366" if grade in ["B", "C"] else "red"
 
 
             grade_trend_html = f"""
