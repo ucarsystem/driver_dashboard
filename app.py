@@ -193,7 +193,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.subheader("📊 노선 내 나의 수치")
 
                 # g1 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path1 = os.path.join("g1", f"{final_code}.png")
+            image_path1 = os.path.join("g1(노선내)", f"{final_code}.png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path1):
@@ -203,7 +203,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             
             st.subheader(f"📉 {bc5}월 vs {ba5}월 비교")
-            st.write(f"엑셀 파일 경로: {base_dir}")
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
             image_path2 = os.path.join("g2(전달내비교)", f"{final_code}.png")
@@ -218,7 +217,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             
             st.subheader(f"📅 나만의 등급 달력_{ba5}월")
                 # g3 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path3 = os.path.join("g3", f"{final_code}.png")
+            image_path3 = os.path.join("g3(달력)", f"{final_code}.png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path3):
