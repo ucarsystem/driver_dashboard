@@ -55,6 +55,10 @@ user_name_input = st.text_input("운전자 이름을 입력하세요")
 year_input = st.text_input("년도를 입력하세요 (예: 24)")
 month_input = st.text_input("월을 입력하세요 (예: 02)")
 
+#월 1자리만 입력했을때 앞에 0 추가
+if month_input:
+    month_input = month_input.zfill(2)
+
 
 if st.button("조회하기") and company_input and user_id_input and user_name_input and year_input and month_input:
     file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
@@ -82,13 +86,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             calendar_data = df_final.iloc[6:16, 51:57]  # AZ7:AF16
             grade_trend = df_final.iloc[22:25, 51:57]  # AZ23:BB25
             
+            code_company = df_final.iloc[20, 35] #운수사코드드.운수사
             st.markdown("<hr style='border:3px solid orange'>", unsafe_allow_html=True)
             
             #출력시작
             col1, col2 = st.columns([1, 3], gap='large')
             with col1 :
-                if os.path.exists("프로필.png"):
-                    st.image("프로필.png", width=150)
+                if os.path.exists("프로필.jpg"):
+                    st.image("프로필.jpg", width=150)
                 else:
                     st.image("https://via.placeholder.com/150", width=150)
 
@@ -189,11 +194,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 {'selector': 'td', 'props': [('text-align', 'center')]}
             ]), hide_index=True)
 
-            
+
             st.subheader("📊 노선 내 나의 수치")
 
                 # g1 폴더 내 AK6(운수사&운전자id&운전자이름) 이름의 PNG 파일 경로 
-            image_path1 = os.path.join("g1(노선내)", f"{final_code}.png")
+            image_path1 = os.path.join("노선내수치", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
 
             route_avg = [98, 1.0, 41.2, 0.41, 15.24]  # 노선 평균 (AO6, AQ6, AR6, AS6, AT6)
             my_stats = [87, 0.7, 39.5, 0.32, 30.57]  # 내 수치 (AO7, AQ7, AR7, AS7, AT7)
@@ -235,7 +240,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.subheader(f"📉 {bc5}월 vs {ba5}월 비교") #전월 vs 이번월
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path2 = os.path.join("g2(전달내비교)", f"{final_code}.png")
+            image_path2 = os.path.join("전월비교", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path2):
@@ -247,7 +252,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             
             st.subheader(f"📅 나만의 등급 달력_{ba5}월")
                 # g3 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path3 = os.path.join("g3(달력)", f"{final_code}.png")
+            image_path3 = os.path.join("달력이미지", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path3):
