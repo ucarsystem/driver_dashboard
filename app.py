@@ -86,14 +86,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             calendar_data = df_final.iloc[6:16, 51:57]  # AZ7:AF16
             grade_trend = df_final.iloc[22:25, 51:57]  # AZ23:BB25
             
-            code_company = df_final.iloc[20, 35] #운수사코드드.운수사
+            code_company = df_final.iloc[21, 35] #운수사코드.운수사
             st.markdown("<hr style='border:3px solid orange'>", unsafe_allow_html=True)
             
             #출력시작
             col1, col2 = st.columns([1, 3], gap='large')
             with col1 :
-                if os.path.exists("프로필.jpg"):
-                    st.image("프로필.jpg", width=150)
+                if os.path.exists("프로필.png"):
+                    st.image("프로필.png", width=150)
                 else:
                     st.image("https://via.placeholder.com/150", width=150)
 
