@@ -38,7 +38,7 @@ else:
     company_list = []
 
 #운수사 코드
-df_code = pd.read_excel(company_file_path, sheet_name="code", header=None)
+df_code = pd.read_excel(company_file_path, sheet_name="code")
 
 ##함수
 
