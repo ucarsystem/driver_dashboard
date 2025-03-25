@@ -192,14 +192,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             # past_idle = f"{round(past_idle),2}%"
             #전달 급감속
             past_sa = get_driver_info_from_sheet(file_path, final_code, past_code1, "급감속")
-            past_sa = round(past_sa, 2)
+            #past_sa = round(past_sa, 2)
 
             #이번달 공회전
             this_idle = get_driver_info_from_sheet(file_path, final_code, this_code, "공회전")
             # this_idle = f"{round(this_idle),2}%"
             #이번달 급감속
             this_sa = get_driver_info_from_sheet(file_path, final_code, this_code, "급감속")
-            this_sa = round(this_sa, 2)
+            #this_sa = round(this_sa, 2)
 
             # ao11 = df_final.iloc[10, 40]  # AO11(전달달성율)
             # ao12 = df_final.iloc[11, 40]  # AO12(이번달달성율)
