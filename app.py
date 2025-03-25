@@ -181,11 +181,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             # bc5 = df_final.iloc[4, 54]  # BC5(전달)
 
             past_percent1 = get_driver_info_from_sheet(file_path, final_code, past_code1, "달성율")
-            past_percent1 = f"{round(past_percent1 * 100)}%" #전월 달성율
+            past_percent1 = f"{round(past_percent1 * 100, 0)}%" #전월 달성율
             this_percent = get_driver_info_from_sheet(file_path, final_code, this_code, "달성율")
-            this_percent = f"{round(this_percent * 100)}%" #이번달 달성율
+            this_percent = f"{round(this_percent * 100, 0)}%" #이번달 달성율
             past_percent2 = get_driver_info_from_sheet(file_path, final_code, past_code2, "달성율")
-            past_percent2 = f"{round(past_percent2 * 100)}%" #전전월 달성율
+            past_percent2 = f"{round(past_percent2 * 100, 0)}%" #전전월 달성율
 
             #전달 공회전
             past_idle = get_driver_info_from_sheet(file_path, final_code, past_code1, "공회전")
