@@ -189,17 +189,17 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             #전달 공회전
             past_idle = get_driver_info_from_sheet(file_path, final_code, past_code1, "공회전")
-            # past_idle = f"{round(past_idle),2}%"
+            past_idle =  "-" if past_idle == "-" else f"{round(float(past_idle),2)}%"
             #전달 급감속
             past_sa = get_driver_info_from_sheet(file_path, final_code, past_code1, "급감속")
-            #past_sa = round(past_sa, 2)
+            past_sa = "-" if past_sa == "-" else f"{round(float(past_sa),2)}"
 
             #이번달 공회전
             this_idle = get_driver_info_from_sheet(file_path, final_code, this_code, "공회전")
-            # this_idle = f"{round(this_idle),2}%"
+            this_idle = "-" if this_idle == "-" else f"{round(float(this_idle),2)}%"
             #이번달 급감속
             this_sa = get_driver_info_from_sheet(file_path, final_code, this_code, "급감속")
-            #this_sa = round(this_sa, 2)
+            this_sa = "-" if this_sa == "-" else f"{round(float(this_sa),2)}"
 
             # ao11 = df_final.iloc[10, 40]  # AO11(전달달성율)
             # ao12 = df_final.iloc[11, 40]  # AO12(이번달달성율)
@@ -213,7 +213,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 <div>
                 <p style='font-size: 15px;'>
                     ● 연비등급: {this_month}월 (<b>{user_grade}</b>)등급 <br>
-                    ● 목표달성율: {this_month}월 ({round(this_percent, 0)}%) <br>
+                    ● 목표달성율: {this_month}월 ({this_percent}) <br>
                     ● 공회전: {this_month}월 ({this_idle}) <br>
                     <b><span style='background-color: yellow;'>● 급감속: {this_month}월 ({this_sa})회/100km당  </span></b> <br>
                 </p>
@@ -224,7 +224,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 <div>
                 <p style='font-size: 15px;'>
                     ● 연비등급: {past_month1}월 (<b>{past_grade1}</b>)등급 -> {this_month}월 (<b>{user_grade}</b>)등급 <br>  
-                    ● 목표달성율: {past_month1}월 ({round(past_percent1, 0)}%) -> {this_month}월 ({round(this_percent, 0)}%)  <br>
+                    ● 목표달성율: {past_month1}월 ({past_percent1}) -> {this_month}월 ({this_percent})  <br>
                     ● 공회전: {past_month1}월 ({past_idle}) -> {this_month}월 ({this_idle}) <br>
                     <b><span style='background-color: yellow;'>● 급감속: {past_month1}월 ({past_sa})회/100km당 -> {this_month}월 ({this_sa})회/100km당  </span></b><br>
                 </p>
