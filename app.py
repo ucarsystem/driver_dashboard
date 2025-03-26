@@ -7,6 +7,7 @@ import matplotlib.font_manager as fm
 import numpy as np
 import matplotlib as mpl 
 import matplotlib.pyplot as plt 
+from openpyxl import load_workbook
 
 # 한글 폰트 설정
 font_path = fm.findfont(fm.FontProperties(family='Malgun Gothic'))
@@ -24,19 +25,33 @@ def load_excel(path):
     except Exception as e:
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
+    
+# 📌 엑셀 AH6~AJ6 직접 수정 함수 (openpyxl 사용)
+def update_excel_values(file_path, company_input, user_id_input, user_name_input):
+    try:
+        wb = load_workbook(file_path)
+        ws = wb["최종(개인별)"]
+        ws["AH6"] = company_input
+        ws["AI6"] = user_id_input
+        ws["AJ6"] = user_name_input
+        wb.save(file_path)
+        return True
+    except Exception as e:
+        st.error(f"엑셀 수정 중 오류 발생: {e}")
+        return False
 
 # 운전자 정보 추출 함수
-def get_driver_info(path, code, month_code, info):
-    try:
-        df = pd.read_excel(path, sheet_name="운전자별")
-        key = code + str(month_code)
-        row = df[df.iloc[:, 1] == key]
-        if row.empty:
-            return "-"
-        col_map = {"달성율": 22, "등급": 23, "웜업": 39, "공회전": 40, "급가속": 43, "급감속": 44}
-        return row.iloc[0, col_map.get(info, -1)] if col_map.get(info) else "-"
-    except:
-        return "-"
+# def get_driver_info(path, code, month_code, info):
+#     try:
+#         df = pd.read_excel(path, sheet_name="운전자별")
+#         key = code + str(month_code)
+#         row = df[df.iloc[:, 1] == key]
+#         if row.empty:
+#             return "-"
+#         col_map = {"달성율": 22, "등급": 23, "웜업": 39, "공회전": 40, "급가속": 43, "급감속": 44}
+#         return row.iloc[0, col_map.get(info, -1)] if col_map.get(info) else "-"
+#     except:
+#         return "-"
     
 # 📂 운수사 목록 불러오기
 company_file = os.path.join(file_dir, "company_info.xlsx")
@@ -68,30 +83,34 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     file_path = os.path.join(file_dir, file_name)
 
     if os.path.exists(file_path):
-        df_final = load_excel(file_path)
+        update_success = update_excel_values(file_path, company_input, user_id_input, user_name_input)
+        df_final = pd.read_excel(file_path, sheet_name="최종(개인별)", header=None) if update_success else None
+
         if df_final is not None:
+
+
 
             # df_final.iloc[5, 33] = company_input  # AH6 운수사
             # df_final.iloc[5, 34] = user_id_input  # AI6 운전자id
             # df_final.iloc[5, 35] = user_name_input  # AJ6 운전자명
             # 데이터 가져오기 (데이터 정의)
             final_code = f"{company_input}{user_id_input}{user_name_input}" #AK6 운수사&운전자id&운전자명
-            df_final.iloc[5, 33:36] = [company_input, user_id_input, user_name_input]
 
             # 년월 코드
             this_code = df_final.iloc[2,52] #이번년월
             past_code1 = df_final.iloc[23,50] #저번달년월
             past_code2 = df_final.iloc[22,50] #2달전년월
 
-            user_grade = get_driver_info(file_path, final_code, this_code, "등급") #이번달 등급
-
-            #user_grade = df_final.iloc[11, 33]  # AH12 이달의 등급
+            user_grade = df_final.iloc[24, 52]
+            # user_grade = get_driver_info(file_path, final_code, this_code, "등급") #이번달 등급
 
             #차량+운전자별 시트 (차량별항목별수치)
-            df_vehicle = pd.read_excel(file_path, sheet_name = "차량+운전자별", header=None)
-            search_key = final_code+str(this_code)
-            vehicle_data = df_vehicle[df_vehicle.iloc[:, 37] == search_key].iloc[:, [4,5,6,12,38,39,42,43,14,32,33]].reset_index(drop=True)
+
+            # df_vehicle = pd.read_excel(file_path, sheet_name = "차량+운전자별", header=None)
+            # search_key = final_code+str(this_code)
+            # vehicle_data = df_vehicle[df_vehicle.iloc[:, 37] == search_key].iloc[:, [4,5,6,12,38,39,42,43,14,32,33]].reset_index(drop=True)
             vehicle_columns = df_final.iloc[17, 39:50].tolist() #차량별 항목별 수치
+            vehicle_data = df_final.iloc[18:28, 39:50].copy()
             vehicle_data.columns = vehicle_columns  # AN18:AX28
 
             # matched_rows = df_vehicle[df_vehicle.iloc[:,37]==search_key]
@@ -141,9 +160,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.markdown("### <📝종합 평가>")
 
             #전달등급
-            past_grade1 = get_driver_info(file_path, final_code, past_code1, "등급")
+            # past_grade1 = get_driver_info(file_path, final_code, past_code1, "등급")
+            past_grade1 = df_final.iloc[10, 41]
             #전전달등급
-            past_grade2 = get_driver_info(file_path, final_code, past_code2, "등급")
+            # past_grade2 = get_driver_info(file_path, final_code, past_code2, "등급")
+            past_grade2 = df_final.iloc[22, 52]
             # ap11 = df_final.iloc[10, 41]  # AP11(전달등급)
             # ap12 = df_final.iloc[11, 41]  # AP12(이번달등급)
             this_month = int(month_input) #이번달
@@ -153,21 +174,31 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             # ba5 = df_final.iloc[4, 52]  # BA5(이번달)
             # bc5 = df_final.iloc[4, 54]  # BC5(전달)
-            percent_format = lambda val: "-" if val == "-" else f"{round(val * 100, 0)}%"
-            past_percent1 = percent_format(get_driver_info(file_path, final_code, past_code1, "달성율"))
-            this_percent = percent_format(get_driver_info(file_path, final_code, this_code, "달성율"))
-            past_percent2 = percent_format(get_driver_info(file_path, final_code, past_code2, "달성율"))
+            # percent_format = lambda val: "-" if val == "-" else f"{round(val * 100, 0)}%"
+            # past_percent1 = percent_format(get_driver_info(file_path, final_code, past_code1, "달성율"))
+            # this_percent = percent_format(get_driver_info(file_path, final_code, this_code, "달성율"))
+            # past_percent2 = percent_format(get_driver_info(file_path, final_code, past_code2, "달성율"))
+
+            past_percent1 = f"{round(df_final.iloc[23, 53] * 100)}%"
+            this_percent = f"{round(df_final.iloc[24, 53] * 100)}%"
+            past_percent2 = f"{round(df_final.iloc[22, 53] * 100)}%"
 
             value_format = lambda val, unit="": "-" if val == "-" else f"{round(float(val),2)}{unit}"
             #전달 공회전
-            past_idle = value_format(get_driver_info(file_path, final_code, past_code1, "공회전"), "%")
-            #전달 급감속
-            past_sa = value_format(get_driver_info(file_path, final_code, past_code1, "급감속"))
+            # past_idle = value_format(get_driver_info(file_path, final_code, past_code1, "공회전"), "%")
+            # #전달 급감속
+            # past_sa = value_format(get_driver_info(file_path, final_code, past_code1, "급감속"))
 
-            #이번달 공회전
-            this_idle = value_format(get_driver_info(file_path, final_code, this_code, "공회전"), "%")
-            #이번달 급감속
-            this_sa = value_format(get_driver_info(file_path, final_code, this_code, "급감속"))
+            # #이번달 공회전
+            # this_idle = value_format(get_driver_info(file_path, final_code, this_code, "공회전"), "%")
+            # #이번달 급감속
+            # this_sa = value_format(get_driver_info(file_path, final_code, this_code, "급감속"))
+            past_idle = value_format(df_final.iloc[10, 43], "%")
+            past_sa = value_format(df_final.iloc[10, 45])
+            this_idle = value_format(df_final.iloc[11, 43], "%")
+            this_sa = value_format(df_final.iloc[11, 45])
+
+
 
             if past_grade1 in ['이상', '-']:
                 evaluation_text = f"""
@@ -274,7 +305,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             # # Streamlit에서 그래프 표시
             # st.pyplot(fig)
             
-            image_path1 = os.path.join("노선내수치", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
+            image_path1 = os.path.join("노선내비교교", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
                 # 이미지 불러오기
             if os.path.exists(image_path1):
                 st.image(image_path1, caption=f"{user_name_input}({user_id_input})님의 노선 내 수치", use_container_width=True)
@@ -285,7 +316,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.subheader(f"📉 {past_month1}월 vs {this_month}월 비교") #전월 vs 이번월
 
                 # g2 폴더 내 AK6 이름의 PNG 파일 경로
-            image_path2 = os.path.join("전월비교", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
+            image_path2 = os.path.join("전월대비", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
 
                 # 이미지 불러오기
             if os.path.exists(image_path2):
@@ -301,7 +332,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
                 # 이미지 불러오기
             if os.path.exists(image_path3):
-                st.image(image_path3, caption=f"{user_name_input}({user_id_input})님의 이번달 등급 달력", use_container_width=True)
+                st.image(image_path3, caption=f"{user_name_input}({user_id_input})님의 이번달 등급 달력", width=600)
             else:
                 st.warning(f"이미지 파일을 찾을 수 없습니다: {image_path3}")
             
