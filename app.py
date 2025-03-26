@@ -91,6 +91,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_vehicle = pd.read_excel(file_path, sheet_name = "차량+운전자별", header=None)
             search_key = final_code+str(this_code)
             vehicle_data = df_vehicle[df_vehicle.iloc[:, 37] == search_key].iloc[:, [4,5,6,12,38,39,42,43,14,32,33]].reset_index(drop=True)
+            vehicle_columns = df_final.iloc[17, 39:50].tolist() #차량별 항목별 수치
+            vehicle_data.columns = vehicle_columns  # AN18:AX28
 
             # matched_rows = df_vehicle[df_vehicle.iloc[:,37]==search_key]
 
@@ -187,7 +189,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                     <b><span style='background-color: yellow;'>● 급감속: {past_month1}월 ({past_sa})회/100km당 -> {this_month}월 ({this_sa})회/100km당  </span></b><br>
                 </p>
                 </div>"""
-                
+
             st.markdown(evaluation_text, unsafe_allow_html=True)
             
             # 추가 조건에 따른 멘트 생성
