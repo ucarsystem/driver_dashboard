@@ -174,14 +174,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             # ba5 = df_final.iloc[4, 52]  # BA5(이번달)
             # bc5 = df_final.iloc[4, 54]  # BC5(전달)
-            # percent_format = lambda val: "-" if val == "-" else f"{round(val * 100, 0)}%"
+            percent_format = lambda val: "-" if val == "-" else f"{round(val * 100, 0)}%"
             # past_percent1 = percent_format(get_driver_info(file_path, final_code, past_code1, "달성율"))
             # this_percent = percent_format(get_driver_info(file_path, final_code, this_code, "달성율"))
             # past_percent2 = percent_format(get_driver_info(file_path, final_code, past_code2, "달성율"))
 
-            past_percent1 = f"{round(df_final.iloc[23, 53] * 100)}%"
-            this_percent = f"{round(df_final.iloc[24, 53] * 100)}%"
-            past_percent2 = f"{round(df_final.iloc[22, 53] * 100)}%"
+            past_percent1 = percent_format(df_final.iloc[23, 53] * 100)
+            this_percent = percent_format(df_final.iloc[24, 53] * 100)
+            past_percent2 = percent_format(df_final.iloc[22, 53] * 100)
 
             value_format = lambda val, unit="": "-" if val == "-" else f"{round(float(val),2)}{unit}"
             #전달 공회전
@@ -276,34 +276,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             st.subheader("📊 노선 내 나의 수치")
 
-            # route_avg = [98, 1.0, 41.2, 0.41, 15.24]  # 노선 평균 (AO6, AQ6, AR6, AS6, AT6)
-            # my_stats = [87, 0.7, 39.5, 0.32, 30.57]  # 내 수치 (AO7, AQ7, AR7, AS7, AT7)
-            # labels = ["달성율", "웜업", "공회전", "급가속", "급감속"]
-            # x = np.arange(len(labels))
-            # fig, ax = plt.subplots(figsize=(12, 3))  # 가로로 길게 설정
-            # bar_width = 0.35  # 막대 너비 조정
-            # colors = ["gray", "darkblue"]  # 노선 평균 (회색), 내 수치 (남색)
-
-            # # 노선 평균 (회색)
-            # bars1 = ax.bar(x - bar_width/2, route_avg, bar_width, label="노선평균", color=colors[0])
-
-            # # 내 수치 (남색)
-            # bars2 = ax.bar(x + bar_width/2, my_stats, bar_width, label="내 수치", color=colors[1])
-
-            # # 상단에 수치 추가
-            # for bar1, bar2, value1, value2 in zip(bars1, bars2, route_avg, my_stats):
-            #     ax.text(bar1.get_x() + bar1.get_width()/2, bar1.get_height(), f"{value1:.1f}", ha='center', va='bottom', fontsize=10, color="black")
-            #     ax.text(bar2.get_x() + bar2.get_width()/2, bar2.get_height(), f"{value2:.1f}", ha='center', va='bottom', fontsize=10, color="black")
-
-            # # 그래프 설정
-            # ax.set_xticks(x)
-            # ax.set_xticklabels(labels, fontsize=12)
-            # ax.legend()
-            # ax.spines['top'].set_visible(False)
-            # ax.spines['right'].set_visible(False)
-
-            # # Streamlit에서 그래프 표시
-            # st.pyplot(fig)
             
             image_path1 = os.path.join("노선내비교교", f"{year_input}{month_input}/{code_company}/{user_name_input}({user_id_input}).png")
                 # 이미지 불러오기
