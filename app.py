@@ -30,19 +30,6 @@ def load_excel(path):
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
     
-# 📌 엑셀 AH6~AJ6 직접 수정 함수 (openpyxl 사용)
-def update_excel_values(file_path, company_input, user_id_input, user_name_input):
-    try:
-        wb = load_workbook(file_path)
-        ws = wb["최종(개인별)"]
-        ws["AH6"] = company_input
-        ws["AI6"] = user_id_input
-        ws["AJ6"] = user_name_input
-        wb.save(file_path)
-        return True
-    except Exception as e:
-        st.error(f"엑셀 수정 중 오류 발생: {e}")
-        return False
     
 # 📂 운수사 목록 불러오기
 company_file = os.path.join(file_dir, "company_info.xlsx")
@@ -72,8 +59,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     file_path = os.path.join(file_dir, file_name)
 
     if os.path.exists(file_path):
-        update_success = update_excel_values(file_path, company_input, user_id_input, user_name_input)
-        df_final = pd.read_excel(file_path, sheet_name="최종(개인별)", header=None) if update_success else None
+        df_final = load_excel(file_path)
 
         if df_final is not None:
 
