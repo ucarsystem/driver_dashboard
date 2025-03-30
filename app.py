@@ -258,8 +258,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     #값 정의
             past_grade1 = df_final.iloc[10, 41]
             past_grade2 = df_final.iloc[22, 52]
-            paste_percent2 = f"{round(df_final.iloc[22, 53] * 100)}%" #전전월 달성율
-            paste_percent1 = f"{round(df_final.iloc[23, 53] * 100)}%" #전월 달성율
+            past_percent2 = f"{round(df_final.iloc[22, 53] * 100)}%" #전전월 달성율
+            past_percent1 = f"{round(df_final.iloc[23, 53] * 100)}%" #전월 달성율
             this_percent = f"{round(df_final.iloc[24, 53] * 100)}%" #이번달 달성율
 
             grade_values = [past_grade2, past_grade1, user_grade]
