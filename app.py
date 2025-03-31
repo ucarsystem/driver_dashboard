@@ -282,7 +282,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                     <div style='font-size: 18px;'>{past_percent1}</div>
                 </div>
                 <div style='background-color: #FFEB3B; padding: 30px; border-radius: 15px; text-align: center; width: 150px; box-shadow: 3px 3px 5px rgba(0,0,0,0.1);'>
-                    <div style='font-size: 18px; font-weight: bold;'>1{this_month}월</div>
+                    <div style='font-size: 18px; font-weight: bold;'>{this_month}월</div>
                     <div style='font-size: 32px; font-weight: bold; color: {get_grade_color(grade_values[2])};'>{grade_values[2]}</div>
                     <div style='font-size: 18px;'>{this_percent}</div>
                 </div>
