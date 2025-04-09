@@ -19,7 +19,7 @@ file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%
 # 엑셀 파일 로드 함수
 def load_excel(path):
     try:
-        return pd.read_excel(path, sheet_name="최종(개인별)", header=None)
+        return pd.read_excel(path, sheet_name="매크로(운전자리스트)", header=None)
     except Exception as e:
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
