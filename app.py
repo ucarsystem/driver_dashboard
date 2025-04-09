@@ -107,7 +107,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         driver_vals = [
             row["이번달웜업비율(%)"] * 100,
             row["이번달공회전비율(%)"] * 100,
-            row["이번달탄력운전 비율(%)"] * 100,
+            row["이번달탄력운전비율(%)"] * 100,
             row["이번달평균연료소모율"],
             row["이번달급가속(회)/100km"],
             row["이번달급감속(회)/100km"]
@@ -115,7 +115,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         avg_vals = [
             row["노선평균웜업비율(%)"] * 100,
             row["노선평균공회전비율(%)"] * 100,
-            row["노선평균탄력운전 비율(%)"] * 100,
+            row["노선평균탄력운전비율(%)"] * 100,
             row["노선평균평균연료소모율"],
             row["노선평균급가속(회)/100km"],
             row["노선평균급감속(회)/100km"]
