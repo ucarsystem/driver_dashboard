@@ -12,7 +12,9 @@ import matplotlib.font_manager as fm
 from openpyxl import load_workbook
 
 # 한글 폰트 설정
-plt.rcParams['font.family'] = 'NanumGothic'
+font_path = './malgun.ttf'  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
+font_prop = fm.FontProperties(fname=font_path)
+plt.rcParams['font.family'] = font_prop.get_name()
 plt.rcParams['axes.unicode_minus'] = False
 
 # 기본 경로 설정
