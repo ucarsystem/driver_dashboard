@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm  
 from openpyxl import load_workbook
 
+# 한글 폰트 설정
+plt.rcParams['font.family'] = 'NanumGothic'
+plt.rcParams['axes.unicode_minus'] = False
 
 # 기본 경로 설정
 file_dir = "./file"
@@ -65,35 +68,73 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         row = filtered.iloc[0]
         st.success(f"✅ 운전자 {user_name_input} (ID: {user_id_input}) 정보 조회 성공")
 
-        st.markdown("---")
-        grade_color = {"S": "🟪", "A": "🟦", "B": "🟩", "C": "🟨", "D": "🟥", "F": "⬛"}
-        grade = row["2502"]
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("이달의 등급", f"{grade_color.get(grade, '')} {grade}")
-        col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
-        col3.metric("연료소모율", f"{round(row['이번달평균연료소모율'], 2)}")
-        col4.metric("탄력운전률", f"{round(row['이번달탄력운전비율(%)'] * 100, 1)}%")
+        # st.markdown("---")
+        # grade_color = {"S": "🟪", "A": "🟦", "B": "🟩", "C": "🟨", "D": "🟥", "F": "⬛"}
+        # grade = row["2502"]
+        # col1, col2, col3, col4 = st.columns(4)
+        # col1.metric("이달의 등급", f"{grade_color.get(grade, '')} {grade}")
+        # col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
+        # col3.metric("연료소모율", f"{round(row['이번달평균연료소모율'], 2)}")
+        # col4.metric("탄력운전률", f"{round(row['이번달탄력운전비율(%)'] * 100, 1)}%")
+
+        # st.markdown("---")
+        # st.subheader("📊 운전 습관 항목별 비교")
+        # indicators = {
+        #     "웜업률(%)": row["이번달웜업비율(%)"] * 100,
+        #     "공회전률(%)": row["이번달공회전비율(%)"] * 100,
+        #     "탄력운전률(%)": row["이번달탄력운전비율(%)"] * 100,
+        #     "급가속(/100km)": row["이번달급가속(회)/100km"],
+        #     "급감속(/100km)": row["이번달급감속(회)/100km"],
+        # }
+
+        # fig, ax = plt.subplots(figsize=(8, 4))
+        # ax.barh(list(indicators.keys()), list(indicators.values()), color='skyblue')
+        # ax.set_xlabel('수치')
+        # ax.set_title('운전자 주요 지표')
+        # st.pyplot(fig)
+
+        # st.markdown("---")
+        # st.subheader("🗣️ 개인 맞춤 피드백")
+        # feedback = row["종함평가"]
+        # st.info(feedback)
 
         st.markdown("---")
-        st.subheader("📊 운전 습관 항목별 비교")
-        indicators = {
-            "웜업률(%)": row["이번달웜업비율(%)"] * 100,
-            "공회전률(%)": row["이번달공회전비율(%)"] * 100,
-            "탄력운전률(%)": row["이번달탄력운전비율(%)"] * 100,
-            "급가속(/100km)": row["이번달급가속(회)/100km"],
-            "급감속(/100km)": row["이번달급감속(회)/100km"],
-        }
+        st.subheader("📊 운전 습관 vs 노선 평균 비교")
+        labels = [
+            "웜업률(%)", "공회전률(%)", "탄력운전률(%)",
+            "연료소모율", "급가속(/100km)", "급감속(/100km)"
+        ]
+        driver_vals = [
+            row["이번달웜업비율(%)"] * 100,
+            row["이번달공회전비율(%)"] * 100,
+            row["이번달탄력운전 비율(%)"] * 100,
+            row["이번달평균연료소모율"],
+            row["이번달급가속(회)/100km"],
+            row["이번달급감속(회)/100km"]
+        ]
+        avg_vals = [
+            row["노선평균웜업비율(%)"] * 100,
+            row["노선평균공회전비율(%)"] * 100,
+            row["노선평균탄력운전 비율(%)"] * 100,
+            row["노선평균평균연료소모율"],
+            row["노선평균급가속(회)/100km"],
+            row["노선평균급감속(회)/100km"]
+        ]
 
-        fig, ax = plt.subplots(figsize=(8, 4))
-        ax.barh(list(indicators.keys()), list(indicators.values()), color='skyblue')
-        ax.set_xlabel('수치')
-        ax.set_title('운전자 주요 지표')
+        fig, ax = plt.subplots(figsize=(8, 5))
+        x = range(len(labels))
+        ax.barh(x, driver_vals, height=0.4, label='운전자', align='center')
+        ax.barh([i + 0.4 for i in x], avg_vals, height=0.4, label='노선 평균', align='center')
+        ax.set_yticks([i + 0.2 for i in x])
+        ax.set_yticklabels(labels)
+        ax.invert_yaxis()
+        ax.legend()
+        ax.set_title("이달 수치 vs 노선 평균 비교")
         st.pyplot(fig)
 
         st.markdown("---")
         st.subheader("🗣️ 개인 맞춤 피드백")
-        feedback = row["종함평가"]
-        st.info(feedback)
+        st.info(row["종함평가"])
 
     else:
             st.warning("데이터를 불러오는 데 실패했습니다.")
