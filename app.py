@@ -266,6 +266,21 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ].sort_values(by="주행거리(km)", ascending=False).head(5)
 
         if not df_vehicle_filtered.empty:
+            df_vehicle_display = df_vehicle_filtered.copy()
+            df_vehicle_display["주행거리(km)"] = df_vehicle_display["주행거리(km)"].apply(lambda x: f"{int(x):,} km")
+            df_vehicle_display["웜업비율(%)"] = df_vehicle_display["웜업비율(%)"].apply(lambda x: f"{x * 100:.2f}%")
+            df_vehicle_display["공회전비율(%)"] = df_vehicle_display["공회전비율(%)"].apply(lambda x: f"{x * 100:.2f}%")
+            df_vehicle_display["급감속(회)/100km"] = df_vehicle_display["급감속(회)/100km"].apply(lambda x: f"{x:.2f}")
+
+            def format_grade(g):
+                color = "green" if g in ["S", "A"] else "#FFD700" if g in ["B", "C"] else "red"
+                return f"<span style='color:{color}; font-weight:bold'>{g}</span>"
+
+            df_vehicle_display["등급"] = df_vehicle_display["등급"].apply(format_grade)
+
+            st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
+            st.markdown("#### 🚗 차량별 요약")
+            st.write(df_vehicle_display[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].to_html(escape=False, index=False), unsafe_allow_html=True)
             st.dataframe(df_vehicle_filtered[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
