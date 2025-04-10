@@ -330,7 +330,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             })
 
             st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
-            st.dataframe(df_vehicle_display)
+            st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
 
@@ -418,7 +418,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
             weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
-            weekly_avg['평균 달성률(%)'] = f"{weekly_avg['평균 달성률(%)'].round(0)}%"
+            weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0).apply(lambda x: f"{int(x)}%")
             
             st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
     else:
