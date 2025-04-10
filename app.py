@@ -140,9 +140,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         cert_display = ""
         if is_cert_24:
-            cert_display += f"""
+            cert_display += """
             <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
-                {st.image('매달.png', width=70)}
+            <img src='매달.png' width='70'>
                 <div>
                     <div style='font-size: 20px; font-weight: bold;'>🏅 24년 우수운전자 인증</div>
                     <div style='color: gray;'>인천시 경제·안전운전 기여</div>
@@ -153,7 +153,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             cert_display += f"""
             <div style='display: flex; align-items: center; gap: 10px;'>
                 <div style='position: relative;'>
-                    {st.image('매달.png', width=70)}
+                    <img src='매달.png' width='70'>
                     <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white;'>80%</div>
                 </div>
                 <div>
@@ -410,7 +410,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
             weekly_avg = grouped.groupby('week')['달성률값'].mean().reset_index()
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
-            weekly_avg['평균 달성률'] = f'{round(weekly_avg['평균 달성률'],0)}%'
+            weekly_avg['평균 달성률(%)'] = f'{round(weekly_avg['평균 달성률(%)'],0)}%'
             st.dataframe(weekly_avg, hide_index=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
