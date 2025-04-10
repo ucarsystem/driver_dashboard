@@ -142,7 +142,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             cert_display += f"""
             <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
-                {st.image('프로필.png', width=70)}
+                {st.image('매달.png', width=70)}
                 <div>
                     <div style='font-size: 20px; font-weight: bold;'>🏅 24년 우수운전자 인증</div>
                     <div style='color: gray;'>인천시 경제·안전운전 기여</div>
@@ -153,7 +153,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             cert_display += f"""
             <div style='display: flex; align-items: center; gap: 10px;'>
                 <div style='position: relative;'>
-                    {st.image('프로필.png', width=70)}
+                    {st.image('매달.png', width=70)}
                     <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white;'>80%</div>
                 </div>
                 <div>
