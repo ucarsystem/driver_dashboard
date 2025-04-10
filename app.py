@@ -104,7 +104,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
         grade_target = "C" if this_grade in ["F", "D"] else "B" if this_grade == "C" else "A" if this_grade == "B" else "S"
-        grade_text_color = "green" if this_grade in ["S", "A"] else "yellow" if this_grade in ["B", "C"] else "red"
+        grade_text_color = "green" if this_grade in ["S", "A"] else "#FFD700" if this_grade in ["B", "C"] else "red"
 
         
         col1, col2, col3, col4 = st.columns(4)
@@ -114,7 +114,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         col4.metric("급감속", f"{round(this_break, 2)}")
 
         # 🚌 추가 정보: 대표 차량 및 노선
-        st.markdown("---")
         st.markdown(f"""
         <div style='display: flex; align-items: center;'>
             <img src='https://img.icons8.com/color/48/bus.png' style='margin-right: 10px;'>
@@ -125,6 +124,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         </div>
         """, unsafe_allow_html=True)
 
+        st.markdown("---")
+
 
         #st.markdown("### <📝종합 평가>")
         st.subheader("🗣️ 개인 맞춤 피드백")
@@ -132,7 +133,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
-        급감속은 <b>매탕 1회 미만!</b><br>
+        이번달 급감속 <b>{this_break}</b> 급감속은 <b>매탕 1회 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
         <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
@@ -141,12 +142,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
-        공회전은 <b>5분 미만!</b><br>
+        이번달 공회전 <b>{this_idle}</b> 공회전은 <b>5분 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
         <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
-        additional_text = idle_text if this_break <5 else  this_break
+        additional_text = idle_text if this_break <5 else  break_text
 
         st.markdown(f"""
         <div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'>
@@ -239,14 +240,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             compare = pd.DataFrame({
                 "지표": ["달성률", "웜업률", "공회전률", "탄력운전률", "급감속"],
                 "전월": [
-                    round(last_percent * 100, 1),
+                    round(last_percent * 100),
                     round(last_warm* 100, 2),
                     round(last_idle * 100, 2),
                     round(row['전월탄력운전비율(%)'] * 100, 2),
                     round(last_break, 2)
                 ],
                 "이달": [
-                    round(this_percent* 100, 1),
+                    round(this_percent* 100),
                     round(this_warm * 100, 2),
                     round(this_idle* 100, 2),
                     round(row['이번달탄력운전비율(%)'] * 100, 2),
@@ -266,7 +267,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ].sort_values(by="주행거리(km)", ascending=False).head(5)
 
         if not df_vehicle_filtered.empty:
-            st.dataframe(df_vehicle_filtered[["노선번호호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
+            st.dataframe(df_vehicle_filtered[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
 
