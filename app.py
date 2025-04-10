@@ -60,6 +60,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     df_vehicle = load_excel(file_path, "차량+운전자별")
     df_monthly = load_excel(file_path, "운전자별")
     df_daily = load_excel(file_path, "일별)차량+운전자")
+    df_cert_24 = load_excel(file_path, "24년 명단")
+    df_cert_25 = load_excel(file_path, "25년 후보자")
 
     # 조건 필터링
     filtered = df[
@@ -104,7 +106,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
         grade_target = "C" if this_grade in ["F", "D"] else "B" if this_grade == "C" else "A" if this_grade == "B" else "S"
-        grade_text_color = "green" if this_grade in ["S", "A"] else "#FFD700" if this_grade in ["B", "C"] else "red"
+        grade_text_color = "green" if this_grade in ["S", "A"] else "orange" if this_grade in ["B", "C"] else "red"
 
         # 🚌 추가 정보: 대표 차량 및 노선
         st.markdown(f"""
@@ -122,6 +124,46 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
         col3.metric("공회전", f"{round(this_idle * 100)}%")
         col4.metric("급감속", f"{round(this_break, 2)}")
+
+        st.markdown("---")
+
+        is_cert_24 = not df_cert_24[
+            (df_cert_24['운수사'] == company_input) &
+            (df_cert_24['성명'] == user_name_input) &
+            (df_cert_24['아이디'].astype(str) == user_id_input)
+        ].empty
+        is_cert_25 = not df_cert_25[
+            (df_cert_25['운수사'] == company_input) &
+            (df_cert_25['성명'] == user_name_input) &
+            (df_cert_25['아이디'].astype(str) == user_id_input)
+        ].empty
+
+        cert_display = ""
+        if is_cert_24:
+            cert_display += """
+            <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
+                <img src='https://raw.githubusercontent.com/yourrepo/images/main/medal_full.png' width='70'>
+                <div>
+                    <div style='font-size: 20px; font-weight: bold;'>🏅 24년 우수운전자 인증</div>
+                    <div style='color: gray;'>인천시 경제·안전운전 기여</div>
+                </div>
+            </div>
+            """
+        if is_cert_25:
+            cert_display += """
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                <div style='position: relative;'>
+                    <img src='https://raw.githubusercontent.com/yourrepo/images/main/medal_partial.png' width='70'>
+                    <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white;'>80%</div>
+                </div>
+                <div>
+                    <div style='font-size: 20px; font-weight: bold;'>🥇 25년 1분기 후보자 명단</div>
+                    <div style='color: gray;'>진행중</div>
+                </div>
+            </div>
+            """
+        if cert_display:
+            st.markdown(cert_display, unsafe_allow_html=True)
 
         st.markdown("---")
 
@@ -257,7 +299,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.dataframe(compare, hide_index=True)
 
         st.markdown("---")
-        st.subheader("🚘 차량별 운전 비교")
+        
+        st.subheader("🚘 차량별 요약")
         df_vehicle_filtered = df_vehicle[
             (df_vehicle['운수사'] == company_input) &
             (df_vehicle['운전자ID'].astype(str) == user_id_input) &
@@ -273,15 +316,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_vehicle_display["급감속(회)/100km"] = df_vehicle_display["급감속(회)/100km"].apply(lambda x: f"{x:.2f}")
 
             def format_grade(g):
-                color = "green" if g in ["S", "A"] else "#FFD700" if g in ["B", "C"] else "red"
+                color = "green" if g in ["S", "A"] else "orange" if g in ["B", "C"] else "red"
                 return f"<span style='color:{color}; font-weight:bold'>{g}</span>"
 
             df_vehicle_display["등급"] = df_vehicle_display["등급"].apply(format_grade)
 
             st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
-            st.markdown("#### 🚗 차량별 요약")
-            st.write(df_vehicle_display[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].to_html(escape=False, index=False), unsafe_allow_html=True)
-            st.dataframe(df_vehicle_filtered[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
 
@@ -337,12 +377,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
             grouped['날짜'] = pd.to_datetime(grouped['DATE'])
-            grouped['날짜표시'] = grouped['날짜'].dt.strftime('%y/%m/%d (%a)')
+            weekday_map = {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri': '금', 'Sat': '토', 'Sun': '일'}
+            grouped['날짜표시'] = grouped['날짜'].dt.strftime('%y/%m/%d (%a)').replace(weekday_map, regex=True)
 
             for _, row_ in grouped.iterrows():
                 rate = int(row_['달성률값'])
                 grade = row_['등급']
-                grade_color = "green" if grade in ["S", "A"] else "#FFD700" if grade in ["B", "C"] else "red"
                 st.markdown(f"""
                 <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
                     <div style='flex: 1;'>{row_['날짜표시']}</div>
