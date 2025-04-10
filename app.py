@@ -142,19 +142,29 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             col_img, col_txt = st.columns([1, 4])
             with col_img:
-                st.image("매달.png", width=70)
+                st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
             with col_txt:
                 st.markdown("#### 🏅 24년 우수운전자 인증")
                 st.markdown("<span style='color: gray;'>인천시 경제·안전운전 기여</span>", unsafe_allow_html=True)
         if is_cert_25:
             col_img, col_txt = st.columns([1, 4])
             with col_img:
-                original = Image.open("매달.png")
+                original = Image.open("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
                 gray_image = ImageOps.grayscale(original)
                 st.image(gray_image, width=70)
             with col_txt:
                 st.markdown("#### 🥇 25년 1분기 후보자 명단")
-                st.markdown("<span style='color: gray;'>진행중</span>", unsafe_allow_html=True)
+                st.markdown("<span style='color: gray;'>진행중..수상유력!</span>", unsafe_allow_html=True)
+        else:
+            col_img, col_txt = st.columns([1, 4])
+            with col_img:
+                original = Image.open("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
+                gray_image = ImageOps.grayscale(original)
+                st.image(gray_image, width=70)
+            with col_txt:
+                st.markdown("#### 🥇 25년 1분기 후보자 명단")
+                st.markdown("<span style='color: gray;'>진행중..</span>", unsafe_allow_html=True)
+
         if cert_display:
             st.markdown(cert_display, unsafe_allow_html=True)
 
@@ -316,6 +326,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_vehicle_display["등급"] = df_vehicle_display["등급"].apply(format_grade)
 
             st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
+            st.dataframe(df_vehicle_display)
 
         st.markdown("---")
 
@@ -404,8 +415,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
             weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0)
-            weekly_avg = weekly_avg[['주차 범위', '평균 달성률(%)']]
-            st.dataframe(weekly_avg, hide_index=True)
+            
+            st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
