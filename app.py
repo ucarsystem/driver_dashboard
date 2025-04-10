@@ -404,12 +404,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             # 🔹 주간 평균 요약
             st.markdown("#### 📅 주간 평균 요약")
-            grouped['week'] = grouped['날짜'].dt.isocalendar().week
+            grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
             weekly_avg = grouped.groupby('week')['달성률값'].mean().reset_index()
-            weekly_avg.columns = ['주차', '평균 달성률']
+            weekly_avg.columns = ['주차 범위', '평균 달성률']
             weekly_avg['평균 달성률'] = weekly_avg['평균 달성률'].round(1)
             st.dataframe(weekly_avg, hide_index=True)
-
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
