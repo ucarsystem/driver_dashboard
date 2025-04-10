@@ -134,7 +134,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
         이번달 급감속 <b>{round(this_break, 2)}</b> 급감속은 <b>매탕 1회 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
-        <span style='color: "green"; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
         idle_text = f"""
@@ -143,7 +143,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
         이번달 공회전 <b>{round(this_idle * 100)}%</b> 공회전은 <b>5분 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
-        <span style='color: "green"; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
         additional_text = idle_text if this_break <5 else  break_text
@@ -290,7 +290,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         else:
             feedback_parts.append("✅ 공회전 관리가 잘 되고 있습니다.")
 
-        st.markdown("\n".join(feedback_parts))
+        st.markdown("<br>".join(feedback_parts), unsafe_allow_html=True)
 
         # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
@@ -319,10 +319,41 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 else:
                     return ""
 
-            grouped['달성률'] = (grouped['가중평균달성율'] * 100).round(1).astype(str) + "%"
+            grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
-            grouped_display = grouped[['DATE', '달성률', '등급']]
-            st.dataframe(grouped_display.rename(columns={"DATE": "날짜"}), hide_index=True)
+            grouped['날짜'] = pd.to_datetime(grouped['DATE'])
+            grouped['날짜표시'] = grouped['날짜'].dt.strftime('%y/%m/%d (%a)')
+
+            for _, row_ in grouped.iterrows():
+                rate = int(row_['달성률값'])
+                grade = row_['등급']
+                grade_color = "green" if grade in ["S", "A"] else "#FFD700" if grade in ["B", "C"] else "red"
+                st.markdown(f"""
+                <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
+                    <div style='flex: 1;'>{row_['날짜표시']}</div>
+                    <div style='flex: 1; text-align: center;'>{rate}%</div>
+                    <div style='flex: 1; text-align: right; color: {grade_color}; font-weight: bold;'>{grade}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # 🔹 등급 그래프 시각화
+            st.markdown("#### 📊 일별 등급 추이 그래프")
+            fig2, ax2 = plt.subplots(figsize=(8, 3))
+            ax2.plot(grouped['날짜'], grouped['달성률값'], marker='o', linestyle='-', color='green')
+            ax2.set_xticks(grouped['날짜'])
+            ax2.set_xticklabels(grouped['날짜표시'], rotation=45, fontsize=8, fontproperties=font_prop)
+            ax2.set_ylabel('달성률 (%)', fontproperties=font_prop)
+            ax2.set_title('일별 달성률 추이', fontproperties=font_prop)
+            ax2.grid(True, linestyle='--', alpha=0.5)
+            st.pyplot(fig2)
+
+            # 🔹 주간 평균 요약
+            st.markdown("#### 📅 주간 평균 요약")
+            grouped['week'] = grouped['날짜'].dt.isocalendar().week
+            weekly_avg = grouped.groupby('week')['달성률값'].mean().reset_index()
+            weekly_avg.columns = ['주차', '평균 달성률']
+            weekly_avg['평균 달성률'] = weekly_avg['평균 달성률'].round(1)
+            st.dataframe(weekly_avg, hide_index=True)
 
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
