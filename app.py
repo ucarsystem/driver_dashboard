@@ -329,7 +329,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 "연비(km/m3)": "연비"
             })
 
-            st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
+            st.write("<style>td span {font-size: 13px;}</style>", unsafe_allow_html=True)
             st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
@@ -392,6 +392,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             for _, row_ in grouped.iterrows():
                 rate = int(row_['달성률값'])
                 grade = row_['등급']
+
+                grade_text_color = "green" if grade in ["S", "A"] else "orange" if grade in ["B", "C"] else "red"
                 st.markdown(f"""
                 <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
                     <div style='flex: 1;'>{row_['날짜표시']}</div>
