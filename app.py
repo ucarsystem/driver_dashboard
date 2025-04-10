@@ -22,13 +22,12 @@ file_dir = "./file"
 file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
 
 # 엑셀 파일 로드 함수
-def load_excel(path):
+def load_excel(path, sheetname):
     try:
-        return pd.read_excel(path, sheet_name="매크로(운전자리스트)")
+        return pd.read_excel(path, sheet_name=sheetname)
     except Exception as e:
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
-    
     
 # 📂 운수사 목록 불러오기
 company_file = os.path.join(file_dir, "company_info.xlsx")
@@ -51,13 +50,15 @@ user_name_input = st.text_input("운전자 이름을 입력하세요")
 
 year_input = st.text_input("년도를 입력하세요 (예: 25)")
 month_input = st.text_input("월을 입력하세요 (예: 02)").zfill(2)
-
+input_yyyymm = f"{year_input}{month_input}"
 
 if st.button("조회하기") and company_input and user_id_input and user_name_input and year_input and month_input:
     file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
     file_path = os.path.join(file_dir, file_name)
 
-    df = load_excel(file_path)
+    df = load_excel(file_path, "매크로(운전자리스트)")
+    df_vehicle = load_excel(file_path, "차량+운전자별")
+    df_monthly = load_excel(file_path, "운전자별")
 
     # 조건 필터링
     filtered = df[
@@ -71,14 +72,33 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.success(f"✅ 운전자 {user_name_input} (ID: {user_id_input}) 정보 조회 성공")
 
         st.markdown("---")
+        
         grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
         grade = row["2502"]
+        grade_target = "C" if grade in ["F", "D"] else "B" if grade == "C" else "A" if grade == "B" else "S"
+        grade_text_color = "green" if grade_target in ["S", "A"] else "#003366" if grade_target in ["B", "C"] else "red"
+        next_month = 1 if int(month_input) == 12 else int(month_input)+1 
+
+        additional_text = f"""
+        <br>
+        <p style='font-size: 22px; font-style: italic;'>
+        <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
+        급감속은 <b>매탕 1회 미만!</b><br>
+        이것만 개선해도 연비 5% 개선, 
+        <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        </p>
+            """
+        
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("이달의 등급", f"{grade_color.get(grade, '')} {grade}")
         col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
         col3.metric("공회전", f"{round(row["이번달공회전비율(%)"] * 100)}%")
         col4.metric("급감속", f"{round(row['이번달급감속(회)/100km'], 2)}")
 
+
+
+        st.markdown("---")
+        st.subheader("🚦 운전 습관 핵심 지표 비교")
         compare_df = pd.DataFrame({
             "지표": ["달성률", "웜업률", "공회전률", "급감속"],
             "이달": [
@@ -135,6 +155,60 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ax.legend(prop=font_prop)
         ax.set_title("이달 수치 vs 노선 평균 비교", fontproperties=font_prop)
         st.pyplot(fig)
+
+        st.markdown("---")
+        st.subheader("📈 전월 대비 개선 여부")
+        def get_prev_yyyymm(yyyymm):
+            y, m = int(yyyymm[:2]), int(yyyymm[2:])
+            if m == 1:
+                return f"{y - 1 if y > 0 else 99}12"
+            else:
+                return f"{y:02d}{m - 1:02d}"
+            
+        prev_yyyymm = get_prev_yyyymm(input_yyyymm)
+        df_prev = df_monthly[
+            (df_monthly['운수사'] == company_input) &
+            (df_monthly['운전자ID'].astype(str) == user_id_input) &
+            (df_monthly['운전자이름'] == user_name_input)
+        ]
+
+        prev_row = df_prev[df_prev['년월'] == int(prev_yyyymm)]
+        curr_row = df_prev[df_prev['년월'] == int(input_yyyymm)]
+
+        if not prev_row.empty and not curr_row.empty:
+            prev = prev_row.iloc[0]
+            curr = curr_row.iloc[0]
+            compare = pd.DataFrame({
+                "지표": ["달성률", "웜업률", "공회전률", "탄력운전률", "급감속"],
+                "전월": [
+                    round(prev['가중달성율'] * 100, 1),
+                    round(prev['웜업비율(%)'] * 100, 2),
+                    round(prev['공회전비율(%)'] * 100, 2),
+                    round(prev['탄력운전 비율(%)'] * 100, 2),
+                    round(prev['급감속(회)/100km'], 1)
+                ],
+                "이달": [
+                    round(curr['가중달성율'] * 100, 1),
+                    round(curr['웜업비율(%)'] * 100, 2),
+                    round(curr['공회전비율(%)'] * 100, 2),
+                    round(curr['탄력운전 비율(%)'] * 100, 2),
+                    round(curr['급감속(회)/100km'], 1)
+                ]
+            })
+            compare['변화'] = compare['이달'] - compare['전월']
+            st.dataframe(compare, hide_index=True)
+
+        st.markdown("---")
+        st.subheader("🚘 차량별 운전 비교")
+        df_vehicle_filtered = df_vehicle[
+            (df_vehicle['운수사'] == company_input) &
+            (df_vehicle['운전자ID'].astype(str) == user_id_input) &
+            (df_vehicle['운전자이름'] == user_name_input) &
+            (df_vehicle['년월'] == int(input_yyyymm))
+        ].sort_values(by="주행거리", ascending=False).head(5)
+
+        if not df_vehicle_filtered.empty:
+            st.dataframe(df_vehicle_filtered[["노선", "차량번호", "주행거리", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
         st.subheader("🗣️ 개인 맞춤 피드백")
