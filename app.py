@@ -106,13 +106,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grade_target = "C" if this_grade in ["F", "D"] else "B" if this_grade == "C" else "A" if this_grade == "B" else "S"
         grade_text_color = "green" if this_grade in ["S", "A"] else "#FFD700" if this_grade in ["B", "C"] else "red"
 
-        
-        col1, col2, col3, col4 = st.columns(4)
-        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; font-weight: bold; color: {grade_text_color};'>{grade_color.get(this_grade, '')} {this_grade}</div>", unsafe_allow_html=True)
-        col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
-        col3.metric("공회전", f"{round(this_idle * 100)}%")
-        col4.metric("급감속", f"{round(this_break, 2)}")
-
         # 🚌 추가 정보: 대표 차량 및 노선
         st.markdown(f"""
         <div style='display: flex; align-items: center;'>
@@ -124,6 +117,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         </div>
         """, unsafe_allow_html=True)
 
+        col1, col2, col3, col4 = st.columns(4)
+        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; font-weight: bold; color: {grade_text_color};'>{grade_color.get(this_grade, '')} {this_grade}</div>", unsafe_allow_html=True)
+        col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
+        col3.metric("공회전", f"{round(this_idle * 100)}%")
+        col4.metric("급감속", f"{round(this_break, 2)}")
+
         st.markdown("---")
 
 
@@ -133,18 +132,18 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
-        이번달 급감속 <b>{this_break}</b> 급감속은 <b>매탕 1회 미만!</b><br>
+        이번달 급감속 <b>{round(this_break, 2)}</b> 급감속은 <b>매탕 1회 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
-        <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        <span style='color: "green"; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
         idle_text = f"""
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
-        이번달 공회전 <b>{this_idle}</b> 공회전은 <b>5분 미만!</b><br>
+        이번달 공회전 <b>{round(this_idle * 100)%}</b> 공회전은 <b>5분 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
-        <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        <span style='color: "green"; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
         additional_text = idle_text if this_break <5 else  break_text
@@ -302,7 +301,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             (df_daily['운전자이름'] == user_name_input)
         ]
         if not df_daily_filtered.empty:
-            grouped = df_daily_filtered.groupby('date')['가중평균달성율'].sum().reset_index()
+            grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
             def calc_grade(score):
                 score *= 100
                 if score >= 100:
@@ -322,8 +321,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             grouped['달성률'] = (grouped['가중평균달성율'] * 100).round(1).astype(str) + "%"
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
-            grouped_display = grouped[['date', '달성률', '등급']]
-            st.dataframe(grouped_display.rename(columns={"date": "날짜"}), hide_index=True)
+            grouped_display = grouped[['DATE', '달성률', '등급']]
+            st.dataframe(grouped_display.rename(columns={"DATE": "날짜"}), hide_index=True)
 
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
