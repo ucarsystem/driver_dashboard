@@ -72,20 +72,58 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.success(f"✅ 운전자 {user_name_input} (ID: {user_id_input}) 정보 조회 성공")
 
         st.markdown("---")
-        
-        grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
-        grade = row["2502"]
-        grade_target = "C" if grade in ["F", "D"] else "B" if grade == "C" else "A" if grade == "B" else "S"
-        grade_text_color = "green" if grade_target in ["S", "A"] else "yellow" if grade_target in ["B", "C"] else "red"
-        next_month = 1 if int(month_input) == 12 else int(month_input)+1 
+
+        #값 정의
+        #이번달
+        this_grade = row["2502"] #등급
+        this_percent = row['이번달달성율']
+        this_warm = row['이번달웜업비율(%)']
         this_idle = row["이번달공회전비율(%)"] 
         this_break = row['이번달급감속(회)/100km']
+        this_line = row['주운행노선']
+        this_bus = row['주운행차량']
+
+        #전월
+        last_grade = row['전월등급']
+        last_percent = row['전월달성율']
+        last_warm = row['전월웜업비율(%)']
+        last_idle = row["전월공회전비율(%)"] 
+        last_break = row['전월급감속(회)/100km']
+
+        #노선평균
+        ave_grade = row['노선평균등급']
+        ave_percent = row['노선평균달성율']
+        ave_warm = row['노선평균웜업비율(%)']
+        ave_idle = row["노선평균공회전비율(%)"] 
+        ave_break = row['노선평균급감속(회)/100km']
+
+        #다음달
+        next_month = 1 if int(month_input) == 12 else int(month_input)+1 
+
+
+        grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
+        grade_target = "C" if this_grade in ["F", "D"] else "B" if this_grade == "C" else "A" if this_grade == "B" else "S"
+        grade_text_color = "green" if this_grade in ["S", "A"] else "yellow" if this_grade in ["B", "C"] else "red"
+
         
         col1, col2, col3, col4 = st.columns(4)
-        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; color: {grade_text_color};'>{grade_color.get(grade, '')} {grade}</div>", unsafe_allow_html=True)
+        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; font-weight: bold; color: {grade_text_color};'>{grade_color.get(this_grade, '')} {this_grade}</div>", unsafe_allow_html=True)
         col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
         col3.metric("공회전", f"{round(this_idle * 100)}%")
         col4.metric("급감속", f"{round(this_break, 2)}")
+
+        # 🚌 추가 정보: 대표 차량 및 노선
+        st.markdown("---")
+        st.markdown(f"""
+        <div style='display: flex; align-items: center;'>
+            <img src='https://img.icons8.com/color/48/bus.png' style='margin-right: 10px;'>
+            <div>
+                <div><strong>대표 차량:</strong> {this_bus}</div>
+                <div><strong>노선:</strong> {this_line}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
 
         #st.markdown("### <📝종합 평가>")
         st.subheader("🗣️ 개인 맞춤 피드백")
@@ -121,22 +159,22 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         compare_df = pd.DataFrame({
             "지표": ["달성률", "웜업률", "공회전률", "급감속"],
             "이달": [
-                f"{round(row['이번달달성율'] * 100)}%",
-                f"{round(row['이번달웜업비율(%)'] * 100, 1)}%",
-                f"{round(row['이번달공회전비율(%)'] * 100, 1)}%",
-                f"{round(row['이번달급감속(회)/100km'], 1)}%"
+                f"{round(this_percent * 100)}%",
+                f"{round(this_warm * 100, 1)}%",
+                f"{round(this_idle * 100, 1)}%",
+                f"{round(this_break, 1)}%"
             ],
             "전월": [
-                f"{round(row['전월달성율'] * 100)}%",
-                f"{round(row['전월웜업비율(%)'] * 100, 1)}%",
-                f"{round(row['전월공회전비율(%)'] * 100, 1)}%",
-                f"{round(row['전월급감속(회)/100km'], 2)}%"
+                f"{round(last_percent * 100)}%",
+                f"{round(last_warm * 100, 1)}%",
+                f"{round(last_idle * 100, 1)}%",
+                f"{round(last_break, 2)}"
             ],  # 예시값
             "노선 평균": [
-                f"{round(row['노선평균달성율'] * 100)}%",
-                f"{round(row['노선평균웜업비율(%)'] * 100, 1)}%",
-                f"{round(row['노선평균공회전비율(%)'] * 100, 1)}%",
-                f"{round(row['노선평균급감속(회)/100km'], 2)}%"
+                f"{round(ave_percent * 100)}%",
+                f"{round(ave_warm * 100, 1)}%",
+                f"{round(ave_idle * 100, 1)}%",
+                f"{round(ave_break, 2)}"
             ],  # 예시값
         })
         st.dataframe(compare_df, hide_index=True)
@@ -147,20 +185,20 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             "연료소모율", "급가속(/100km)", "급감속(/100km)"
         ]
         driver_vals = [
-            row["이번달웜업비율(%)"] * 100,
-            row["이번달공회전비율(%)"] * 100,
+            this_warm * 100,
+            this_idle * 100,
             row["이번달탄력운전비율(%)"] * 100,
             row["이번달평균연료소모율"],
             row["이번달급가속(회)/100km"],
-            row["이번달급감속(회)/100km"]
+            this_break
         ]
         avg_vals = [
-            row["노선평균웜업비율(%)"] * 100,
-            row["노선평균공회전비율(%)"] * 100,
+            ave_warm * 100,
+            ave_idle * 100,
             row["노선평균탄력운전비율(%)"] * 100,
             row["노선평균평균연료소모율"],
             row["노선평균급가속(회)/100km"],
-            row["노선평균급감속(회)/100km"]
+            ave_break
         ]
 
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -200,18 +238,18 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             compare = pd.DataFrame({
                 "지표": ["달성률", "웜업률", "공회전률", "탄력운전률", "급감속"],
                 "전월": [
-                    round(prev['가중달성율'] * 100, 1),
-                    round(prev['웜업비율(%)'] * 100, 2),
-                    round(prev['공회전비율(%)'] * 100, 2),
-                    round(prev['탄력운전 비율(%)'] * 100, 2),
-                    round(prev['급감속(회)/100km'], 1)
+                    round(last_percent * 100, 1),
+                    round(last_warm* 100, 2),
+                    round(last_idle * 100, 2),
+                    round(row['전월탄력운전비율(%)'] * 100, 2),
+                    round(last_break, 2)
                 ],
                 "이달": [
-                    round(curr['가중달성율'] * 100, 1),
-                    round(curr['웜업비율(%)'] * 100, 2),
-                    round(curr['공회전비율(%)'] * 100, 2),
-                    round(curr['탄력운전 비율(%)'] * 100, 2),
-                    round(curr['급감속(회)/100km'], 1)
+                    round(this_percent* 100, 1),
+                    round(this_warm * 100, 2),
+                    round(this_idle* 100, 2),
+                    round(row['이번달탄력운전비율(%)'] * 100, 2),
+                    round(this_break, 2)
                 ]
             })
             compare['변화'] = compare['이달'] - compare['전월']
@@ -227,7 +265,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ].sort_values(by="주행거리(km)", ascending=False).head(5)
 
         if not df_vehicle_filtered.empty:
-            st.dataframe(df_vehicle_filtered[["노선", "차량번호", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
+            st.dataframe(df_vehicle_filtered[["노선번호호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
 
@@ -251,10 +289,44 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         else:
             feedback_parts.append("✅ 공회전 관리가 잘 되고 있습니다.")
 
-        st.success("\n".join(feedback_parts))
+        st.markdown("\n".join(feedback_parts))
+
+        # 📅 일별 달성률 및 등급 표시
+        st.markdown("---")
+        st.subheader("📅 일별 달성률 및 등급")
+        df_daily = pd.read_excel(xls, sheet_name="일별)차량+운전자")
+        df_daily_filtered = df_daily[
+            (df_daily['운수사'] == company) &
+            (df_daily['운전자ID'].astype(str) == driver_id) &
+            (df_daily['운전자이름'] == name) &
+            (df_daily['년월'] == int(input_yyyymm))
+        ]
+        if not df_daily_filtered.empty:
+            grouped = df_daily_filtered.groupby('date')['가중평균달성율'].sum().reset_index()
+            def calc_grade(score):
+                score *= 100
+                if score >= 100:
+                    return "S"
+                elif score >= 95:
+                    return "A"
+                elif score >= 90:
+                    return "B"
+                elif score >= 85:
+                    return "C"
+                elif score >= 80:
+                    return "D"
+                elif score >= 65:
+                    return "F"
+                else:
+                    return ""
+
+            grouped['달성률'] = (grouped['가중평균달성율'] * 100).round(1).astype(str) + "%"
+            grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
+            grouped_display = grouped[['date', '달성률', '등급']]
+            st.dataframe(grouped_display.rename(columns={"date": "날짜"}), hide_index=True)
 
     else:
-            st.warning("데이터를 불러오는 데 실패했습니다.")
+            st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
     st.warning("운수사, 운전자 ID, 운전자 이름을 입력하세요.")
 
