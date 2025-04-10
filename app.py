@@ -322,7 +322,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             df_vehicle_display["등급"] = df_vehicle_display["등급"].apply(format_grade)
 
-            df_vehicle_display = df_vehicle_display["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "연비(km/m3)", "등급"]
+            df_vehicle_display = df_vehicle_display[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "연비(km/m3)", "등급"]]
+
+            df_vehicle_display = df_vehicle_display.rename(columns={
+                "차량번호4": "차량번호",
+                "연비(km/m3)": "연비"
+            })
 
             st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
             st.dataframe(df_vehicle_display)
