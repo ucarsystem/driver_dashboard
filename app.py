@@ -76,16 +76,20 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
         grade = row["2502"]
         grade_target = "C" if grade in ["F", "D"] else "B" if grade == "C" else "A" if grade == "B" else "S"
-        grade_text_color = "green" if grade_target in ["S", "A"] else "#FFD700" if grade_target in ["B", "C"] else "red"
+        grade_text_color = "green" if grade_target in ["S", "A"] else "yellow" if grade_target in ["B", "C"] else "red"
         next_month = 1 if int(month_input) == 12 else int(month_input)+1 
+        this_idle = row["이번달공회전비율(%)"] 
+        this_break = row['이번달급감속(회)/100km']
         
         col1, col2, col3, col4 = st.columns(4)
         col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; color: {grade_text_color};'>{grade_color.get(grade, '')} {grade}</div>", unsafe_allow_html=True)
         col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
-        col3.metric("공회전", f"{round(row["이번달공회전비율(%)"] * 100)}%")
-        col4.metric("급감속", f"{round(row['이번달급감속(회)/100km'], 2)}")
+        col3.metric("공회전", f"{round(this_idle * 100)}%")
+        col4.metric("급감속", f"{round(this_break, 2)}")
 
-        additional_text = f"""
+        #st.markdown("### <📝종합 평가>")
+        st.subheader("🗣️ 개인 맞춤 피드백")
+        break_text = f"""
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
@@ -94,6 +98,22 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
+        idle_text = f"""
+        <br>
+        <p style='font-size: 22px; font-style: italic;'>
+        <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
+        공회전은 <b>5분 미만!</b><br>
+        이것만 개선해도 연비 5% 개선, 
+        <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        </p>"""
+
+        additional_text = idle_text if this_break <5 else  this_break
+
+        st.markdown(f"""
+        <div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'>
+        {additional_text}
+        </div>
+        """, unsafe_allow_html=True)
 
 
         st.markdown("---")
@@ -204,14 +224,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             (df_vehicle['운전자ID'].astype(str) == user_id_input) &
             (df_vehicle['운전자이름'] == user_name_input) &
             (df_vehicle['년월'] == int(input_yyyymm))
-        ].sort_values(by="주행거리", ascending=False).head(5)
+        ].sort_values(by="주행거리(km)", ascending=False).head(5)
 
         if not df_vehicle_filtered.empty:
-            st.dataframe(df_vehicle_filtered[["노선", "차량번호", "주행거리", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
+            st.dataframe(df_vehicle_filtered[["노선", "차량번호", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "등급"]].reset_index(drop=True))
 
         st.markdown("---")
-        st.subheader("🗣️ 개인 맞춤 피드백")
-        st.info(row["종함평가"])
 
         # 조건별 자동 피드백 생성
         st.markdown("### 📌 급감속/공회전 분석 피드백")
