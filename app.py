@@ -219,7 +219,21 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 f"{round(ave_break, 2)}"
             ],  # 예시값
         })
-        st.dataframe(compare_df, hide_index=True)
+
+        st.write("""
+        <style>
+        td span {
+            font-size: 13px;
+        }
+        table td {
+            white-space: nowrap !important;
+            text-align: center;
+            vertical-align: middle;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        st.write(compare_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+        
         st.markdown("---")
 
         st.subheader("📊 이달 vs 노선 평균 그래프")
@@ -296,7 +310,19 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 ]
             })
             compare['변화'] = compare['이달'] - compare['전월']
-            st.dataframe(compare, hide_index=True)
+            st.write("""
+            <style>
+            td span {
+                font-size: 13px;
+            }
+            table td {
+                white-space: nowrap !important;
+                text-align: center;
+                vertical-align: middle;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            st.write(compare.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
         
@@ -325,7 +351,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_vehicle_display = df_vehicle_display[["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "연비(km/m3)", "등급"]]
 
             df_vehicle_display = df_vehicle_display.rename(columns={
+                "노선번호" : "노선"
                 "차량번호4": "차량번호",
+                "주행거리(km)" : "주행거리",
+                "웜업비율(%)" : "웜업률(%)", 
+                "공회전비율(%)" : "공회전율(%)",
                 "연비(km/m3)": "연비"
             })
 
@@ -434,7 +464,21 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
             weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0).apply(lambda x: f"{int(x)}%")
             
-            st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
+            # st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
+            st.write("""
+            <style>
+            td span {
+                font-size: 13px;
+            }
+            table td {
+                white-space: nowrap !important;
+                text-align: center;
+                vertical-align: middle;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
+            st.write(weekly_avg.to_html(escape=False, index=False), unsafe_allow_html=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
