@@ -59,7 +59,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     df = load_excel(file_path, "매크로(운전자리스트)")
     df_vehicle = load_excel(file_path, "차량+운전자별")
     df_monthly = load_excel(file_path, "운전자별")
-    df_daily = load_excel(file_path, sheet_name="일별)차량+운전자")
+    df_daily = load_excel(file_path, "일별)차량+운전자")
 
     # 조건 필터링
     filtered = df[
