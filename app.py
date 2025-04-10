@@ -59,6 +59,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     df = load_excel(file_path, "매크로(운전자리스트)")
     df_vehicle = load_excel(file_path, "차량+운전자별")
     df_monthly = load_excel(file_path, "운전자별")
+    df_daily = load_excel(file_path, sheet_name="일별)차량+운전자")
 
     # 조건 필터링
     filtered = df[
@@ -157,7 +158,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.markdown("---")
         st.subheader("🚦 운전 습관 핵심 지표 비교")
         compare_df = pd.DataFrame({
-            "지표": ["달성률", "웜업률", "공회전률", "급감속"],
+            "지표": ["달성률(%)", "웜업률(%)", "공회전률(%)", "급감속(회/100km)"],
             "이달": [
                 f"{round(this_percent * 100)}%",
                 f"{round(this_warm * 100, 1)}%",
@@ -294,12 +295,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
         st.subheader("📅 일별 달성률 및 등급")
-        df_daily = pd.read_excel(xls, sheet_name="일별)차량+운전자")
         df_daily_filtered = df_daily[
-            (df_daily['운수사'] == company) &
-            (df_daily['운전자ID'].astype(str) == driver_id) &
-            (df_daily['운전자이름'] == name) &
-            (df_daily['년월'] == int(input_yyyymm))
+            (df_daily['운수사'] == company_input) &
+            (df_daily['운전자ID'].astype(str) == user_id_input) &
+            (df_daily['운전자이름'] == user_name_input)
         ]
         if not df_daily_filtered.empty:
             grouped = df_daily_filtered.groupby('date')['가중평균달성율'].sum().reset_index()
