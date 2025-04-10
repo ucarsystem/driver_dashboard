@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import requests
 import numpy as np
-
+from PIL import Image, ImageOps
 import matplotlib as mpl 
 import matplotlib.pyplot as plt 
 import matplotlib.font_manager as fm  
@@ -140,28 +140,21 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         cert_display = ""
         if is_cert_24:
-            cert_display += """
-            <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
-            <img src='https://github.com/ucarsystem/driver_dashboard/blob/main/%EB%A7%A4%EB%8B%AC.png' width='70'>
-                <div>
-                    <div style='font-size: 20px; font-weight: bold;'>🏅 24년 우수운전자 인증</div>
-                    <div style='color: gray;'>인천시 경제·안전운전 기여</div>
-                </div>
-            </div>
-            """
+            col_img, col_txt = st.columns([1, 4])
+            with col_img:
+                st.image("매달.png", width=70)
+            with col_txt:
+                st.markdown("#### 🏅 24년 우수운전자 인증")
+                st.markdown("<span style='color: gray;'>인천시 경제·안전운전 기여</span>", unsafe_allow_html=True)
         if is_cert_25:
-            cert_display += f"""
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                <div style='position: relative;'>
-                    <img src='https://github.com/ucarsystem/driver_dashboard/blob/main/%EB%A7%A4%EB%8B%AC.png' width='70'>
-                    <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white;'>80%</div>
-                </div>
-                <div>
-                    <div style='font-size: 20px; font-weight: bold;'>🥇 25년 1분기 후보자 명단</div>
-                    <div style='color: gray;'>진행중</div>
-                </div>
-            </div>
-            """
+            col_img, col_txt = st.columns([1, 4])
+            with col_img:
+                original = Image.open("매달.png")
+                gray_image = ImageOps.grayscale(original)
+                st.image(gray_image, width=70)
+            with col_txt:
+                st.markdown("#### 🥇 25년 1분기 후보자 명단")
+                st.markdown("<span style='color: gray;'>진행중</span>", unsafe_allow_html=True)
         if cert_display:
             st.markdown(cert_display, unsafe_allow_html=True)
 
@@ -408,9 +401,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             # 🔹 주간 평균 요약
             st.markdown("#### 📅 주간 평균 요약")
             grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
-            weekly_avg = grouped.groupby('week')['달성률값'].mean().reset_index()
+            weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
-            weekly_avg['평균 달성률(%)'] = f'{round(weekly_avg['평균 달성률(%)'],0)}%'
+            weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0)
+            weekly_avg = weekly_avg[['주차 범위', '평균 달성률(%)']]
             st.dataframe(weekly_avg, hide_index=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
