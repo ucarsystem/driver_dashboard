@@ -204,7 +204,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 f"{round(this_percent * 100)}%",
                 f"{round(this_warm * 100, 1)}%",
                 f"{round(this_idle * 100, 1)}%",
-                f"{round(this_break, 1)}%"
+                f"{round(this_break, 2)}"
             ],
             "전월": [
                 f"{round(last_percent * 100)}%",
@@ -329,7 +329,17 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 "연비(km/m3)": "연비"
             })
 
-            st.write("<style>td span {font-size: 13px;}</style>", unsafe_allow_html=True)
+            st.write("""
+            <style>
+            td span {
+                font-size: 13px;
+            }
+            table td {
+                white-space: nowrap !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
             st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
