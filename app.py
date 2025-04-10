@@ -76,8 +76,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grade_color = {"S": "🟩", "A": "🟩", "B": "🟨", "C": "🟨", "D": "🟥", "F": "🟥"}
         grade = row["2502"]
         grade_target = "C" if grade in ["F", "D"] else "B" if grade == "C" else "A" if grade == "B" else "S"
-        grade_text_color = "green" if grade_target in ["S", "A"] else "#003366" if grade_target in ["B", "C"] else "red"
+        grade_text_color = "green" if grade_target in ["S", "A"] else "#FFD700" if grade_target in ["B", "C"] else "red"
         next_month = 1 if int(month_input) == 12 else int(month_input)+1 
+        
+        col1, col2, col3, col4 = st.columns(4)
+        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; color: {grade_text_color};'>{grade_color.get(grade, '')} {grade}</div>", unsafe_allow_html=True)
+        col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
+        col3.metric("공회전", f"{round(row["이번달공회전비율(%)"] * 100)}%")
+        col4.metric("급감속", f"{round(row['이번달급감속(회)/100km'], 2)}")
 
         additional_text = f"""
         <br>
@@ -87,13 +93,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         이것만 개선해도 연비 5% 개선, 
         <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>
-            """
-        
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("이달의 등급", f"{grade_color.get(grade, '')} {grade}")
-        col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
-        col3.metric("공회전", f"{round(row["이번달공회전비율(%)"] * 100)}%")
-        col4.metric("급감속", f"{round(row['이번달급감속(회)/100km'], 2)}")
 
 
 
