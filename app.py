@@ -141,7 +141,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <br>
         <p style='font-size: 22px; font-style: italic;'>
         <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
-        이번달 공회전 <b>{round(this_idle * 100)%}</b> 공회전은 <b>5분 미만!</b><br>
+        이번달 공회전 <b>{round(this_idle * 100)}%</b> 공회전은 <b>5분 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
         <span style='color: "green"; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
