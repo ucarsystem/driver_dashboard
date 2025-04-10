@@ -140,9 +140,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         cert_display = ""
         if is_cert_24:
-            cert_display += """
+            cert_display += f"""
             <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 10px;'>
-                <img src='https://raw.githubusercontent.com/yourrepo/images/main/medal_full.png' width='70'>
+                {st.image('프로필.png', width=70)}
                 <div>
                     <div style='font-size: 20px; font-weight: bold;'>🏅 24년 우수운전자 인증</div>
                     <div style='color: gray;'>인천시 경제·안전운전 기여</div>
@@ -150,10 +150,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             </div>
             """
         if is_cert_25:
-            cert_display += """
+            cert_display += f"""
             <div style='display: flex; align-items: center; gap: 10px;'>
                 <div style='position: relative;'>
-                    <img src='https://raw.githubusercontent.com/yourrepo/images/main/medal_partial.png' width='70'>
+                    {st.image('프로필.png', width=70)}
                     <div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; color: white;'>80%</div>
                 </div>
                 <div>
@@ -221,6 +221,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             ],  # 예시값
         })
         st.dataframe(compare_df, hide_index=True)
+        st.markdown("---")
 
         st.subheader("📊 이달 vs 노선 평균 그래프")
         labels = [
@@ -387,11 +388,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
                     <div style='flex: 1;'>{row_['날짜표시']}</div>
                     <div style='flex: 1; text-align: center;'>{rate}%</div>
-                    <div style='flex: 1; text-align: right; color: {grade_color}; font-weight: bold;'>{grade}</div>
+                    <div style='flex: 1; text-align: right; color: {grade_text_color}; font-weight: bold;'>{grade}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
             # 🔹 등급 그래프 시각화
+            st.markdown("---")
             st.markdown("#### 📊 일별 등급 추이 그래프")
             fig2, ax2 = plt.subplots(figsize=(8, 3))
             ax2.plot(grouped['날짜'], grouped['달성률값'], marker='o', linestyle='-', color='green')
@@ -402,12 +404,13 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             ax2.grid(True, linestyle='--', alpha=0.5)
             st.pyplot(fig2)
 
+            st.markdown("---")
             # 🔹 주간 평균 요약
             st.markdown("#### 📅 주간 평균 요약")
             grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
             weekly_avg = grouped.groupby('week')['달성률값'].mean().reset_index()
-            weekly_avg.columns = ['주차 범위', '평균 달성률']
-            weekly_avg['평균 달성률'] = weekly_avg['평균 달성률'].round(1)
+            weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
+            weekly_avg['평균 달성률'] = f'{round(weekly_avg['평균 달성률'],0)}%'
             st.dataframe(weekly_avg, hide_index=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
