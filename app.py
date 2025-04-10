@@ -149,7 +149,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_25:
             col_img, col_txt = st.columns([1, 4])
             with col_img:
-                original = Image.open("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
+                original = Image.open("medal.png", width=70)
                 gray_image = ImageOps.grayscale(original)
                 st.image(gray_image, width=70)
             with col_txt:
