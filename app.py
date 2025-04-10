@@ -92,7 +92,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         급감속은 <b>매탕 1회 미만!</b><br>
         이것만 개선해도 연비 5% 개선, 
         <span style='color: {grade_text_color}; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
-        </p>
+        </p>"""
 
 
 
