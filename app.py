@@ -314,12 +314,15 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             df_vehicle_display["웜업비율(%)"] = df_vehicle_display["웜업비율(%)"].apply(lambda x: f"{x * 100:.2f}%")
             df_vehicle_display["공회전비율(%)"] = df_vehicle_display["공회전비율(%)"].apply(lambda x: f"{x * 100:.2f}%")
             df_vehicle_display["급감속(회)/100km"] = df_vehicle_display["급감속(회)/100km"].apply(lambda x: f"{x:.2f}")
+            df_vehicle_display["연비(km/m3)"] = df_vehicle_display["연비(km/m3)"].apply(lambda x: f"{x:.2f}")
 
             def format_grade(g):
                 color = "green" if g in ["S", "A"] else "orange" if g in ["B", "C"] else "red"
                 return f"<span style='color:{color}; font-weight:bold'>{g}</span>"
 
             df_vehicle_display["등급"] = df_vehicle_display["등급"].apply(format_grade)
+
+            df_vehicle_display = df_vehicle_display["노선번호", "차량번호4", "주행거리(km)", "웜업비율(%)", "공회전비율(%)", "급감속(회)/100km", "연비(km/m3)", "등급"]
 
             st.write("<style>td span {font-size: 16px;}</style>", unsafe_allow_html=True)
             st.dataframe(df_vehicle_display)
@@ -410,7 +413,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
             weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
             weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
-            weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0)
+            weekly_avg['평균 달성률(%)'] = f"{weekly_avg['평균 달성률(%)'].round(0)}%"
             
             st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
     else:
