@@ -274,7 +274,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ax.set_yticklabels(labels, fontproperties=font_prop)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         ax.invert_yaxis()
-        ax.legend(fontproperties=font_prop)
+        ax.legend()
         ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=14, fontweight='bold', fontproperties=font_prop)
         st.pyplot(fig)
 
@@ -437,7 +437,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
             grouped['날짜'] = pd.to_datetime(grouped['DATE'])
 
-            year = grouped['날짜'].dt.year.iloc[0]
 
             # 📅 달력형 등급 표시
             import calendar
