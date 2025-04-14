@@ -274,7 +274,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ax.set_yticklabels(labels, fontproperties=font_prop)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         ax.invert_yaxis()
-        ax.legend()
+        ax.legend(fontproperties=font_prop)
         ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=14, fontweight='bold', fontproperties=font_prop)
         st.pyplot(fig)
 
@@ -461,7 +461,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         html += "<td style='height: 50px;'></td>"
                     else:
                         grade = grade_map.get(day, "")
-                        emoji = "🥇" if grade in ["S", "A"] else "" #S,A 등급만 매달 표시
+                        emoji = "🥇" if grade in ["S", "A"] else " " #S,A 등급만 매달 표시
                         color = "red" if i == 0 else "black"
                         html += f"""
                         <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
