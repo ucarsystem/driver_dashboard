@@ -145,7 +145,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
             with col_txt:
                 st.markdown("#### 🏅 24년 우수운전자 인증")
-                st.markdown("<span style='color: gray;'>인천시 경제·안전운전 기여</span>", unsafe_allow_html=True)
+                st.markdown("<span style='color: gray;'>24년 인천시 경제·안전운전 기여!👍</span>", unsafe_allow_html=True)
         if is_cert_25:
             col_img, col_txt = st.columns([1, 4])
             with col_img:
@@ -295,14 +295,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             compare = pd.DataFrame({
                 "지표": ["달성률", "웜업률", "공회전률", "탄력운전률", "급감속"],
                 "전월": [
-                    round(last_percent * 100),
+                    round(last_percent * 100, 0),
                     round(last_warm* 100, 2),
                     round(last_idle * 100, 2),
                     round(row['전월탄력운전비율(%)'] * 100, 2),
                     round(last_break, 2)
                 ],
                 "이달": [
-                    round(this_percent* 100),
+                    round(this_percent* 100, 0),
                     round(this_warm * 100, 2),
                     round(this_idle* 100, 2),
                     round(row['이번달탄력운전비율(%)'] * 100, 2),
