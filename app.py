@@ -237,7 +237,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.write(compare_df.to_html(escape=False, index=False), unsafe_allow_html=True)
         
         st.markdown("---")
-
         st.subheader("📊 이달 vs 노선 평균 그래프")
         labels = [
             "웜업률(%)", "공회전률(%)", "탄력운전률(%)",
@@ -272,11 +271,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             ax.text(a + 0.5, i + 0.4, f"{a:.1f}", va='center', fontsize=9)
 
         ax.set_yticks([i + 0.2 for i in x])
-        ax.set_yticklabels(labels)
+        ax.set_yticklabels(labels, fontproperties=font_prop)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         ax.invert_yaxis()
         ax.legend()
-        ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=14, fontweight='bold')
+        ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=14, fontweight='bold', fontproperties=font_prop)
         st.pyplot(fig)
 
         st.markdown("---")
@@ -462,9 +461,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         html += "<td style='height: 50px;'></td>"
                     else:
                         grade = grade_map.get(day, "")
-                        content = "🥇" if grade in ["S", "A"] else grade
+                        emoji = "🥇" if grade in ["S", "A"] else grade #S,A 등급만 매달 표시
                         color = "red" if i == 0 else "black"
-                        html += f"<td style='padding: 6px; border: 1px solid #ccc; color: {color}; font-weight: bold;'>{day}<br>{content}</td>"
+                        html += f"""
+                        <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
+                            <div style='font-weight: bold;'>{day}</div>
+                            <div>{emoji if emoji else grade}</div>
+                        </td>
+                        """
                 html += "</tr>"
 
             html += "</table>"
