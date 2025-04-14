@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm  
 import matplotlib.ticker as ticker
 from openpyxl import load_workbook
+import calendar
+import datetime
 
 # 한글 폰트 설정
 font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
@@ -435,21 +437,56 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
             grouped['날짜'] = pd.to_datetime(grouped['DATE'])
-            weekday_map = {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri': '금', 'Sat': '토', 'Sun': '일'}
-            grouped['날짜표시'] = grouped['날짜'].dt.strftime('%y/%m/%d (%a)').replace(weekday_map, regex=True)
 
-            for _, row_ in grouped.iterrows():
-                rate = int(row_['달성률값'])
-                grade = row_['등급']
+            year = grouped['날짜'].dt.year.iloc[0]
 
-                grade_text_color = "green" if grade in ["S", "A"] else "orange" if grade in ["B", "C"] else "red"
-                st.markdown(f"""
-                <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
-                    <div style='flex: 1;'>{row_['날짜표시']}</div>
-                    <div style='flex: 1; text-align: center;'>{rate}%</div>
-                    <div style='flex: 1; text-align: right; color: {grade_text_color}; font-weight: bold;'>{grade}</div>
-                </div>
-                """, unsafe_allow_html=True)
+            # 📅 달력형 등급 표시
+            import calendar
+            year = grouped['날짜'].dt.year.iloc[0]
+            month = grouped['날짜'].dt.month.iloc[0]
+            grade_map = grouped.set_index(grouped['날짜'].dt.day)['등급'].to_dict()
+            cal = calendar.Calendar()
+            month_days = cal.monthdayscalendar(year, month)
+
+            html = """
+            <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
+            <tr style='background-color: #e0e0e0;'>
+            <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+            </tr>
+            """
+
+            for week in month_days:
+                html += "<tr>"
+                for i, day in enumerate(week):
+                    if day == 0:
+                        html += "<td style='height: 50px;'></td>"
+                    else:
+                        grade = grade_map.get(day, "")
+                        content = "🥇" if grade in ["S", "A"] else grade
+                        color = "red" if i == 0 else "black"
+                        html += f"<td style='padding: 6px; border: 1px solid #ccc; color: {color}; font-weight: bold;'>{day}<br>{content}</td>"
+                html += "</tr>"
+
+            html += "</table>"
+            st.markdown(html, unsafe_allow_html=True)
+
+
+            #일별 달성률 및 등급
+            # weekday_map = {'Mon': '월', 'Tue': '화', 'Wed': '수', 'Thu': '목', 'Fri': '금', 'Sat': '토', 'Sun': '일'}
+            # grouped['날짜표시'] = grouped['날짜'].dt.strftime('%y/%m/%d (%a)').replace(weekday_map, regex=True)
+
+            # for _, row_ in grouped.iterrows():
+            #     rate = int(row_['달성률값'])
+            #     grade = row_['등급']
+
+            #     grade_text_color = "green" if grade in ["S", "A"] else "orange" if grade in ["B", "C"] else "red"
+            #     st.markdown(f"""
+            #     <div style='display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0;'>
+            #         <div style='flex: 1;'>{row_['날짜표시']}</div>
+            #         <div style='flex: 1; text-align: center;'>{rate}%</div>
+            #         <div style='flex: 1; text-align: right; color: {grade_text_color}; font-weight: bold;'>{grade}</div>
+            #     </div>
+            #     """, unsafe_allow_html=True)
 
             # 🔹 등급 그래프 시각화
             st.markdown("---")
