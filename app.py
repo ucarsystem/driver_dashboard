@@ -169,7 +169,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             cert_grid += f"""
                 <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
-                    <div style='font-size: 15px; font-weight: bold;'>24년 인증</div>
+                    <div style='font-size: 15px; font-weight: bold;'>🏅24년 인증자</div>
                     <img src='{medal_url}' width='60'>
                 </div>
             """
@@ -183,29 +183,43 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         for q_idx, q_row in quarter_avg.iterrows():
             year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중달성율']
             quarter_title = f"{year}년 {quarter}분기"
+
+            months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
+            month_boxes = ""
+            for _, m_row in months_in_quarter.iterrows():
+                grade = m_row['월별등급']
+                emoji = "🥇" if grade in ["S", "A"] else grade
+                month_boxes += f"""
+                    <div style='width: 60px; height: 70px; text-align: center;'>
+                        <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
+                        <div style='font-size: 18px;'>{emoji}</div>
+                    </div>
+                """
+
             if year < current_year or (year == current_year and quarter < current_quarter):
                 # 이미 지난 분기
                 medal = f"<img src='{medal_url}' width='60'>" if avg_score >= 1.0 else f"<div style='font-weight:bold;'>진행중<br>({avg_score*100:.0f}%)</div>"
             else:
                 # 현재 분기 또는 미래
-                medal = f"<img src='{medal_black_url}' width='60'><div style='font-size: 13px;'>진행중<br>({avg_score*100:.0f}%)</div>"
+                medal = f"<img src='{medal_black_url}' width='60'><div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
 
             cert_grid += f"""
                 <div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>
                     <div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>
                     {medal}
+                    {month_boxes}
                 </div>
             """
 
-        for m_idx, m_row in grouped_month.iterrows():
-            grade = m_row['월별등급']
-            emoji = "🥇" if grade in ["S", "A"] else grade
-            cert_grid += f"""
-                <div style='width: 60px; height: 70px; text-align: center;'>
-                    <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
-                    <div style='font-size: 18px;'>{emoji}</div>
-                </div>
-            """
+        # for m_idx, m_row in grouped_month.iterrows():
+        #     grade = m_row['월별등급']
+        #     emoji = "🥇" if grade in ["S", "A"] else grade
+        #     cert_grid += f"""
+        #         <div style='width: 60px; height: 70px; text-align: center;'>
+        #             <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
+        #             <div style='font-size: 18px;'>{emoji}</div>
+        #         </div>
+        #     """
 
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
