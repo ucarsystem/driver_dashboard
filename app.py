@@ -342,7 +342,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
 
         st.markdown("---")
-        st.subheader("🚦 운전 습관 핵심 지표 비교")
+        st.subheader("🚦 운전 습관 핵심 지표 비교 🚦")
         compare_df = pd.DataFrame({
             "지표": ["달성률(%)", "웜업률(%)", "공회전률(%)", "급감속(회/100km)"],
             "이달": [
