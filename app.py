@@ -154,6 +154,25 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             .reset_index()
         )
 
+        def calc_grade(score):
+            score *= 100
+            if score >= 100:
+                return "S"
+            elif score >= 95:
+                return "A"
+            elif score >= 90:
+                return "B"
+            elif score >= 85:
+                return "C"
+            elif score >= 80:
+                return "D"
+            elif score >= 65:
+                return "F"
+            else:
+                return ""
+
+        quarter_avg['등급'] = quarter_avg['가중평균달성율'].apply(calc_grade)
+
         grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
         grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
 
@@ -169,8 +188,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             cert_grid += f"""
                 <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
-                    <div style='font-size: 15px; font-weight: bold;'>🏅24년 인증자</div>
-                    <img src='{medal_url}' width='80'>
+                    <div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자</div>
+                    <img src='{medal_url}' width='100'>
                 </div>
             """
 
@@ -181,42 +200,30 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         current_quarter = (current_month - 1) // 3 + 1
 
         for q_idx, q_row in quarter_avg.iterrows():
-            year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중달성율']
+            year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중평균달성율'], q_row['등급']
             quarter_title = f"{year}년 {quarter}분기"
 
             months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
             month_boxes = ""
             for _, m_row in months_in_quarter.iterrows():
-                grade = m_row['월별등급']
-                emoji = "🥇" if grade in ["S", "A"] else grade
+                grade_month = m_row['월별등급']
+                emoji = "🥇" if grade_month in ["S", "A"] else grade_month
                 month_boxes += f"""
                     <div style='width: 60px; height: 70px; text-align: center;'>
                         <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
                         <div style='font-size: 18px;'>{emoji}</div>
                     </div>
                 """
-            def calc_grade(score):
-                score *= 100
-                if score >= 100:
-                    return "S"
-                elif score >= 95:
-                    return "A"
-                elif score >= 90:
-                    return "B"
-                elif score >= 85:
-                    return "C"
-                elif score >= 80:
-                    return "D"
-                elif score >= 65:
-                    return "F"
-                else:
-                    return ""
-                
-            quarter_avg['grade'] = quarter_avg['가중달성율'].apply(calc_grade)
 
             if year < current_year or (year == current_year and quarter < current_quarter):
                 # 이미 지난 분기
-                medal = f"<img src='{medal_url}' width='80'>" if avg_score >= 1.0 else f"<img src='{medal_black_url}' width='80'><div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                if avg_score >= 1.0:
+                    medal = f"<img src='{medal_url}' width='80'>"
+                else:
+                    medal = f"""
+                        <img src='{medal_black_url}' width='80'>
+                        <div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>
+                    """
             else:
                 # 현재 분기 또는 미래
                 medal = f"<img src='{medal_black_url}' width='80'><div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
@@ -274,10 +281,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             calendar_rows = []
             for week in month_days:
-                row = []
+                low = []
                 for i, day in enumerate(week):
                     if day == 0:
-                        row.append("<td style='height: 60px;'></td>")
+                        low.append("<td style='height: 60px;'></td>")
                     else:
                         grade = grade_map.get(day, "")
                         if grade in ["S", "A"]:
@@ -289,12 +296,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         else:
                             emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
                         color = "red" if i == 0 else "black"
-                        row.append(f"""
+                        low.append(f"""
                             <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
                                 <div style='font-size: 14px; font-weight: bold;'>{day}</div>
                                 <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
                             </td>""")
-                calendar_rows.append("<tr>" + "".join(row) + "</tr>")
+                calendar_rows.append("<tr>" + "".join(low) + "</tr>")
 
             html = """
             <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
