@@ -259,15 +259,22 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             ave_break
         ]
 
-        # 데이터에 따라 색상 변화
-        colors = ["#4B8BBE" if d <= a else "#FF6B6B" for d, a in zip(driver_vals, avg_vals)]
+        # 조건에 따른 색상 정의
+        def get_color(i, d, a):
+            good_if_higher = (i == 2)  # 탄력운전률만 높을수록 좋음
+            if (good_if_higher and d >= a) or (not good_if_higher and d <= a):
+                return '#A8D5BA'  # 연한 녹색
+            else:
+                return '#66BB6A'  # 진한 녹색 (기준보다 나쁠 때)
+
+        colors = [get_color(i, d, a) for i, (d, a) in enumerate(zip(driver_vals, avg_vals))]
 
         fig, ax = plt.subplots(figsize=(9, 5))
         x = range(len(labels))
         bar_width = 0.4
 
         bars1 = ax.barh(x, driver_vals, height=bar_width, label='운전자', align='center', color=colors)
-        bars2 = ax.barh([i + bar_width for i in x], avg_vals, height=bar_width, label='노선 평균', align='center', color='#FFB347')
+        bars2 = ax.barh([i + bar_width for i in x], avg_vals, height=bar_width, label='노선 평균', align='center', color='#FFE08C')
 
         # 값 표시
         for i, (d, a) in enumerate(zip(driver_vals, avg_vals)):
@@ -285,6 +292,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ax.grid(True, axis='x', linestyle='--', alpha=0.4)
 
         st.pyplot(fig)
+
 
         st.markdown("---")
         st.subheader("📈 전월 대비 개선 여부")
@@ -469,7 +477,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         elif grade in ["D", "F"]:
                             emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
                         else:
-                            emoji = "  "
+                            emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
                         color = "red" if i == 0 else "black"
                         row.append(f"""
                             <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
