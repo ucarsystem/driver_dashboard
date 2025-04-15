@@ -128,45 +128,120 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         col4.metric("급감속", f"{round(this_break, 2)}")
 
         st.markdown("---")
+        st.subheader("🏅 분기별/월별 인증 현황")
 
+        from calendar import month_abbr
+        df_cert_25_summary = df_monthly[
+            (df_monthly['운수사'] == company_input) &
+            (df_monthly['운전자ID'].astype(str) == user_id_input) &
+            (df_monthly['운전자이름'] == user_name_input)&
+            (df_monthly['년월'].astype(str).str.startswith("25"))
+        ]
+
+        medal_url = "https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png"
+
+        # 분기/월 전처리
+        df_cert_25_summary['년'] = df_cert_25_summary['년월'].astype(str).str[:2].astype(int)
+        df_cert_25_summary['월'] = df_cert_25_summary['년월'].astype(str).str[2:].astype(int)
+        df_cert_25_summary['분기'] = df_cert_25_summary['월'].apply(lambda m: (m - 1) // 3 + 1)
+
+        # 분기별 평균: 각 분기에 해당하는 월의 평균
+        quarter_avg = (
+            df_cert_25_summary
+            .groupby(['년', '분기'])
+            .agg({'가중평균달성율': 'mean'})
+            .reset_index()
+        )
+
+        grouped_month = df_cert_25_summary[['년', '월', '2502']].copy()
+        grouped_month = grouped_month.rename(columns={'2502': '월별등급'})
+
+        # 24년 인증 확인
         is_cert_24 = not df_cert_24[
             (df_cert_24['운수사'] == company_input) &
             (df_cert_24['성명'] == user_name_input) &
             (df_cert_24['아이디'].astype(str) == user_id_input)
         ].empty
-        is_cert_25 = not df_cert_25[
-            (df_cert_25['운수사'] == company_input) &
-            (df_cert_25['성명'] == user_name_input) &
-            (df_cert_25['아이디'].astype(str) == user_id_input)
-        ].empty
 
-        cert_display = ""
+        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
+
         if is_cert_24:
-            col_img, col_txt = st.columns([1, 4])
-            with col_img:
-                st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
-            with col_txt:
-                st.markdown("#### 🏅 24년 우수운전자 인증")
-                st.markdown("<span style='color: gray;'>24년 인천시 경제·안전운전 기여!👍</span>", unsafe_allow_html=True)
-        if is_cert_25:
-            col_img, col_txt = st.columns([1, 4])
-            with col_img:
-                st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
-            with col_txt:
-                st.markdown("#### 🥇 25년 1분기 후보자 명단")
-                st.markdown("<span style='color: gray;'>진행중..수상유력!</span>", unsafe_allow_html=True)
-        else:
-            col_img, col_txt = st.columns([1, 4])
-            with col_img:
-                st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
-            with col_txt:
-                st.markdown("#### 🥇 25년 1분기 후보자 명단")
-                st.markdown("<span style='color: gray;'>진행중..</span>", unsafe_allow_html=True)
+            cert_grid += f"""
+                <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
+                    <div style='font-size: 15px; font-weight: bold;'>24년 인증</div>
+                    <img src='{medal_url}' width='60'>
+                </div>
+            """
 
-        if cert_display:
-            st.markdown(cert_display, unsafe_allow_html=True)
+        for q_idx, q_row in quarter_avg.iterrows():
+            year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중평균달성율']
+            quarter_title = f"{year}년 {quarter}분기"
+            medal = f"<img src='{medal_url}' width='60'>" if avg_score >= 1.0 else f"<div style='font-weight:bold;'>진행중<br>({avg_score*100:.0f}%)</div>"
+            cert_grid += f"""
+                <div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>
+                    <div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>
+                    {medal}
+                </div>
+            """
+
+        for m_idx, m_row in grouped_month.iterrows():
+            grade = m_row['월별등급']
+            emoji = "🥇" if grade in ["S", "A"] else grade
+            cert_grid += f"""
+                <div style='width: 60px; height: 70px; text-align: center;'>
+                    <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
+                    <div style='font-size: 18px;'>{emoji}</div>
+                </div>
+            """
+
+        cert_grid += "</div>"
+        st.markdown(cert_grid, unsafe_allow_html=True)
 
         st.markdown("---")
+
+        
+
+
+
+
+        # is_cert_24 = not df_cert_24[
+        #     (df_cert_24['운수사'] == company_input) &
+        #     (df_cert_24['성명'] == user_name_input) &
+        #     (df_cert_24['아이디'].astype(str) == user_id_input)
+        # ].empty
+        # is_cert_25 = not df_cert_25[
+        #     (df_cert_25['운수사'] == company_input) &
+        #     (df_cert_25['성명'] == user_name_input) &
+        #     (df_cert_25['아이디'].astype(str) == user_id_input)
+        # ].empty
+
+        # cert_display = ""
+        # if is_cert_24:
+        #     col_img, col_txt = st.columns([1, 4])
+        #     with col_img:
+        #         st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
+        #     with col_txt:
+        #         st.markdown("#### 🏅 24년 우수운전자 인증")
+        #         st.markdown("<span style='color: gray;'>24년 인천시 경제·안전운전 기여!👍</span>", unsafe_allow_html=True)
+        # if is_cert_25:
+        #     col_img, col_txt = st.columns([1, 4])
+        #     with col_img:
+        #         st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
+        #     with col_txt:
+        #         st.markdown("#### 🥇 25년 1분기 후보자 명단")
+        #         st.markdown("<span style='color: gray;'>진행중..수상유력!</span>", unsafe_allow_html=True)
+        # else:
+        #     col_img, col_txt = st.columns([1, 4])
+        #     with col_img:
+        #         st.image("https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png", width=70)
+        #     with col_txt:
+        #         st.markdown("#### 🥇 25년 1분기 후보자 명단")
+        #         st.markdown("<span style='color: gray;'>진행중..</span>", unsafe_allow_html=True)
+
+        # if cert_display:
+        #     st.markdown(cert_display, unsafe_allow_html=True)
+
+        # st.markdown("---")
 
 
         #st.markdown("### <📝종합 평가>")
