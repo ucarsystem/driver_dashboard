@@ -446,31 +446,37 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             cal = calendar.Calendar()
             month_days = cal.monthdayscalendar(year, month)
 
+            calendar_rows = []
+            for week in month_days:
+                row = []
+                for i, day in enumerate(week):
+                    if day == 0:
+                        row.append("<td style='height: 60px;'></td>")
+                    else:
+                        grade = grade_map.get(day, "")
+                        if grade in ["S", "A"]:
+                            emoji = "🥇"
+                        elif grade in ["B", "C"]:
+                            emoji = f"<span style='color: orange; font-weight: bold;'>{grade}</span>"
+                        elif grade in ["D", "F"]:
+                            emoji = f"<span style='color: red; font-weight: bold;'>{grade}</span>"
+                        else:
+                            emoji = ""
+                        color = "red" if i == 0 else "black"
+                        row.append(f"""
+                            <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
+                                <div style='font-size: 14px; font-weight: bold;'>{day}</div>
+                                <div style='font-size: 18px; font-weight: bold;'>{emoji}</div>
+                            </td>""")
+                calendar_rows.append("<tr>" + "".join(row) + "</tr>")
+
             html = """
             <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
             <tr style='background-color: #e0e0e0;'>
-            <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+                <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
             </tr>
-            """
+            """ + "".join(calendar_rows) + "</table>"
 
-            for week in month_days:
-                html += "<tr>"
-                for i, day in enumerate(week):
-                    if day == 0:
-                        html += "<td style='height: 50px;'></td>"
-                    else:
-                        grade = grade_map.get(day, "")
-                        emoji = "🥇" if grade in ["S", "A"] else "" #S,A 등급만 매달 표시
-                        color = "red" if i == 0 else "black"
-                        html += f"""
-                        <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
-                            <div style='font-size: 14px; font-weight: bold;'>{day}</div>
-                            <div style='font-size: 18px; font-weight: bold;'>{emoji if emoji else grade}</div>
-                        </td>
-                        """
-                html += "</tr>"
-
-            html += "</table>"
             st.markdown(html, unsafe_allow_html=True)
 
 
