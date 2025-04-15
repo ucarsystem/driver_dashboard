@@ -179,15 +179,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         if is_cert_24:
             medal_24 = (
-                "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
-                "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>"      
+                "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
                 "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
             )
         st.markdown(medal_24, unsafe_allow_html=True)
 
-        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
+        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;'>"
 
         # 현재 날짜 기준으로 현재 연도/월 확인
         now = datetime.datetime.now()
@@ -210,19 +209,19 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 else:
                     medal = (
                         f"<img src='{medal_black_url}' width='100'>"
-                        f"<div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                        f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
                     )
             else:
                 medal = (
                     f"<img src='{medal_black_url}' width='100'>"
-                    f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
+                    f"<div style='font-size: 13px;'>진행중...({avg_score*100:.0f}%)</div>"
                 )
 
             # 월별 박스를 가로 배치하기 위한 container 추가
             month_boxes = "".join([
-                "<div style='margin: 5px; text-align: center; display: inline-block;'>"
-                f"<div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>"
-                f"<div style='font-size: 18px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
+                "<div style='margin: 15px; text-align: center; display: inline-block;'>"
+                f"<div style='font-size: 16px; font-weight: bold;'>{m_row['월']}월</div>"
+                f"<div style='font-size: 24px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
                 "</div>"
                 for _, m_row in months_in_quarter.iterrows()
             ])
@@ -231,7 +230,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 "<div style='width: 200px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
                 f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
                 f"{medal}"
-                f"<div style='margin-top: 10px; display: flex; justify-content: center;'>{month_boxes}</div>"
+                f"<div style='margin-top: 15px; display: flex; justify-content: center;'>{month_boxes}</div>"
                 "</div>"
             )
 
