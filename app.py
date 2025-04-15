@@ -211,16 +211,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 </div>
             """
 
-        # for m_idx, m_row in grouped_month.iterrows():
-        #     grade = m_row['월별등급']
-        #     emoji = "🥇" if grade in ["S", "A"] else grade
-        #     cert_grid += f"""
-        #         <div style='width: 60px; height: 70px; text-align: center;'>
-        #             <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
-        #             <div style='font-size: 18px;'>{emoji}</div>
-        #         </div>
-        #     """
-
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
 
