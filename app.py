@@ -460,12 +460,12 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         html += "<td style='height: 50px;'></td>"
                     else:
                         grade = grade_map.get(day, "")
-                        emoji = "🥇" if grade in ["S", "A"] else " " #S,A 등급만 매달 표시
+                        emoji = "🥇" if grade in ["S", "A"] else "" #S,A 등급만 매달 표시
                         color = "red" if i == 0 else "black"
                         html += f"""
                         <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
-                            <div style='font-weight: bold;'>{day}</div>
-                            <div>{emoji if emoji else grade}</div>
+                            <div style='font-size: 14px; font-weight: bold;'>{day}</div>
+                            <div style='font-size: 18px; font-weight: bold;'>{emoji if emoji else grade}</div>
                         </td>
                         """
                 html += "</tr>"
