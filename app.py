@@ -222,6 +222,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 f"{medal}"
                 f"{month_boxes}"
                 f"</div>"
+            )
 
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
