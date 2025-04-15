@@ -142,6 +142,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.markdown("---")
         st.subheader("🏆나의 인증 현황")
 
+
+        st.markdown(f"<div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'> 4분기 모두 우수인증자 수여 시 그랜드슬림 달성!")
+
         from calendar import month_abbr
         df_cert_25_summary = df_monthly[
             (df_monthly['운수사'] == company_input) &
