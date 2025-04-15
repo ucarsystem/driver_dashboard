@@ -345,6 +345,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.markdown("---")
         st.subheader("🗣️ 개인 맞춤 피드백")
+
+        #급감속 멘트
         break_text = f"""
         <br>
         <p style='font-size: 22px; font-style: italic;'>
@@ -354,6 +356,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
+        #공회전멘트
         idle_text = f"""
         <br>
         <p style='font-size: 22px; font-style: italic;'>
@@ -363,6 +366,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
+        #급감속이 5보다 작으면 공회전관리멘트 보여주기
         additional_text = idle_text if this_break <5 else  break_text
 
         st.markdown(f"""
@@ -491,7 +495,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             prev = prev_row.iloc[0]
             curr = curr_row.iloc[0]
             compare = pd.DataFrame({
-                "지표": ["달성률", "웜업률", "공회전률", "탄력운전률", "급감속"],
+                "지표": ["달성률(%)", "웜업률(%)", "공회전률(%)", "탄력운전률(%)", "급감속"],
                 "전월": [
                     round(last_percent * 100, 0),
                     round(last_warm* 100, 2),
