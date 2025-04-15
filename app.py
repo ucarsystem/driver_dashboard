@@ -139,6 +139,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ]
 
         medal_url = "https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png"
+        medal_black_url = "https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal_black.png"
 
         # 분기/월 전처리
         df_cert_25_summary['년'] = df_cert_25_summary['년월'].astype(str).str[:2].astype(int)
@@ -153,48 +154,58 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             .reset_index()
         )
 
-        st.write(df_cert_25_summary.columns.tolist())
+        grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
+        grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
 
-        # grouped_month = df_cert_25_summary[['년', '월', '2502']].copy()
-        # grouped_month = grouped_month.rename(columns={'2502': '월별등급'})
+        # 24년 인증 확인
+        is_cert_24 = not df_cert_24[
+            (df_cert_24['운수사'] == company_input) &
+            (df_cert_24['성명'] == user_name_input) &
+            (df_cert_24['아이디'].astype(str) == user_id_input)
+        ].empty
 
-        # # 24년 인증 확인
-        # is_cert_24 = not df_cert_24[
-        #     (df_cert_24['운수사'] == company_input) &
-        #     (df_cert_24['성명'] == user_name_input) &
-        #     (df_cert_24['아이디'].astype(str) == user_id_input)
-        # ].empty
+        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
 
-        # cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
+        if is_cert_24:
+            cert_grid += f"""
+                <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
+                    <div style='font-size: 15px; font-weight: bold;'>24년 인증</div>
+                    <img src='{medal_url}' width='60'>
+                </div>
+            """
 
-        # if is_cert_24:
-        #     cert_grid += f"""
-        #         <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
-        #             <div style='font-size: 15px; font-weight: bold;'>24년 인증</div>
-        #             <img src='{medal_url}' width='60'>
-        #         </div>
-        #     """
+        # 현재 날짜 기준으로 현재 연도/월 확인
+        now = datetime.datetime.now()
+        current_year = int(str(now.year)[-2:])  # 25
+        current_month = now.month
+        current_quarter = (current_month - 1) // 3 + 1
 
-        # for q_idx, q_row in quarter_avg.iterrows():
-        #     year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중달성율']
-        #     quarter_title = f"{year}년 {quarter}분기"
-        #     medal = f"<img src='{medal_url}' width='60'>" if avg_score >= 1.0 else f"<div style='font-weight:bold;'>진행중<br>({avg_score*100:.0f}%)</div>"
-        #     cert_grid += f"""
-        #         <div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>
-        #             <div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>
-        #             {medal}
-        #         </div>
-        #     """
+        for q_idx, q_row in quarter_avg.iterrows():
+            year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중달성율']
+            quarter_title = f"{year}년 {quarter}분기"
+            if year < current_year or (year == current_year and quarter < current_quarter):
+                # 이미 지난 분기
+                medal = f"<img src='{medal_url}' width='60'>" if avg_score >= 1.0 else f"<div style='font-weight:bold;'>진행중<br>({avg_score*100:.0f}%)</div>"
+            else:
+                # 현재 분기 또는 미래
+                medal = f"<img src='{medal_black_url}' width='60'><div style='font-size: 13px;'>진행중<br>({avg_score*100:.0f}%)</div>"
 
-        # for m_idx, m_row in grouped_month.iterrows():
-        #     grade = m_row['월별등급']
-        #     emoji = "🥇" if grade in ["S", "A"] else grade
-        #     cert_grid += f"""
-        #         <div style='width: 60px; height: 70px; text-align: center;'>
-        #             <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
-        #             <div style='font-size: 18px;'>{emoji}</div>
-        #         </div>
-        #     """
+            cert_grid += f"""
+                <div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>
+                    <div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>
+                    {medal}
+                </div>
+            """
+
+        for m_idx, m_row in grouped_month.iterrows():
+            grade = m_row['월별등급']
+            emoji = "🥇" if grade in ["S", "A"] else grade
+            cert_grid += f"""
+                <div style='width: 60px; height: 70px; text-align: center;'>
+                    <div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>
+                    <div style='font-size: 18px;'>{emoji}</div>
+                </div>
+            """
 
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
