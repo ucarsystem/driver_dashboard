@@ -177,15 +177,16 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             (df_cert_24['아이디'].astype(str) == user_id_input)
         ].empty
 
-        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
-
         if is_cert_24:
-            cert_grid += (
+            medal_24 = (
                 "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>"      
                 "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
             )
+        st.markdown(medal_24, unsafe_allow_html=True)
+
+        cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px;'>"
 
         # 현재 날짜 기준으로 현재 연도/월 확인
         now = datetime.datetime.now()
