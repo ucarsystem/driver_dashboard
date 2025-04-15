@@ -188,7 +188,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             cert_grid += f"""
                 <div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>
-                    <div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자</div>
+                    <div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>
                     <img src='{medal_url}' width='100'>
                 </div>
             """
