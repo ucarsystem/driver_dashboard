@@ -129,7 +129,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         # 인증 현황🏅
         st.markdown("---")
-        st.subheader("나만의 인증 현황")
+        st.subheader("🏅나만의 인증 현황")
 
         from calendar import month_abbr
         df_cert_25_summary = df_monthly[
