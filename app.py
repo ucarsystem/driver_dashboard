@@ -197,42 +197,86 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중달성율'], q_row['등급']
             quarter_title = f"{year}년 {quarter}분기"
 
-            months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
-            
+            months_in_quarter = grouped_month[
+                (grouped_month['년'] == year) & 
+                (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))
+            ]
+
+            if year < current_year or (year == current_year and quarter < current_quarter):
+                if avg_score >= 1.0:
+                    medal = f"<img src='{medal_url}' width='100'>"
+                else:
+                    medal = (
+                        f"<img src='{medal_black_url}' width='100'>"
+                        f"<div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                    )
+            else:
+                medal = (
+                    f"<img src='{medal_black_url}' width='100'>"
+                    f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
+                )
+
+            # 월별 박스를 가로 배치하기 위한 container 추가
             month_boxes = "".join([
-                "<div style='width: 60px; height: 70px; text-align: center;'>"
+                "<div style='margin: 5px; text-align: center; display: inline-block;'>"
                 f"<div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>"
                 f"<div style='font-size: 18px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
                 "</div>"
                 for _, m_row in months_in_quarter.iterrows()
             ])
 
-            if year < current_year or (year == current_year and quarter < current_quarter):
-                # 이미 지난 분기
-                if avg_score >= 1.0:
-                    medal = f"<img src='{medal_url}' width='100'>"
-                else:
-                    medal = (
-                        f"<img src='{medal_black_url}' width='100'>"
-                        f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
-                    )
-            else:
-                # 현재 분기 또는 미래
-                medal = (
-                    f"<img src='{medal_black_url}' width='80'>"
-                    f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
-                )
-
             cert_grid += (
-                "<div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
+                "<div style='width: 200px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
                 f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
                 f"{medal}"
-                f"{month_boxes}"
+                f"<div style='margin-top: 10px; display: flex; justify-content: center;'>{month_boxes}</div>"
                 "</div>"
             )
 
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
+
+
+        # for q_idx, q_row in quarter_avg.iterrows():
+        #     year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중달성율'], q_row['등급']
+        #     quarter_title = f"{year}년 {quarter}분기"
+
+        #     months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
+            
+        #     month_boxes = "".join([
+        #         "<div style='width: 60px; height: 70px; text-align: center;'>"
+        #         f"<div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>"
+        #         f"<div style='font-size: 18px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
+        #         "</div>"
+        #         for _, m_row in months_in_quarter.iterrows()
+        #     ])
+
+        #     if year < current_year or (year == current_year and quarter < current_quarter):
+        #         # 이미 지난 분기
+        #         if avg_score >= 1.0:
+        #             medal = f"<img src='{medal_url}' width='100'>"
+        #         else:
+        #             medal = (
+        #                 f"<img src='{medal_black_url}' width='100'>"
+        #                 f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
+        #             )
+        #     else:
+        #         # 현재 분기 또는 미래
+        #         medal = (
+        #             f"<img src='{medal_black_url}' width='80'>"
+        #             f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
+        #         )
+
+        #     cert_grid += (
+        #         "<div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
+        #         f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
+        #         f"{medal}"
+        #         f"{month_boxes}"
+        #         "</div>"
+        #     )
+
+        # cert_grid += "</div>"
+        # st.markdown(cert_grid, unsafe_allow_html=True)
 
         # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
