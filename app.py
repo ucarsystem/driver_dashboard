@@ -259,23 +259,31 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             ave_break
         ]
 
+        # 데이터에 따라 색상 변화
         colors = ["#4B8BBE" if d <= a else "#FF6B6B" for d, a in zip(driver_vals, avg_vals)]
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(9, 5))
         x = range(len(labels))
-        ax.barh(x, driver_vals, height=0.4, label='운전자', align='center', color=colors)
-        ax.barh([i + 0.4 for i in x], avg_vals, height=0.4, label='노선 평균', align='center', color='#FFB347')
-        
-        for i, (d, a) in enumerate(zip(driver_vals, avg_vals)):
-            ax.text(d + 0.5, i, f"{d:.1f}", va='center', fontsize=9)
-            ax.text(a + 0.5, i + 0.4, f"{a:.1f}", va='center', fontsize=9)
+        bar_width = 0.4
 
-        ax.set_yticks([i + 0.2 for i in x])
-        ax.set_yticklabels(labels, fontproperties=font_prop)
+        bars1 = ax.barh(x, driver_vals, height=bar_width, label='운전자', align='center', color=colors)
+        bars2 = ax.barh([i + bar_width for i in x], avg_vals, height=bar_width, label='노선 평균', align='center', color='#FFB347')
+
+        # 값 표시
+        for i, (d, a) in enumerate(zip(driver_vals, avg_vals)):
+            ax.text(d + 0.8, i, f"{d:.1f}", va='center', fontsize=10, fontweight='bold', color='black')
+            ax.text(a + 0.8, i + bar_width, f"{a:.1f}", va='center', fontsize=10, fontweight='bold', color='black')
+
+        # 라벨 및 제목 스타일 조정
+        ax.set_yticks([i + bar_width / 2 for i in x])
+        ax.set_yticklabels(labels, fontproperties=font_prop, fontsize=11)
         ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
         ax.invert_yaxis()
-        ax.legend()
-        ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=14, fontweight='bold', fontproperties=font_prop)
+        ax.legend(prop=font_prop)
+        ax.set_title("이달 수치 vs 노선 평균 비교", fontsize=15, fontweight='bold', fontproperties=font_prop)
+        ax.set_axisbelow(True)
+        ax.grid(True, axis='x', linestyle='--', alpha=0.4)
+
         st.pyplot(fig)
 
         st.markdown("---")
@@ -408,7 +416,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
-        st.subheader("📅 일별 달성률 및 등급")
+        st.subheader("📅 일별 등급")
         df_daily_filtered = df_daily[
             (df_daily['운수사'] == company_input) &
             (df_daily['운전자ID'].astype(str) == user_id_input) &
