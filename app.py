@@ -149,7 +149,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         quarter_avg = (
             df_cert_25_summary
             .groupby(['년', '분기'])
-            .agg({'가중평균달성율': 'mean'})
+            .agg({'가중달성율': 'mean'})
             .reset_index()
         )
 
@@ -174,7 +174,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             """
 
         for q_idx, q_row in quarter_avg.iterrows():
-            year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중평균달성율']
+            year, quarter, avg_score = q_row['년'], int(q_row['분기']), q_row['가중달성율']
             quarter_title = f"{year}년 {quarter}분기"
             medal = f"<img src='{medal_url}' width='60'>" if avg_score >= 1.0 else f"<div style='font-weight:bold;'>진행중<br>({avg_score*100:.0f}%)</div>"
             cert_grid += f"""
