@@ -143,7 +143,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         st.subheader("🏆나의 인증 현황")
 
 
-        st.markdown(f"<div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'> 4분기 모두 우수인증자 수여 시 그랜드슬림 달성!", unsafe_allow_html=True)
+        st.markdown(f"<div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'> 4분기 모두 우수인증자 수여 시 그랜드슬림 달성!", unsafe_allow_html=True)
 
         from calendar import month_abbr
         df_cert_25_summary = df_monthly[
@@ -184,7 +184,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             medal_24 = (
                 "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
-                "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 우수인증자 🏅</div>"
+                "<div style='font-size: 15px; font-weight: bold;'>🏅24년 우수인증자🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
             )
