@@ -406,9 +406,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         def get_color(i, d, a):
             good_if_higher = (i == 2)  # 탄력운전률만 높을수록 좋음
             if (good_if_higher and d >= a) or (not good_if_higher and d <= a):
-                return '#A8D5BA'  # 연한 녹색
+                return '#C8E6C9'  # 연한 녹색
             else:
-                return '#66BB6A'  # 진한 녹색 (기준보다 나쁠 때)
+                return '#2E7D32'  # 진한 녹색 (기준보다 나쁠 때)
 
         colors = [get_color(i, d, a) for i, (d, a) in enumerate(zip(driver_vals, avg_vals))]
 
