@@ -183,7 +183,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         if is_cert_24:
             medal_24 = (
-                "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
+                "<div style='width: 160px; height: 160px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
                 "<div style='font-size: 15px; font-weight: bold;'>🏅24년 우수인증자🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
