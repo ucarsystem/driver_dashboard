@@ -343,7 +343,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             st.markdown(html, unsafe_allow_html=True)
 
-
+        st.markdown("---")
         st.subheader("🗣️ 개인 맞춤 피드백")
         break_text = f"""
         <br>
