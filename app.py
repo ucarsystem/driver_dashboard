@@ -200,7 +200,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         current_quarter = (current_month - 1) // 3 + 1
 
         for q_idx, q_row in quarter_avg.iterrows():
-            year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중평균달성율'], q_row['등급']
+            year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중달성율'], q_row['등급']
             quarter_title = f"{year}년 {quarter}분기"
 
             months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
