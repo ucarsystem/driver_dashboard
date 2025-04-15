@@ -171,7 +171,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             else:
                 return ""
 
-        quarter_avg['등급'] = quarter_avg['가중평균달성율'].apply(calc_grade)
+        quarter_avg['등급'] = quarter_avg['가중달성율'].apply(calc_grade)
 
         grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
         grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
