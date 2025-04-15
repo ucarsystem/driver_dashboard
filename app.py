@@ -38,8 +38,8 @@ company_list = df_company[0].dropna().tolist() if not df_company.empty else []
 df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
 
 
-# Streamlit UI 구성
-st.title("🚍 운전자별 대시보드")
+# Streamlit UI 구성🚍
+st.title(" 운전자별 대시보드")
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
 
 user_id_input = st.text_input("운전자 ID를 입력하세요")
