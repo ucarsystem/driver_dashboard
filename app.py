@@ -457,16 +457,16 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                         if grade in ["S", "A"]:
                             emoji = "🥇"
                         elif grade in ["B", "C"]:
-                            emoji = f"<span style='color: orange; font-weight: bold;'>{grade}</span>"
+                            emoji = f"<span style='color: orange; font-weight: bold; font-size: 20px;'>{grade}</span>"
                         elif grade in ["D", "F"]:
-                            emoji = f"<span style='color: red; font-weight: bold;'>{grade}</span>"
+                            emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
                         else:
-                            emoji = ""
+                            emoji = "  "
                         color = "red" if i == 0 else "black"
                         row.append(f"""
                             <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
                                 <div style='font-size: 14px; font-weight: bold;'>{day}</div>
-                                <div style='font-size: 18px; font-weight: bold;'>{emoji}</div>
+                                <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
                             </td>""")
                 calendar_rows.append("<tr>" + "".join(row) + "</tr>")
 
