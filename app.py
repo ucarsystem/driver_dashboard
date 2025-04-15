@@ -319,9 +319,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                             emoji = "<div style='font-size: 30px;'>🎖️</div>"
                             label = ""
                         elif grade in ["B", "C"]:
-                            emoji = f"<div style='font-size: 30px;'>🎖️</div><div style='color: orange; font-size: 18px; font-weight: bold;'>{grade}</div>"
+                            emoji = f"<div style='color: orange; font-size: 30px; font-weight: bold;'>{grade}</div>"
                         elif grade in ["D", "F"]:
-                            emoji = f"<div style='font-size: 30px;'>🎖️</div><div style='color: red; font-size: 18px; font-weight: bold;'>{grade}</div>"
+                            emoji = f"<div style='color: red; font-size: 30px; font-weight: bold;'>{grade}</div>"
                         else:
                             emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
                         color = "red" if i == 0 else "black"
