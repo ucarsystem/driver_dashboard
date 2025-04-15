@@ -197,10 +197,78 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
 
+        # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
+        st.subheader("📅 일별 등급")
+        df_daily_filtered = df_daily[
+            (df_daily['운수사'] == company_input) &
+            (df_daily['운전자ID'].astype(str) == user_id_input) &
+            (df_daily['운전자이름'] == user_name_input)
+        ]
+        if not df_daily_filtered.empty:
+            grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
+            def calc_grade(score):
+                score *= 100
+                if score >= 100:
+                    return "S"
+                elif score >= 95:
+                    return "A"
+                elif score >= 90:
+                    return "B"
+                elif score >= 85:
+                    return "C"
+                elif score >= 80:
+                    return "D"
+                elif score >= 65:
+                    return "F"
+                else:
+                    return ""
 
-        ??
+            grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
+            grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
+            grouped['날짜'] = pd.to_datetime(grouped['DATE'])
 
+
+            # 📅 달력형 등급 표시
+            import calendar
+            year = grouped['날짜'].dt.year.iloc[0]
+            month = grouped['날짜'].dt.month.iloc[0]
+            grade_map = grouped.set_index(grouped['날짜'].dt.day)['등급'].to_dict()
+            cal = calendar.Calendar()
+            month_days = cal.monthdayscalendar(year, month)
+
+            calendar_rows = []
+            for week in month_days:
+                row = []
+                for i, day in enumerate(week):
+                    if day == 0:
+                        row.append("<td style='height: 60px;'></td>")
+                    else:
+                        grade = grade_map.get(day, "")
+                        if grade in ["S", "A"]:
+                            emoji = "🥇"
+                        elif grade in ["B", "C"]:
+                            emoji = f"<span style='color: orange; font-weight: bold; font-size: 20px;'>{grade}</span>"
+                        elif grade in ["D", "F"]:
+                            emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
+                        else:
+                            emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
+                        color = "red" if i == 0 else "black"
+                        row.append(f"""
+                            <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
+                                <div style='font-size: 14px; font-weight: bold;'>{day}</div>
+                                <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
+                            </td>""")
+                calendar_rows.append("<tr>" + "".join(row) + "</tr>")
+
+            html = """
+            <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
+            <tr style='background-color: #e0e0e0;'>
+                <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+            </tr>
+            """ + "".join(calendar_rows) + "</table>"
+
+            st.markdown(html, unsafe_allow_html=True)
 
 
 
@@ -497,78 +565,78 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.markdown("<br>".join(feedback_parts), unsafe_allow_html=True)
 
-        # 📅 일별 달성률 및 등급 표시
-        st.markdown("---")
-        st.subheader("📅 일별 등급")
-        df_daily_filtered = df_daily[
-            (df_daily['운수사'] == company_input) &
-            (df_daily['운전자ID'].astype(str) == user_id_input) &
-            (df_daily['운전자이름'] == user_name_input)
-        ]
-        if not df_daily_filtered.empty:
-            grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
-            def calc_grade(score):
-                score *= 100
-                if score >= 100:
-                    return "S"
-                elif score >= 95:
-                    return "A"
-                elif score >= 90:
-                    return "B"
-                elif score >= 85:
-                    return "C"
-                elif score >= 80:
-                    return "D"
-                elif score >= 65:
-                    return "F"
-                else:
-                    return ""
+        # # 📅 일별 달성률 및 등급 표시
+        # st.markdown("---")
+        # st.subheader("📅 일별 등급")
+        # df_daily_filtered = df_daily[
+        #     (df_daily['운수사'] == company_input) &
+        #     (df_daily['운전자ID'].astype(str) == user_id_input) &
+        #     (df_daily['운전자이름'] == user_name_input)
+        # ]
+        # if not df_daily_filtered.empty:
+        #     grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
+        #     def calc_grade(score):
+        #         score *= 100
+        #         if score >= 100:
+        #             return "S"
+        #         elif score >= 95:
+        #             return "A"
+        #         elif score >= 90:
+        #             return "B"
+        #         elif score >= 85:
+        #             return "C"
+        #         elif score >= 80:
+        #             return "D"
+        #         elif score >= 65:
+        #             return "F"
+        #         else:
+        #             return ""
 
-            grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
-            grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
-            grouped['날짜'] = pd.to_datetime(grouped['DATE'])
+        #     grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
+        #     grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
+        #     grouped['날짜'] = pd.to_datetime(grouped['DATE'])
 
 
-            # 📅 달력형 등급 표시
-            import calendar
-            year = grouped['날짜'].dt.year.iloc[0]
-            month = grouped['날짜'].dt.month.iloc[0]
-            grade_map = grouped.set_index(grouped['날짜'].dt.day)['등급'].to_dict()
-            cal = calendar.Calendar()
-            month_days = cal.monthdayscalendar(year, month)
+        #     # 📅 달력형 등급 표시
+        #     import calendar
+        #     year = grouped['날짜'].dt.year.iloc[0]
+        #     month = grouped['날짜'].dt.month.iloc[0]
+        #     grade_map = grouped.set_index(grouped['날짜'].dt.day)['등급'].to_dict()
+        #     cal = calendar.Calendar()
+        #     month_days = cal.monthdayscalendar(year, month)
 
-            calendar_rows = []
-            for week in month_days:
-                row = []
-                for i, day in enumerate(week):
-                    if day == 0:
-                        row.append("<td style='height: 60px;'></td>")
-                    else:
-                        grade = grade_map.get(day, "")
-                        if grade in ["S", "A"]:
-                            emoji = "🥇"
-                        elif grade in ["B", "C"]:
-                            emoji = f"<span style='color: orange; font-weight: bold; font-size: 20px;'>{grade}</span>"
-                        elif grade in ["D", "F"]:
-                            emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
-                        else:
-                            emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
-                        color = "red" if i == 0 else "black"
-                        row.append(f"""
-                            <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
-                                <div style='font-size: 14px; font-weight: bold;'>{day}</div>
-                                <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
-                            </td>""")
-                calendar_rows.append("<tr>" + "".join(row) + "</tr>")
+        #     calendar_rows = []
+        #     for week in month_days:
+        #         row = []
+        #         for i, day in enumerate(week):
+        #             if day == 0:
+        #                 row.append("<td style='height: 60px;'></td>")
+        #             else:
+        #                 grade = grade_map.get(day, "")
+        #                 if grade in ["S", "A"]:
+        #                     emoji = "🥇"
+        #                 elif grade in ["B", "C"]:
+        #                     emoji = f"<span style='color: orange; font-weight: bold; font-size: 20px;'>{grade}</span>"
+        #                 elif grade in ["D", "F"]:
+        #                     emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
+        #                 else:
+        #                     emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
+        #                 color = "red" if i == 0 else "black"
+        #                 row.append(f"""
+        #                     <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
+        #                         <div style='font-size: 14px; font-weight: bold;'>{day}</div>
+        #                         <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
+        #                     </td>""")
+        #         calendar_rows.append("<tr>" + "".join(row) + "</tr>")
 
-            html = """
-            <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
-            <tr style='background-color: #e0e0e0;'>
-                <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
-            </tr>
-            """ + "".join(calendar_rows) + "</table>"
+        #     html = """
+        #     <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
+        #     <tr style='background-color: #e0e0e0;'>
+        #         <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+        #     </tr>
+        #     """ + "".join(calendar_rows) + "</table>"
 
-            st.markdown(html, unsafe_allow_html=True)
+        #     st.markdown(html, unsafe_allow_html=True)
 
 
             #일별 달성률 및 등급
@@ -588,41 +656,41 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             #     </div>
             #     """, unsafe_allow_html=True)
 
-            # 🔹 등급 그래프 시각화
-            st.markdown("---")
-            st.markdown("#### 📊 일별 등급 추이 그래프")
-            fig2, ax2 = plt.subplots(figsize=(8, 3))
-            ax2.plot(grouped['날짜'], grouped['달성률값'], marker='o', linestyle='-', color='green')
-            ax2.set_xticks(grouped['날짜'])
-            ax2.set_xticklabels(grouped['날짜표시'], rotation=45, fontsize=8, fontproperties=font_prop)
-            ax2.set_ylabel('달성률 (%)', fontproperties=font_prop)
-            ax2.set_title('일별 달성률 추이', fontproperties=font_prop)
-            ax2.grid(True, linestyle='--', alpha=0.5)
-            st.pyplot(fig2)
+            # # 🔹 등급 그래프 시각화
+            # st.markdown("---")
+            # st.markdown("#### 📊 일별 등급 추이 그래프")
+            # fig2, ax2 = plt.subplots(figsize=(8, 3))
+            # ax2.plot(grouped['날짜'], grouped['달성률값'], marker='o', linestyle='-', color='green')
+            # ax2.set_xticks(grouped['날짜'])
+            # ax2.set_xticklabels(grouped['날짜표시'], rotation=45, fontsize=8, fontproperties=font_prop)
+            # ax2.set_ylabel('달성률 (%)', fontproperties=font_prop)
+            # ax2.set_title('일별 달성률 추이', fontproperties=font_prop)
+            # ax2.grid(True, linestyle='--', alpha=0.5)
+            # st.pyplot(fig2)
 
-            st.markdown("---")
-            # 🔹 주간 평균 요약
-            st.markdown("#### 📅 주간 평균 요약")
-            grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
-            weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
-            weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
-            weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0).apply(lambda x: f"{int(x)}%")
+            # st.markdown("---")
+            # # 🔹 주간 평균 요약
+            # st.markdown("#### 📅 주간 평균 요약")
+            # grouped['week'] = grouped['날짜'].dt.to_period('W').apply(lambda r: (r.start_time.strftime('%-m/%d') + ' ~ ' + r.end_time.strftime('%-m/%d')))
+            # weekly_avg = grouped.groupby('week', as_index=False)['달성률값'].mean()
+            # weekly_avg.columns = ['주차 범위', '평균 달성률(%)']
+            # weekly_avg['평균 달성률(%)'] = weekly_avg['평균 달성률(%)'].round(0).apply(lambda x: f"{int(x)}%")
             
-            # st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
-            st.write("""
-            <style>
-            td span {
-                font-size: 13px;
-            }
-            table td {
-                white-space: nowrap !important;
-                text-align: center;
-                vertical-align: middle;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+            # # st.dataframe(weekly_avg[['주차 범위', '평균 달성률(%)']], hide_index=True)
+            # st.write("""
+            # <style>
+            # td span {
+            #     font-size: 13px;
+            # }
+            # table td {
+            #     white-space: nowrap !important;
+            #     text-align: center;
+            #     vertical-align: middle;
+            # }
+            # </style>
+            # """, unsafe_allow_html=True)
 
-            st.write(weekly_avg.to_html(escape=False, index=False), unsafe_allow_html=True)
+            # st.write(weekly_avg.to_html(escape=False, index=False), unsafe_allow_html=True)
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
