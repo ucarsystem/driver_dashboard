@@ -72,6 +72,17 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         (df["운전자ID"].astype(str) == user_id_input)
     ]
 
+    #등급함수
+    def calc_grade(score):
+        score *= 100
+        if score >= 100: return "S"
+        elif score >= 95: return "A"
+        elif score >= 90: return "B"
+        elif score >= 85: return "C"
+        elif score >= 80: return "D"
+        elif score >= 65: return "F"
+        else: return ""
+
     if not filtered.empty:
         row = filtered.iloc[0]
         st.success(f"✅ 운전자 {user_name_input} (ID: {user_id_input}) 정보 조회 성공")
@@ -129,7 +140,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         # 인증 현황🏅
         st.markdown("---")
-        st.subheader("🏅나만의 인증 현황")
+        st.subheader("🏆나의 인증 현황")
 
         from calendar import month_abbr
         df_cert_25_summary = df_monthly[
@@ -155,16 +166,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             .reset_index()
         )
 
-        def calc_grade(score):
-            score *= 100
-            if score >= 100: return "S"
-            elif score >= 95: return "A"
-            elif score >= 90: return "B"
-            elif score >= 85: return "C"
-            elif score >= 80: return "D"
-            elif score >= 65: return "F"
-            else: return ""
-
         quarter_avg['등급'] = quarter_avg['가중달성율'].apply(calc_grade)
 
         grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
@@ -180,7 +181,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             medal_24 = (
                 "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
-                "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>"
+                "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 우수인증자 🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
             )
@@ -289,22 +290,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         ]
         if not df_daily_filtered.empty:
             grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
-            def calc_grade(score):
-                score *= 100
-                if score >= 100:
-                    return "S"
-                elif score >= 95:
-                    return "A"
-                elif score >= 90:
-                    return "B"
-                elif score >= 85:
-                    return "C"
-                elif score >= 80:
-                    return "D"
-                elif score >= 65:
-                    return "F"
-                else:
-                    return ""
 
             grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
             grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
@@ -324,31 +309,37 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 low = []
                 for i, day in enumerate(week):
                     if day == 0:
-                        low.append("<td style='height: 60px;'></td>")
+                        low.append("<td style='height: 80px;'></td>")
                     else:
                         grade = grade_map.get(day, "")
                         if grade in ["S", "A"]:
-                            emoji = "🥇"
+                            emoji = "<div style='font-size: 30px;'>🎖️</div>"
+                            label = ""
                         elif grade in ["B", "C"]:
-                            emoji = f"<span style='color: orange; font-weight: bold; font-size: 20px;'>{grade}</span>"
+                            emoji = f"<div style='font-size: 30px;'>🎖️</div><div style='color: orange; font-size: 18px; font-weight: bold;'>{grade}</div>"
                         elif grade in ["D", "F"]:
-                            emoji = f"<span style='color: red; font-weight: bold; font-size: 20px;'>{grade}</span>"
+                            emoji = f"<div style='font-size: 30px;'>🎖️</div><div style='color: red; font-size: 18px; font-weight: bold;'>{grade}</div>"
                         else:
                             emoji = f"<span style='font-weight: bold; font-size: 20px;'>"  "</span>"
                         color = "red" if i == 0 else "black"
                         low.append(f"""
-                            <td style='padding: 6px; border: 1px solid #ccc; color: {color};'>
-                                <div style='font-size: 14px; font-weight: bold;'>{day}</div>
-                                <div style='font-size: 20px; font-weight: bold;'>{emoji}</div>
+                            <td style='padding: 8px; border: 1px solid #ccc; color: {color}; height: 80px;'>
+                                <div style='font-size: 16px; font-weight: bold;'>{day}</div>
+                                {emoji}
                             </td>""")
                 calendar_rows.append("<tr>" + "".join(low) + "</tr>")
 
             html = """
-            <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
-            <tr style='background-color: #e0e0e0;'>
-                <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+            <table style='border-collapse: collapse; margin: auto; background-color: #fff;'>
+            <tr style='background-color: #f2f2f2;'>
+                <th style='color: red; width: 80px;'>일</th><th style='width: 80px;'>월</th><th style='width: 80px;'>화</th><th style='width: 80px;'>수</th><th style='width: 80px;'>목</th><th style='width: 80px;'>금</th><th style='width: 80px;'>토</th>
             </tr>
             """ + "".join(calendar_rows) + "</table>"
+            # <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
+            # <tr style='background-color: #e0e0e0;'>
+            #     <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+            # </tr>
+            # """ + "".join(calendar_rows) + "</table>"
 
             st.markdown(html, unsafe_allow_html=True)
 
