@@ -39,7 +39,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 
 
 # Streamlit UI 구성🚍
-st.title("운전자별 대시보드")
+st.title("🚍 운전자별 대시보드")
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
 
 user_id_input = st.text_input("운전자 ID를 입력하세요")
@@ -127,8 +127,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         col3.metric("공회전", f"{round(this_idle * 100)}%")
         col4.metric("급감속", f"{round(this_break, 2)}")
 
+        # 인증 현황🏅
         st.markdown("---")
-        st.subheader("🏅 분기별/월별 인증 현황")
+        st.subheader("나만의 인증 현황")
 
         from calendar import month_abbr
         df_cert_25_summary = df_monthly[
@@ -180,10 +181,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         if is_cert_24:
             cert_grid += (
-                f"<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>"      
-                f"<div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>"
+                "<div style='width: 150px; height: 150px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px;'>"      
+                "<div style='font-size: 15px; font-weight: bold;'>🏅 24년 인증자 🏅</div>"
                 f"<img src='{medal_url}' width='100'>"
-                f"</div>"
+                "</div>"
             )
 
         # 현재 날짜 기준으로 현재 연도/월 확인
@@ -199,10 +200,10 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
             
             month_boxes = "".join([
-                f"<div style='width: 60px; height: 70px; text-align: center;'>"
+                "<div style='width: 60px; height: 70px; text-align: center;'>"
                 f"<div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>"
                 f"<div style='font-size: 18px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
-                f"</div>"
+                "</div>"
                 for _, m_row in months_in_quarter.iterrows()
             ])
 
@@ -211,17 +212,23 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 if avg_score >= 1.0:
                     medal = f"<img src='{medal_url}' width='80'>"
                 else:
-                    medal = f"<img src='{medal_black_url}' width='80'><div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                    medal = (
+                        f"<img src='{medal_black_url}' width='80'>"
+                        f"<div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                    )
             else:
                 # 현재 분기 또는 미래
-                medal = f"<img src='{medal_black_url}' width='80'><div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
+                medal = (
+                    f"<img src='{medal_black_url}' width='80'>"
+                    f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
+                )
 
             cert_grid += (
-                f"<div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
+                "<div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
                 f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
                 f"{medal}"
                 f"{month_boxes}"
-                f"</div>"
+                "</div>"
             )
 
         cert_grid += "</div>"
@@ -229,7 +236,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         # 📅 일별 달성률 및 등급 표시
         st.markdown("---")
-        st.subheader("📅 일별 등급")
+        st.subheader("📅 일별 등급 스탬프")
         df_daily_filtered = df_daily[
             (df_daily['운수사'] == company_input) &
             (df_daily['운전자ID'].astype(str) == user_id_input) &
