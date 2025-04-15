@@ -210,11 +210,11 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             if year < current_year or (year == current_year and quarter < current_quarter):
                 # 이미 지난 분기
                 if avg_score >= 1.0:
-                    medal = f"<img src='{medal_url}' width='80'>"
+                    medal = f"<img src='{medal_url}' width='100'>"
                 else:
                     medal = (
-                        f"<img src='{medal_black_url}' width='80'>"
-                        f"<div style='font-weight:bold;'>{grade}<br>({avg_score*100:.0f}%)</div>"
+                        f"<img src='{medal_black_url}' width='100'>"
+                        f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
                     )
             else:
                 # 현재 분기 또는 미래
