@@ -171,7 +171,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         # 인천 전체 순위
         df_incheon = df_incheon.sort_values(by="가중달성율", ascending=False).reset_index(drop=True)
-        incheon_rank = df_incheon[df_incheon['운전자ID'].astype(str) == user_id_input].index[0] + 1
+        incheon_rank = df_incheon[df_incheon['운전자ID'].astype(str) == user_id_input & df_incheon['운수사'] == company_input].index[0] + 1
         incheon_total = len(df_incheon)
         incheon_percent = incheon_rank / incheon_total * 100
 
@@ -192,13 +192,13 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <div style='background-color: #f9f9f9; padding: 15px; border-radius: 8px; line-height: 1.8;'>
 
         <p style='font-size: 18px; margin: 5px 0;'>
-            <strong>🚩 인천시 전체</strong>: 
+            <strong>🚩 인천시 전체 순위</strong>: 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>{incheon_rank}등</span> / 총 {incheon_total}명 → 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - incheon_percent:.1f}%</span>
         </p>
 
         <p style='font-size: 18px; margin: 5px 0;'>
-            <strong>🏢 소속 운수사</strong>: 
+            <strong>🏢 {company_input} 내 순위</strong>: 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>{company_rank}등</span> / 총 {company_total}명 → 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - company_percent:.1f}%</span>
         </p>
