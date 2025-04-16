@@ -179,12 +179,17 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             (df_monthly['년월'] == int(input_yyyymm)) &
             (df_monthly['운수사'] == company_input) &
             (df_monthly['운전자이름'].notnull())
-        ]
+        ].sort_values(by="이번달달성율", ascending=False).reset_index(drop=True)
         # 운수사 내부 순위
-        df_company_rank = df_company_driver.sort_values(by="가중달성율", ascending=False).reset_index(drop=True)
-        company_rank = df_company_driver[df_company_driver['운전자ID'].astype(str) == user_id_input].index[0] + 1
-        company_total = len(df_company_driver)
-        company_percent = company_rank / company_total * 100
+        company_driver_match = df_company_driver[df_company_driver['운전자ID'].astype(str) == user_id_input]
+        if not company_driver_match.empty:
+            company_rank = company_driver_match.index[0] + 1
+            company_total = len(df_company_driver)
+            company_percent = company_rank / company_total * 100
+        else:
+            company_rank = "-"
+            company_total = len(df_company_driver)
+            company_percent = 0.0  # 또는 표시하지 않도록 설정
 
         # 표시
         st.markdown("### 🏅 이달의 순위 요약")
@@ -194,13 +199,13 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <p style='font-size: 18px; margin: 5px 0;'>
             <strong>🚩 인천시 전체 순위</strong>: 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>{incheon_rank}등</span> / 총 {incheon_total}명 → 
-            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - incheon_percent:.1f}%</span>
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {incheon_percent:.1f}%</span>
         </p>
 
         <p style='font-size: 18px; margin: 5px 0;'>
             <strong>🏢 {company_input} 내 순위</strong>: 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>{company_rank}등</span> / 총 {company_total}명 → 
-            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - company_percent:.1f}%</span>
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {company_percent:.1f}%</span>
         </p>
 
         </div>
