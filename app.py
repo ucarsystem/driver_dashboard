@@ -208,11 +208,21 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if is_cert_24:
             medal_24 = (
                 "<div style='width: 180px; height: 180px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
-                "<div style='font-size: 15px; font-weight: bold;'>🏅24년 우수인증자🏅</div>"
+                "<div style='font-size: 15px; font-weight: bold;'>24년 전체</div>"
                 f"<img src='{medal_url}' width='100'>"
+                f"<div style='font-weight:bold; font-size: 15px; background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;display: inline-block;'>🏅 우수운전자 🏅</div>"
                 "</div>"
             )
-            st.markdown(medal_24, unsafe_allow_html=True)
+        else:
+            medal_24 = (
+                "<div style='width: 180px; height: 180px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
+                "<div style='font-size: 15px; font-weight: bold;'>24년 전체</div>"
+                f"<img src='{medal_black_url}' width='100'>"
+                f"<div style='font-weight:bold; font-size: 13px; display: inline-block;'>다음 기회를 도전해보세요!</div>"
+                "</div>"
+
+            )
+        st.markdown(medal_24, unsafe_allow_html=True)
 
         cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;'>"
 
@@ -235,7 +245,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 if avg_score >= 0.95:
                     medal = (
                         f"<img src='{medal_url}' width='100'>"
-                        f"<div style='font-weight:bold; font-size: 13px; background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;display: inline-block;'>✨ 우수운전자 ✨</div>"
+                        f"<div style='font-weight:bold; font-size: 15px; background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;display: inline-block;'>✨ 우수운전자 ✨</div>"
                     )
                 else:
                     medal = (
@@ -500,7 +510,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.markdown("---")
 
-        # 7.차량별요약      
+        # 6.차량별요약      
         st.subheader("🚘 차량별 요약")
         df_vehicle_filtered = df_vehicle[
             (df_vehicle['운수사'] == company_input) &
@@ -550,8 +560,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
-        # 6. 개인 맞춤 피드백
 
+        # 7. 개인 맞춤 피드백
         st.subheader("🗣️ 개인 맞춤 피드백")
 
         #급감속 멘트
