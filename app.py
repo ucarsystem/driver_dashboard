@@ -124,13 +124,13 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         # 🚌 이번달 핵심 성과 요약
         summary_msg = ""
         if this_grade in ["S", "A"]:
-            summary_msg = f"🎉 이번 달 <b>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
+            summary_msg = f"🎉 {int(month_input)}월 <b>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
         elif this_break < 5:
-            summary_msg = f"✅ 이번 달 급감속 <b>{this_break:.1f}</b>회! <b>{grade_target}등급</b>까지 도전해보세요!"
+            summary_msg = f"✅ {int(month_input)}월 급감속 <b>{this_break:.1f}</b>회! <b>{grade_target}등급</b>까지 도전해보세요!"
         elif this_idle > ave_idle:
             summary_msg = f"⚠️ 공회전율이 다소 높습니다. 시동 관리를 통해 <b>{grade_target}등급</b> 도전해보세요!"
         else:
-            summary_msg = f"📌 이번 달 <b>{this_grade}</b>등급! 조금만 더 노력하면 <b>{grade_target}</b>도 가능합니다."
+            summary_msg = f"📌 {int(month_input)}월 <b>{this_grade}</b>등급! 조금만 더 노력하면 <b>{grade_target}</b>도 가능합니다."
 
         st.markdown(f"""
         <div style='
@@ -157,10 +157,56 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         """, unsafe_allow_html=True)
 
         col1, col2, col3, col4 = st.columns(4)
-        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>이달의 등급</div><div style='font-size: 28px; font-weight: bold; color: {grade_text_color};'>{grade_color.get(this_grade, '')} {this_grade}</div>", unsafe_allow_html=True)
+        col1.markdown(f"<div style='font-size: 20px; font-weight: bold;'>{int(month_input)}월 등급</div><div style='font-size: 28px; font-weight: bold; color: {grade_text_color};'>{grade_color.get(this_grade, '')} {this_grade}</div>", unsafe_allow_html=True)
         col2.metric("달성률", f"{round(row['이번달달성율'] * 100)}%")
         col3.metric("공회전", f"{round(this_idle * 100)}%")
         col4.metric("급감속", f"{round(this_break, 2)}")
+
+        # 순위표시
+
+        # [운전자별] 시트에서 순위 계산
+        df_rank = df_monthly[df_monthly['년월'] == int(input_yyyymm)].copy()
+        df_rank['달성률'] = df_rank['이번달달성율'] * 100
+
+        # 인천 전체 순위
+        df_rank['인천순위'] = df_rank['달성률'].rank(ascending=False, method='min')
+        incheon_total = len(df_rank)
+        incheon_rank = int(df_rank[
+            (df_rank['운수사'] == company_input) &
+            (df_rank['운전자ID'].astype(str) == user_id_input) &
+            (df_rank['운전자이름'] == user_name_input)
+        ]['인천순위'].values[0])
+        incheon_percent = (incheon_rank / incheon_total) * 100
+
+        # 운수사 내부 순위
+        df_company_rank = df_rank[df_rank['운수사'] == company_input].copy()
+        df_company_rank['운수사순위'] = df_company_rank['달성률'].rank(ascending=False, method='min')
+        company_total = len(df_company_rank)
+        company_rank = int(df_company_rank[
+            (df_company_rank['운전자ID'].astype(str) == user_id_input) &
+            (df_company_rank['운전자이름'] == user_name_input)
+        ]['운수사순위'].values[0])
+        company_percent = (company_rank / company_total) * 100
+
+        # 표시
+        st.markdown("### 🏅 이달의 순위 요약")
+        st.markdown(f"""
+        <div style='background-color: #f9f9f9; padding: 15px; border-radius: 8px; line-height: 1.8;'>
+
+        <p style='font-size: 18px; margin: 5px 0;'>
+            <strong>🚩 인천시 전체</strong>: 
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>{incheon_rank}등</span> / 총 {incheon_total}명 → 
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - incheon_percent:.1f}%</span>
+        </p>
+
+        <p style='font-size: 18px; margin: 5px 0;'>
+            <strong>🏢 소속 운수사</strong>: 
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>{company_rank}등</span> / 총 {company_total}명 → 
+            <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {100 - company_percent:.1f}%</span>
+        </p>
+
+        </div>
+        """, unsafe_allow_html=True)
 
         # 2. 인증 현황🏅
         st.markdown("---")
