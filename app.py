@@ -39,7 +39,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 
 
 # Streamlit UI 구성🚍
-st.title(" 운전자별 대시보드")
+st.title("🚍 운전자별 대시보드")
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
 
 user_id_input = st.text_input("운전자 ID를 입력하세요")
@@ -121,7 +121,31 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grade_target = "C" if this_grade in ["F", "D"] else "B" if this_grade == "C" else "A" if this_grade == "B" else "S"
         grade_text_color = "green" if this_grade in ["S", "A"] else "orange" if this_grade in ["B", "C"] else "red"
 
-        # 🚌 추가 정보: 대표 차량 및 노선
+        # 🚌 이번달 핵심 성과 요약
+        summary_msg = ""
+        if this_grade in ["S", "A"]:
+            summary_msg = f"🎉 이번 달 <b>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
+        elif this_break < 5:
+            summary_msg = f"✅ 이번 달 급감속 <b>{this_break:.1f}</b>회! <b>{grade_target}등급</b>까지 도전해보세요!"
+        elif this_idle > ave_idle:
+            summary_msg = f"⚠️ 공회전율이 다소 높습니다. 시동 관리를 통해 <b>{grade_target}등급</b> 도전해보세요!"
+        else:
+            summary_msg = f"📌 이번 달 <b>{this_grade}</b>등급! 조금만 더 노력하면 <b>{grade_target}</b>도 가능합니다."
+
+        st.markdown(f"""
+        <div style='
+            background-color: #f9f9f9; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            border-left: 6px solid #FFA500; 
+            font-size: 18px;
+            font-weight: bold;
+        '>
+        🗣️ {summary_msg}
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ✅ 2. 기존 요약 (대표 차량, 노선, 등급, 주요 지표)
         st.markdown(f"""
         <div style='display: flex; align-items: center;'>
             <img src='https://img.icons8.com/color/48/bus.png' style='margin-right: 10px;'>
@@ -138,7 +162,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         col3.metric("공회전", f"{round(this_idle * 100)}%")
         col4.metric("급감속", f"{round(this_break, 2)}")
 
-        # 인증 현황🏅
+        # 2. 인증 현황🏅
         st.markdown("---")
         st.subheader("🏆나의 인증 현황")
 
@@ -244,49 +268,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         cert_grid += "</div>"
         st.markdown(cert_grid, unsafe_allow_html=True)
 
-
-        # for q_idx, q_row in quarter_avg.iterrows():
-        #     year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중달성율'], q_row['등급']
-        #     quarter_title = f"{year}년 {quarter}분기"
-
-        #     months_in_quarter = grouped_month[(grouped_month['년'] == year) & (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))]
-            
-        #     month_boxes = "".join([
-        #         "<div style='width: 60px; height: 70px; text-align: center;'>"
-        #         f"<div style='font-size: 12px; font-weight: bold;'>{m_row['월']}월</div>"
-        #         f"<div style='font-size: 18px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
-        #         "</div>"
-        #         for _, m_row in months_in_quarter.iterrows()
-        #     ])
-
-        #     if year < current_year or (year == current_year and quarter < current_quarter):
-        #         # 이미 지난 분기
-        #         if avg_score >= 1.0:
-        #             medal = f"<img src='{medal_url}' width='100'>"
-        #         else:
-        #             medal = (
-        #                 f"<img src='{medal_black_url}' width='100'>"
-        #                 f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
-        #             )
-        #     else:
-        #         # 현재 분기 또는 미래
-        #         medal = (
-        #             f"<img src='{medal_black_url}' width='80'>"
-        #             f"<div style='font-size: 13px;'>진행중...<br>({avg_score*100:.0f}%)</div>"
-        #         )
-
-        #     cert_grid += (
-        #         "<div style='width: 150px; height: 150px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
-        #         f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
-        #         f"{medal}"
-        #         f"{month_boxes}"
-        #         "</div>"
-        #     )
-
-        # cert_grid += "</div>"
-        # st.markdown(cert_grid, unsafe_allow_html=True)
-
-        # 📅 일별 달성률 및 등급 표시
+        # 3. 📅 일별 달성률 및 등급 표시
         st.markdown("---")
         st.subheader("📅 일별 등급 스탬프")
         df_daily_filtered = df_daily[
@@ -349,39 +331,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             st.markdown(html, unsafe_allow_html=True)
 
-        st.markdown("---")
-        st.subheader("🗣️ 개인 맞춤 피드백")
 
-        #급감속 멘트
-        break_text = f"""
-        <br>
-        <p style='font-size: 22px; font-style: italic;'>
-        <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
-        이번달 급감속 <b>{round(this_break, 2)}</b> 급감속은 <b>매탕 1회 미만!</b><br>
-        이것만 개선해도 연비 5% 개선, 
-        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
-        </p>"""
-
-        #공회전멘트
-        idle_text = f"""
-        <br>
-        <p style='font-size: 22px; font-style: italic;'>
-        <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
-        이번달 공회전 <b>{round(this_idle * 100)}%</b> 공회전은 <b>5분 미만!</b><br>
-        이것만 개선해도 연비 5% 개선, 
-        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
-        </p>"""
-
-        #급감속이 5보다 작으면 공회전관리멘트 보여주기
-        additional_text = idle_text if this_break <5 else  break_text
-
-        st.markdown(f"""
-        <div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'>
-        {additional_text}
-        </div>
-        """, unsafe_allow_html=True)
-
-
+        # 4. 운전습관 지표 비교
         st.markdown("---")
         st.subheader("🚦 운전 습관 핵심 지표 비교 🚦")
         compare_df = pd.DataFrame({
@@ -477,7 +428,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.pyplot(fig)
 
-
+        # 5. 전월대비 변화
         st.markdown("---")
         st.subheader("📈 전월 대비 개선 여부")
         def get_prev_yyyymm(yyyymm):
@@ -522,14 +473,14 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             def trend_icon(idx, diff):
                 if idx in [0, 3]:  # 달성률, 탄력운전률: 높을수록 좋음
                     if diff > 0:
-                        return f"<span style='color: green;'>🟢 +{diff:.2f}</span>"
+                        return f"<span style='color: green;'>🟢 +{diff:.2f} 개선</span>"
                     elif diff < 0:
-                        return f"<span style='color: red;'>🔴 -{abs(diff):.2f}</span>"
+                        return f"<span style='color: red;'>🔴 -{abs(diff):.2f} 악화</span>"
                 else: #웜업률, 공회전률, 급감속: 낮을수록 좋음
                     if diff < 0:
-                        return f"<span style='color: green;'>🟢 +{abs(diff):.2f}</span>"
+                        return f"<span style='color: green;'>🟢 +{abs(diff):.2f} 개선</span>"
                     elif diff > 0:
-                        return f"<span style='color: red;'>🔴 -{diff:.2f}</span>"
+                        return f"<span style='color: red;'>🔴 -{diff:.2f} 악화</span>"
                 return "-"
 
             compare['변화'] = [trend_icon(i, compare['이달'][i] - compare['전월'][i]) for i in range(len(compare))]
@@ -548,7 +499,62 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.write(compare.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
-        
+        # 6. 개인 맞춤 피드백
+
+        st.subheader("🗣️ 개인 맞춤 피드백")
+
+        #급감속 멘트
+        break_text = f"""
+        <br>
+        <p style='font-size: 22px; font-style: italic;'>
+        <b>{next_month}</b>월에는, <b>급감속</b>을 줄여봅시다.<br>
+        이번달 급감속 <b>{round(this_break, 2)}</b> 급감속은 <b>매탕 1회 미만!</b><br>
+        이것만 개선해도 연비 5% 개선, 
+        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        </p>"""
+
+        #공회전멘트
+        idle_text = f"""
+        <br>
+        <p style='font-size: 22px; font-style: italic;'>
+        <b>{next_month}</b>월에는, <b>공회전</b>을 줄여봅시다.<br>
+        이번달 공회전 <b>{round(this_idle * 100)}%</b> 공회전은 <b>5분 미만!</b><br>
+        이것만 개선해도 연비 5% 개선, 
+        <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
+        </p>"""
+
+        #급감속이 5보다 작으면 공회전관리멘트 보여주기
+        additional_text = idle_text if this_break <5 else  break_text
+
+        st.markdown(f"""
+        <div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'>
+        {additional_text}
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 조건별 자동 피드백 생성
+        st.markdown("### 📌 사고위험/공회전 분석 피드백")
+        break_ = row["이번달급가속(회)/100km"]
+        idle = row["이번달공회전비율(%)"] * 100
+
+        feedback_parts = []
+        if break_ < row["노선평균급감속(회)/100km"]:
+            feedback_parts.append("✅ 사고위험 발생이 매우 적어 안전 운전에 기여하고 있습니다.")
+        elif break_ < 80:
+            feedback_parts.append("🟡 사고위험이 다소 발생하고 있습니다. ")
+        else:
+            feedback_parts.append("⚠️ 사고위험 지수가 높습니다. 매탕 급감속 횟수 1회씩만 줄여보세요.")
+
+        if idle > row["노선평균공회전비율(%)"]*100:
+            feedback_parts.append("⚠️ 공회전 비율이 높습니다. 정차 시 시동 관리에 유의해 주세요.")
+        elif idle > 40:
+            feedback_parts.append("🟡 공회전이 평균보다 다소 높습니다. 불필요한 정차를 줄여주세요.")
+        else:
+            feedback_parts.append("✅ 공회전 관리가 잘 되고 있습니다.")
+
+        st.markdown("<br>".join(feedback_parts), unsafe_allow_html=True)
+
+        # 7.차량별요약      
         st.subheader("🚘 차량별 요약")
         df_vehicle_filtered = df_vehicle[
             (df_vehicle['운수사'] == company_input) &
@@ -585,7 +591,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.write("""
             <style>
             td span {
-                font-size: 13px;
+                font-size: 15px;
             }
             table td {
                 white-space: nowrap !important;
@@ -598,28 +604,6 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
-
-        # 조건별 자동 피드백 생성
-        st.markdown("### 📌 사고위험/공회전 분석 피드백")
-        break_ = row["이번달급가속(회)/100km"]
-        idle = row["이번달공회전비율(%)"] * 100
-
-        feedback_parts = []
-        if break_ < row["노선평균급감속(회)/100km"]:
-            feedback_parts.append("✅ 사고위험 발생이 매우 적어 안전 운전에 기여하고 있습니다.")
-        elif break_ < 80:
-            feedback_parts.append("🟡 사고위험이 다소 발생하고 있습니다. ")
-        else:
-            feedback_parts.append("⚠️ 사고위험 지수가 높습니다. 매탕 급감속 횟수 1회씩만 줄여보세요.")
-
-        if idle > row["노선평균공회전비율(%)"]*100:
-            feedback_parts.append("⚠️ 공회전 비율이 높습니다. 정차 시 시동 관리에 유의해 주세요.")
-        elif idle > 40:
-            feedback_parts.append("🟡 공회전이 평균보다 다소 높습니다. 불필요한 정차를 줄여주세요.")
-        else:
-            feedback_parts.append("✅ 공회전 관리가 잘 되고 있습니다.")
-
-        st.markdown("<br>".join(feedback_parts), unsafe_allow_html=True)
 
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
