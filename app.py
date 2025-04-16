@@ -533,7 +533,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         """, unsafe_allow_html=True)
 
         # 조건별 자동 피드백 생성
-        st.markdown("### 📌 사고위험/공회전 분석 피드백")
+        # st.markdown("### 📌 사고위험/공회전 분석 피드백")
         break_ = row["이번달급가속(회)/100km"]
         idle = row["이번달공회전비율(%)"] * 100
 
