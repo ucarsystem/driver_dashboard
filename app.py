@@ -39,7 +39,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 
 
 # Streamlit UI 구성🚍
-st.title("🚍 운전자별 대시보드")
+st.title(" 운전자별 대시보드")
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
 
 user_id_input = st.text_input("운전자 ID를 입력하세요")
@@ -212,6 +212,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                     medal = (
                         f"<img src='{medal_url}' width='100'>"
                         f"<div style='font-weight:bold; font-size: 13px; color: #FFD700'>우수운전자</div>"
+                    )
                 else:
                     medal = (
                         f"<img src='{medal_black_url}' width='100'>"
