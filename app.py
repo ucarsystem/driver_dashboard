@@ -209,7 +209,9 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
             if year < current_year or (year == current_year and quarter < current_quarter):
                 if avg_score >= 0.95:
-                    medal = f"<img src='{medal_url}' width='100'>"
+                    medal = (
+                        f"<img src='{medal_url}' width='100'>"
+                        f"<div style='font-weight:bold; font-size: 13px; color: #FFD700'>우수운전자</div>"
                 else:
                     medal = (
                         f"<img src='{medal_black_url}' width='100'>"
