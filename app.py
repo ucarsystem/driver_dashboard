@@ -500,7 +500,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             prev = prev_row.iloc[0]
             curr = curr_row.iloc[0]
             compare = pd.DataFrame({
-                "지표": ["달성률(%)", "웜업률(%)", "공회전률(%)", "탄력운전률(%)", "급감속"],
+                "지표": ["달성률(%)", "웜업률(%)", "공회전률(%)", "탄력운전비율(%)", "급감속"],
                 "전월": [
                     round(last_percent * 100, 0),
                     round(last_warm* 100, 2),
@@ -516,7 +516,22 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                     round(this_break, 2)
                 ]
             })
-            compare['변화'] = compare['이달'] - compare['전월']
+
+            #변화 계산 및 방향 아이콘 추가
+            def trend_icon(idx, diff):
+                if idx in [0, 3]:  # 달성률, 탄력운전률: 높을수록 좋음
+                    if diff > 0:
+                        return f"<span style='color: green;'>🟢 +{diff:.2f}</span>"
+                    elif diff < 0:
+                        return f"<span style='color: red;'>🔴 -{abs(diff):.2f}</span>"
+                else: #웜업률, 공회전률, 급감속: 낮을수록 좋음
+                    if diff < 0:
+                        return f"<span style='color: green;'>🟢 +{abs(diff):.2f}</span>"
+                    elif diff > 0:
+                        return f"<span style='color: red;'>🔴 -{diff:.2f}</span>"
+                return "-"
+
+            compare['변화'] = [trend_icon(i, compare['이달'][i] - compare['전월'][i]) for i in range(len(compare))]
             st.write("""
             <style>
             td span {
