@@ -212,7 +212,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
                 f"<img src='{medal_url}' width='100'>"
                 "</div>"
             )
-        st.markdown(medal_24, unsafe_allow_html=True)
+            st.markdown(medal_24, unsafe_allow_html=True)
 
         cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;'>"
 
@@ -500,7 +500,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.markdown("---")
 
-        # 6.차량별요약      
+        # 7.차량별요약      
         st.subheader("🚘 차량별 요약")
         df_vehicle_filtered = df_vehicle[
             (df_vehicle['운수사'] == company_input) &
@@ -550,7 +550,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             st.write(df_vehicle_display.to_html(escape=False, index=False), unsafe_allow_html=True)
 
         st.markdown("---")
-        # 7. 개인 맞춤 피드백
+        # 6. 개인 맞춤 피드백
 
         st.subheader("🗣️ 개인 맞춤 피드백")
 
@@ -605,8 +605,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         st.markdown("<br>".join(feedback_parts), unsafe_allow_html=True)
 
-    
-
+        
     else:
             st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
