@@ -124,7 +124,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         # 🚌 이번달 핵심 성과 요약
         summary_msg = ""
         if this_grade in ["S", "A"]:
-            summary_msg = f"🎉 이번 달 <b>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
+            summary_msg = f"🎉 이번 달 <b> <style = 'font-weight: bold; color: {grade_text_color};'>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
         elif this_break < 5:
             summary_msg = f"✅ 이번 달 급감속 <b>{this_break:.1f}</b>회! <b>{grade_target}등급</b>까지 도전해보세요!"
         elif this_idle > ave_idle:
@@ -141,7 +141,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             font-size: 18px;
             font-weight: bold;
         '>
-        🗣️ {summary_msg}
+         {summary_msg}
         </div>
         """, unsafe_allow_html=True)
 
