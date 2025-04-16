@@ -179,7 +179,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             (df_monthly['년월'] == int(input_yyyymm)) &
             (df_monthly['운수사'] == company_input) &
             (df_monthly['운전자이름'].notnull())
-        ].sort_values(by="이번달달성율", ascending=False).reset_index(drop=True)
+        ].sort_values(by="가중달성율", ascending=False).reset_index(drop=True)
         # 운수사 내부 순위
         company_driver_match = df_company_driver[df_company_driver['운전자ID'].astype(str) == user_id_input]
         if not company_driver_match.empty:
