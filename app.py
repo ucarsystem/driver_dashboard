@@ -165,28 +165,26 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         # 순위표시
 
         # [운전자별] 시트에서 순위 계산
-        df_rank = df_monthly[df_monthly['년월'] == int(input_yyyymm)].copy()
-        df_rank['달성률'] = df_rank['이번달달성율'] * 100
+        df_incheon = df_monthly[(df_monthly['년월'] == int(input_yyyymm))&
+                             (df_monthly['운전자이름'].notnull())
+        ].copy()
 
         # 인천 전체 순위
-        df_rank['인천순위'] = df_rank['달성률'].rank(ascending=False, method='min')
-        incheon_total = len(df_rank)
-        incheon_rank = int(df_rank[
-            (df_rank['운수사'] == company_input) &
-            (df_rank['운전자ID'].astype(str) == user_id_input) &
-            (df_rank['운전자이름'] == user_name_input)
-        ]['인천순위'].values[0])
-        incheon_percent = (incheon_rank / incheon_total) * 100
+        df_incheon = df_incheon.sort_values(by="가중달성율", ascending=False).reset_index(drop=True)
+        incheon_rank = df_incheon[df_incheon['운전자ID'].astype(str) == user_id_input].index[0] + 1
+        incheon_total = len(df_incheon)
+        incheon_percent = incheon_rank / incheon_total * 100
 
+        df_company_driver = df_monthly[
+            (df_monthly['년월'] == int(input_yyyymm)) &
+            (df_monthly['운수사'] == company_input) &
+            (df_monthly['운전자이름'].notnull())
+        ]
         # 운수사 내부 순위
-        df_company_rank = df_rank[df_rank['운수사'] == company_input].copy()
-        df_company_rank['운수사순위'] = df_company_rank['달성률'].rank(ascending=False, method='min')
-        company_total = len(df_company_rank)
-        company_rank = int(df_company_rank[
-            (df_company_rank['운전자ID'].astype(str) == user_id_input) &
-            (df_company_rank['운전자이름'] == user_name_input)
-        ]['운수사순위'].values[0])
-        company_percent = (company_rank / company_total) * 100
+        df_company_rank = df_company_driver.sort_values(by="가중달성율", ascending=False).reset_index(drop=True)
+        company_rank = df_company_driver[df_company_driver['운전자ID'].astype(str) == user_id_input].index[0] + 1
+        company_total = len(df_company_driver)
+        company_percent = company_rank / company_total * 100
 
         # 표시
         st.markdown("### 🏅 이달의 순위 요약")
