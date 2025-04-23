@@ -37,6 +37,11 @@ df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os
 company_list = df_company[0].dropna().tolist() if not df_company.empty else []
 df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
 
+#24년 인증제
+medal_filepath = os.path.join(file_dir, "인증제.xlsx")
+cert_24_all = load_excel(medal_filepath, "24년 명단")
+cert_25_all = load_excel(medal_filepath, "25년 명단")
+
 
 # Streamlit UI 구성🚍
 st.title(" 운전자별 대시보드")
@@ -62,7 +67,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     df_vehicle = load_excel(file_path, "차량+운전자별")
     df_monthly = load_excel(file_path, "운전자별")
     df_daily = load_excel(file_path, "일별)차량+운전자")
-    df_cert_24 = load_excel(file_path, "24년 명단")
+    # df_cert_24 = load_excel(file_path, "24년 명단")
     df_cert_25 = load_excel(file_path, "25년 후보자")
 
     # 조건 필터링
@@ -191,8 +196,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
             company_total = len(df_company_driver)
             company_percent = 0.0  # 또는 표시하지 않도록 설정
 
-        # 표시
-        st.markdown("### 🏅 이달의 순위 요약")
+        # 표시(순위)
         st.markdown(f"""
         <div style='background-color: #f9f9f9; padding: 15px; border-radius: 8px; line-height: 1.8;'>
 
@@ -203,7 +207,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         </p>
 
         <p style='font-size: 18px; margin: 5px 0;'>
-            <strong>🏢 {company_input} 내 순위</strong>: 
+            <strong>🧑‍💼 {company_input} 내 순위</strong>: 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>{company_rank}등</span> / 총 {company_total}명 → 
             <span style='font-size: 20px; font-weight: bold; color: orange;'>상위 {company_percent:.1f}%</span>
         </p>
@@ -247,11 +251,55 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
         grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
 
+        # ✅ 24년 인증자 진행바 표시
+        cert_24_total = cert_24_all['전체명수'].sum()
+        cert_24_win = cert_24_all['시상명수'].sum()
+        cert_24_percent = round(cert_24_win / cert_24_total * 100, 1) if cert_24_total > 0 else 0
+
+        st.markdown("**24년 인증자**")
+        st.progress(cert_24_percent / 100)
+        st.markdown(f"상위 {cert_24_percent}% (총 {cert_24_total}명 중 {cert_24_win}명 인증서 수여)")
+
+        is_cert_24_bar = not cert_24_all[
+            (cert_24_all['운수사'] == company_input) &
+            (cert_24_all['성명'] == user_name_input) &
+            (cert_24_all['아이디'].astype(str) == user_id_input)
+        ].empty
+
+        if is_cert_24_bar:
+            st.success(f"24년 상위 {cert_24_percent}% 우수운전자이십니다! 🏅")
+
+        # ✅ 25년 진행바 (25년 명단 시트 기반) - 실제 열 존재 여부 기준으로 진행바 표시
+        progress_columns = [col for col in cert_25_all.columns if "분기 등급" in str(col)]
+
+        for col_name in progress_columns:
+            bar_quarter = col_name.split("분기")[0]
+            st.markdown(f"**25년 인증 현황 - {bar_quarter}분기**")
+
+            cert_25_q = cert_25_all[cert_25_all[col_name].notnull()]
+            bar_total = len(cert_25_q)
+            bar_win = len(cert_25_q[cert_25_q[col_name].isin(['A', 'S'])])
+            bar_percent = round(bar_win / bar_total * 100, 1) if bar_total > 0 else 0
+
+            st.progress(bar_percent / 100)
+            st.markdown(f"상위 {bar_percent}% (총 {bar_total}명 중 {bar_win}명 인증서 수여)")
+
+            is_certified = not cert_25_q[
+                (cert_25_q['운수사'] == company_input) &
+                (cert_25_q['운전자ID'].astype(str) == user_id_input) &
+                (cert_25_q['운전자이름'] == user_name_input) &
+                (cert_25_q[col_name].isin(['A', 'S']))
+            ].empty
+
+            if is_certified:
+                st.success(f"{bar_quarter}분기 상위 {bar_percent}% 우수운전자이십니다! 🎖")
+
+        # 매달 표시 (24년 인증, 25년 분기별)
         # 24년 인증 확인
-        is_cert_24 = not df_cert_24[
-            (df_cert_24['운수사'] == company_input) &
-            (df_cert_24['성명'] == user_name_input) &
-            (df_cert_24['아이디'].astype(str) == user_id_input)
+        is_cert_24 = not cert_24_all[
+            (cert_24_all['운수사'] == company_input) &
+            (cert_24_all['성명'] == user_name_input) &
+            (cert_24_all['아이디'].astype(str) == user_id_input)
         ].empty
 
         if is_cert_24:
@@ -275,6 +323,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
 
         cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;'>"
 
+        # 25년 인증현황
         # 현재 날짜 기준으로 현재 연도/월 확인
         now = datetime.datetime.now()
         current_year = int(str(now.year)[-2:])  # 25
