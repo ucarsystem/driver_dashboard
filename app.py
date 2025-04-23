@@ -68,7 +68,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
     df_monthly = load_excel(file_path, "운전자별")
     df_daily = load_excel(file_path, "일별)차량+운전자")
     # df_cert_24 = load_excel(file_path, "24년 명단")
-    df_cert_25 = load_excel(file_path, "25년 후보자")
+    # df_cert_25 = load_excel(file_path, "25년 후보자")
 
     # 조건 필터링
     filtered = df[
@@ -252,8 +252,8 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
 
         # ✅ 24년 인증자 진행바 표시
-        cert_24_total = cert_24_all['전체명수'].sum()
-        cert_24_win = cert_24_all['시상명수'].sum()
+        cert_24_total = int(cert_24_all['전체명수'].sum())
+        cert_24_win = int(cert_24_all['시상명수'].sum())
         cert_24_percent = round(cert_24_win / cert_24_total * 100, 1) if cert_24_total > 0 else 0
 
         st.markdown("**24년 인증자**")
