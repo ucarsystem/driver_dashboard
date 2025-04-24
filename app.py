@@ -682,7 +682,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         <span style='color: green; font-weight: bold;'>{grade_target}등급</span>까지 도달 목표!!
         </p>"""
 
-        #급감속이 5보다 작으면 공회전관리멘트 보여주기
+        #급감속이 20보다 작으면 공회전관리멘트 보여주기
         additional_text = idle_text if this_break <20 else  break_text
 
         st.markdown(f"""
