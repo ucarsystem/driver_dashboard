@@ -131,7 +131,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         if this_grade in ["S", "A"]:
             summary_msg = f"🎉 {int(month_input)}월 <b>{this_grade}</b>등급 달성! 안정적인 운전 감사합니다."
         elif this_break > 20:
-            summary_msg = f"✅ {int(month_input)}월 급감속 <b>{this_break:.1f}</b>회! 탕별 급감속 1회 목표로 <b>{grade_target}등급</b>까지 도전해보세요!"
+            summary_msg = f"⚠️ {int(month_input)}월 급감속 <b>{this_break:.1f}</b>회! 탕별 급감속 1회 목표로 <b>{grade_target}등급</b>까지 도전해보세요!"
         elif this_idle > ave_idle:
             summary_msg = f"⚠️ 공회전율이 다소 높습니다. 시동 관리를 통해 <b>{grade_target}등급</b> 도전해보세요!"
         else:
@@ -683,7 +683,7 @@ if st.button("조회하기") and company_input and user_id_input and user_name_i
         </p>"""
 
         #급감속이 5보다 작으면 공회전관리멘트 보여주기
-        additional_text = idle_text if this_break <5 else  break_text
+        additional_text = idle_text if this_break <20 else  break_text
 
         st.markdown(f"""
         <div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px;'>
