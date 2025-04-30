@@ -89,8 +89,8 @@ if st.button("1️⃣ 운전자 정보 확인"):
                     'month_input': month_input
                 })
                 st.experimental_rerun()
-            else:
-                st.warning("❌ 입력하신 정보와 일치하는 운전자 정보를 찾을 수 없습니다.")
+            # else:
+            #     st.warning("❌ 입력하신 정보와 일치하는 운전자 정보를 찾을 수 없습니다.")
         # else:
         #     st.warning("⚠️ 운수사, 운전자 ID, 운전자 이름을 모두 입력해주세요.")
     
@@ -755,7 +755,7 @@ if "file_path" in st.session_state:
         else:
             st.warning("해당 운전자의 정보가 없습니다. 관리자에 문의해주세요.")
     else:
-            st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
+        st.warning("운수사, 운전자 ID, 운전자 이름을 확인해주세요.")
 else:
     st.warning("운수사, 운전자 ID, 운전자 이름을 입력하세요.")
 
