@@ -46,15 +46,15 @@ cert_25_all = load_excel(medal_filepath, "25년 명단")
 
 # Streamlit UI 구성🚍
 st.title("🚍 운전자별 대시보드")
-company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=None)
+company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
 
-user_id_input = st.text_input("운전자 ID를 입력하세요")
+user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 # st.markdown("""
 #     <a href='https://driverid-xgkps9rbvh4iph8yrcvovb.streamlit.app/' target='_blank' 
 #     style='display: inline-block; padding: 10px 20px; background-color: green; color: white; font-weight: bold; 
 #     text-align: center; text-decoration: none; border-radius: 5px;'>내 ID를 모른다면? >> ID 조회하기</a>
 # """, unsafe_allow_html=True)
-user_name_input = st.text_input("운전자 이름을 입력하세요")
+user_name_input = st.text_input("운전자 이름을 입력하세요", value=st.session_state.get("user_name_input", ""))
 
 # ID목록 체크
 if st.button("1️⃣ 운전자 정보 확인"):
@@ -91,8 +91,8 @@ if st.button("1️⃣ 운전자 정보 확인"):
                 st.experimental_rerun()
             else:
                 st.warning("❌ 입력하신 정보와 일치하는 운전자 정보를 찾을 수 없습니다.")
-        else:
-            st.warning("⚠️ 운수사, 운전자 ID, 운전자 이름을 모두 입력해주세요.")
+        # else:
+        #     st.warning("⚠️ 운수사, 운전자 ID, 운전자 이름을 모두 입력해주세요.")
     
 # Step 2: 파일 로드 후 조회
 if "file_path" in st.session_state:
