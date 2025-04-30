@@ -22,7 +22,7 @@ plt.rcParams['axes.unicode_minus'] = False
 # 기본 경로 설정
 file_dir = "./file"
 company_file = os.path.join(file_dir, "company_info.xlsx")
-id_check_file = os.path.join(file_dir, "ID목록.xlsx")
+id_check_file = os.path.join(file_dir, "인천ID.xlsx")
 file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
 
 # 엑셀 파일 로드 함수
