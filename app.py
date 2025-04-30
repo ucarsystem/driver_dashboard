@@ -88,7 +88,6 @@ if st.button("1️⃣ 운전자 정보 확인"):
                     'year_input': year_input,
                     'month_input': month_input
                 })
-                st.experimental_rerun()
 
                 df = load_excel(file_path, "매크로(운전자리스트)")
                 df_vehicle = load_excel(file_path, "차량+운전자별")
