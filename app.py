@@ -70,33 +70,40 @@ if st.button("1️⃣ 운전자 정보 확인"):
         if not valid_user.empty:
             st.success("✅ 해당 운전자의 정보를 조회하겠습니다.")
 
-            with st.form("select_month_form"):
-                year_input = st.selectbox("년도를 입력하세요", [25])
-                month_input = st.selectbox("월을 입력하세요", ["01", "02", "03", "04", "05", "06"]).zfill(2)
-                submitted = st.form_submit_button("2️⃣ 조회 실행하기")
+    year_input = "25"
+    month_input = "06"
+    input_yyyymm = f"{year_input}{month_input}"
+    file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
+    file_path = os.path.join(file_dir, file_name)
 
-            if submitted:
-                input_yyyymm = f"{year_input}{month_input}"
-                file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
-                file_path = os.path.join(file_dir, file_name)
-                st.session_state.update({
-                    'company_input': company_input,
-                    'user_id_input': user_id_input,
-                    'user_name_input': user_name_input,
-                    'input_yyyymm': input_yyyymm,
-                    'file_path': file_path,
-                    'year_input': year_input,
-                    'month_input': month_input
-                })
-                st.experimental_rerun()
+
+            # with st.form("select_month_form"):
+                # year_input = st.selectbox("년도를 입력하세요", [25])
+                # month_input = st.selectbox("월을 입력하세요", ["01", "02", "03", "04", "05", "06"]).zfill(2)
+                # submitted = st.form_submit_button("2️⃣ 조회 실행하기")
+
+            # if submitted:
+            #     input_yyyymm = f"{year_input}{month_input}"
+            #     file_name = f"인천 개인별 대시보드_{year_input}년{month_input}월.xlsx"
+            #     file_path = os.path.join(file_dir, file_name)
+            #     st.session_state.update({
+            #         'company_input': company_input,
+            #         'user_id_input': user_id_input,
+            #         'user_name_input': user_name_input,
+            #         'input_yyyymm': input_yyyymm,
+            #         'file_path': file_path,
+            #         'year_input': year_input,
+            #         'month_input': month_input
+            #     })
+            #     st.experimental_rerun()
     
 # Step 2: 파일 로드 후 조회
-if "file_path" in st.session_state:
-    company_input = st.session_state["company_input"]
-    user_id_input = st.session_state["user_id_input"]
-    user_name_input = st.session_state["user_name_input"]
-    input_yyyymm = st.session_state["input_yyyymm"]
-    file_path = st.session_state["file_path"]
+# if "file_path" in st.session_state:
+#     company_input = st.session_state["company_input"]
+#     user_id_input = st.session_state["user_id_input"]
+#     user_name_input = st.session_state["user_name_input"]
+#     input_yyyymm = st.session_state["input_yyyymm"]
+#     file_path = st.session_state["file_path"]
 
     if os.path.exists(file_path):
         df = load_excel(file_path, "매크로(운전자리스트)")
