@@ -57,7 +57,7 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 user_name_input = st.text_input("운전자 이름을 입력하세요", value=st.session_state.get("user_name_input", ""))
 
 # ID목록 체크
-if st.button("1️운전자 정보 확인"):
+if st.button("운전자 정보 확인"):
     if company_input and user_id_input and user_name_input:
         df_id_list = load_excel(id_check_file, "ID목록") if os.path.exists(id_check_file) else pd.DataFrame()
 
@@ -271,6 +271,7 @@ if st.button("1️운전자 정보 확인"):
 
                 grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
 
+                grouped['가중평균달성율'] = pd.to_numeric(grouped['가중평균달성율'], errors='coerce')
                 grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
                 grouped['등급'] = grouped['가중평균달성율'].apply(calc_grade)
                 grouped['날짜'] = pd.to_datetime(grouped['DATE'])
