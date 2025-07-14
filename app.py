@@ -265,8 +265,10 @@ if st.button("1️⃣ 운전자 정보 확인"):
                 (df_daily['운수사'] == company_input) &
                 (df_daily['운전자ID'].astype(str) == user_id_input) &
                 (df_daily['운전자이름'] == user_name_input)
+                (df_daily['최종평가'] == "최종")
             ]
             if not df_daily_filtered.empty:
+
                 grouped = df_daily_filtered.groupby('DATE')['가중평균달성율'].sum().reset_index()
 
                 grouped['달성률값'] = (grouped['가중평균달성율'] * 100).round(0)
