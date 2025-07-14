@@ -57,7 +57,7 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 user_name_input = st.text_input("운전자 이름을 입력하세요", value=st.session_state.get("user_name_input", ""))
 
 # ID목록 체크
-if st.button("1️⃣ 운전자 정보 확인"):
+if st.button("1️운전자 정보 확인"):
     if company_input and user_id_input and user_name_input:
         df_id_list = load_excel(id_check_file, "ID목록") if os.path.exists(id_check_file) else pd.DataFrame()
 
