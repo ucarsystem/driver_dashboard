@@ -72,7 +72,7 @@ if st.button("1️⃣ 운전자 정보 확인"):
 
             with st.form("select_month_form"):
                 year_input = st.selectbox("년도를 입력하세요", [25])
-                month_input = st.selectbox("월을 입력하세요", ["01", "02", "03", "04"]).zfill(2)
+                month_input = st.selectbox("월을 입력하세요", ["01", "02", "03", "04", "05", "06"]).zfill(2)
                 submitted = st.form_submit_button("2️⃣ 조회 실행하기")
 
             if submitted:
@@ -89,10 +89,6 @@ if st.button("1️⃣ 운전자 정보 확인"):
                     'month_input': month_input
                 })
                 st.experimental_rerun()
-            # else:
-            #     st.warning("❌ 입력하신 정보와 일치하는 운전자 정보를 찾을 수 없습니다.")
-        # else:
-        #     st.warning("⚠️ 운수사, 운전자 ID, 운전자 이름을 모두 입력해주세요.")
     
 # Step 2: 파일 로드 후 조회
 if "file_path" in st.session_state:
@@ -255,167 +251,6 @@ if "file_path" in st.session_state:
             </div>
             """, unsafe_allow_html=True)
 
-            # 2. 인증 현황🏅
-            st.markdown("---")
-            st.subheader("🏆나의 인증 현황")
-
-
-            st.markdown(f"<div style='background-color: rgba(211, 211, 211, 0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'> 4분기 모두 우수인증자 수여 시 그랜드슬림 달성!", unsafe_allow_html=True)
-
-            from calendar import month_abbr
-            df_cert_25_summary = df_monthly[
-                (df_monthly['운수사'] == company_input) &
-                (df_monthly['운전자ID'].astype(str) == user_id_input) &
-                (df_monthly['운전자이름'] == user_name_input)&
-                (df_monthly['년월'].astype(str).str.startswith("25"))
-            ]
-
-            medal_url = "https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal.png"
-            medal_black_url = "https://raw.githubusercontent.com/ucarsystem/driver_dashboard/main/medal_black.png"
-
-            # 분기/월 전처리
-            df_cert_25_summary['년'] = df_cert_25_summary['년월'].astype(str).str[:2].astype(int)
-            df_cert_25_summary['월'] = df_cert_25_summary['년월'].astype(str).str[2:].astype(int)
-            df_cert_25_summary['분기'] = df_cert_25_summary['월'].apply(lambda m: (m - 1) // 3 + 1)
-
-            # 분기별 평균: 각 분기에 해당하는 월의 평균
-            quarter_avg = (
-                df_cert_25_summary
-                .groupby(['년', '분기'])
-                .agg({'가중달성율': 'mean'})
-                .reset_index()
-            )
-
-            quarter_avg['등급'] = quarter_avg['가중달성율'].apply(calc_grade)
-
-            grouped_month = df_cert_25_summary[['년', '월', '등급']].copy()
-            grouped_month = grouped_month.rename(columns={'등급': '월별등급'})
-
-            # ✅ 24년 인증자 진행바 표시
-            cert_24_total = int(cert_24_all['전체명수'].sum())
-            cert_24_win = int(cert_24_all['시상명수'].sum())
-            cert_24_percent = round(cert_24_win / cert_24_total * 100, 1) if cert_24_total > 0 else 0
-
-            st.markdown("**24년 인증자**")
-            st.progress(cert_24_percent / 100)
-            st.markdown(f"상위 {cert_24_percent}% (총 {cert_24_total}명 중 {cert_24_win}명 인증서 수여)")
-
-            is_cert_24_bar = not cert_24_all[
-                (cert_24_all['운수사'] == company_input) &
-                (cert_24_all['성명'] == user_name_input) &
-                (cert_24_all['아이디'].astype(str) == user_id_input)
-            ].empty
-
-            if is_cert_24_bar:
-                st.success(f"24년 상위 {cert_24_percent}% 우수운전자이십니다! 🏅")
-
-            # ✅ 25년 진행바 (25년 명단 시트 기반) - 실제 열 존재 여부 기준으로 진행바 표시
-            progress_columns = [col for col in cert_25_all.columns if "분기 등급" in str(col)]
-
-            for col_name in progress_columns:
-                bar_quarter = col_name.split("분기")[0]
-                st.markdown(f"**25년 인증 현황 - {bar_quarter}분기**")
-
-                cert_25_q = cert_25_all[cert_25_all[col_name].notnull()]
-                bar_total = len(cert_25_q)
-                bar_win = len(cert_25_q[cert_25_q[col_name].isin(['A', 'S'])])
-                bar_percent = round(bar_win / bar_total * 100, 1) if bar_total > 0 else 0
-
-                st.progress(bar_percent / 100)
-                st.markdown(f"상위 {bar_percent}% (총 {bar_total}명 중 {bar_win}명 인증서 수여)")
-
-                is_certified = not cert_25_q[
-                    (cert_25_q['운수사'] == company_input) &
-                    (cert_25_q['운전자ID'].astype(str) == user_id_input) &
-                    (cert_25_q['운전자이름'] == user_name_input) &
-                    (cert_25_q[col_name].isin(['A', 'S']))
-                ].empty
-
-                if is_certified:
-                    st.success(f"{bar_quarter}분기 상위 {bar_percent}% 우수운전자이십니다! 🎖")
-
-            # 매달 표시 (24년 인증, 25년 분기별)
-            # 24년 인증 확인
-            is_cert_24 = not cert_24_all[
-                (cert_24_all['운수사'] == company_input) &
-                (cert_24_all['성명'] == user_name_input) &
-                (cert_24_all['아이디'].astype(str) == user_id_input)
-            ].empty
-
-            if is_cert_24:
-                medal_24 = (
-                    "<div style='width: 180px; height: 180px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
-                    "<div style='font-size: 15px; font-weight: bold;'>24년 전체</div>"
-                    f"<img src='{medal_url}' width='100'>"
-                    f"<div style='font-weight:bold; font-size: 15px; background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;display: inline-block;'>🏅 우수운전자 🏅</div>"
-                    "</div>"
-                )
-            else:
-                medal_24 = (
-                    "<div style='width: 180px; height: 180px; text-align: center; border: 2px solid #888; border-radius: 10px; padding: 10px; margin-bottom: 30px;'>"
-                    "<div style='font-size: 15px; font-weight: bold;'>24년 전체</div>"
-                    f"<img src='{medal_black_url}' width='100'>"
-                    f"<div style='font-weight:bold; font-size: 13px; display: inline-block;'>다음 기회를 도전해보세요!</div>"
-                    "</div>"
-
-                )
-            st.markdown(medal_24, unsafe_allow_html=True)
-
-            cert_grid = "<div style='display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;'>"
-
-            # 25년 인증현황
-            # 현재 날짜 기준으로 현재 연도/월 확인
-            now = datetime.datetime.now()
-            current_year = int(str(now.year)[-2:])  # 25
-            current_month = now.month
-            current_quarter = (current_month - 1) // 3 + 1
-
-            for q_idx, q_row in quarter_avg.iterrows():
-                year, quarter, avg_score, grade = q_row['년'], int(q_row['분기']), q_row['가중달성율'], q_row['등급']
-                quarter_title = f"{year}년 {quarter}분기"
-
-                months_in_quarter = grouped_month[
-                    (grouped_month['년'] == year) & 
-                    (grouped_month['월'].between((quarter - 1) * 3 + 1, quarter * 3))
-                ]
-
-                if year < current_year or (year == current_year and quarter < current_quarter):
-                    if avg_score >= 0.95:
-                        medal = (
-                            f"<img src='{medal_url}' width='100'>"
-                            f"<div style='font-weight:bold; font-size: 15px; background: linear-gradient(to right, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;display: inline-block;'>✨ 우수운전자 ✨</div>"
-                        )
-                    else:
-                        medal = (
-                            f"<img src='{medal_black_url}' width='100'>"
-                            f"<div style='font-weight:bold;'>{grade}({avg_score*100:.0f}%)</div>"
-                        )
-                else:
-                    medal = (
-                        f"<img src='{medal_black_url}' width='100'>"
-                        f"<div style='font-size: 13px;'>진행중...({avg_score*100:.0f}%)</div>"
-                    )
-
-                # 월별 박스를 가로 배치하기 위한 container 추가
-                month_boxes = "".join([
-                    "<div style='margin: 15px; text-align: center; display: inline-block;'>"
-                    f"<div style='font-size: 16px; font-weight: bold;'>{m_row['월']}월</div>"
-                    f"<div style='font-size: 24px;'>{'🥇' if m_row['월별등급'] in ['S', 'A'] else m_row['월별등급']}</div>"
-                    "</div>"
-                    for _, m_row in months_in_quarter.iterrows()
-                ])
-
-                cert_grid += (
-                    "<div style='width: 200px; text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 10px;'>"
-                    f"<div style='font-size: 15px; font-weight: bold;'>{quarter_title}</div>"
-                    f"{medal}"
-                    f"<div style='margin-top: 15px; display: flex; justify-content: center;'>{month_boxes}</div>"
-                    "</div>"
-                )
-
-            cert_grid += "</div>"
-            st.markdown(cert_grid, unsafe_allow_html=True)
-
             # 3. 📅 일별 달성률 및 등급 표시
             st.markdown("---")
             st.subheader("📅 일별 등급 스탬프")
@@ -449,7 +284,7 @@ if "file_path" in st.session_state:
                         else:
                             grade = grade_map.get(day, "")
                             if grade in ["S", "A"]:
-                                emoji = "<div style='font-size: 30px;'>🎖️</div>"
+                                emoji = f"<div style='color: green; font-size: 30px; font-weight: bold;'>{grade}</div>"
                                 label = ""
                             elif grade in ["B", "C"]:
                                 emoji = f"<div style='color: orange; font-size: 30px; font-weight: bold;'>{grade}</div>"
@@ -471,11 +306,6 @@ if "file_path" in st.session_state:
                     <th style='color: red; width: 80px;'>일</th><th style='width: 80px;'>월</th><th style='width: 80px;'>화</th><th style='width: 80px;'>수</th><th style='width: 80px;'>목</th><th style='width: 80px;'>금</th><th style='width: 80px;'>토</th>
                 </tr>
                 """ + "".join(calendar_rows) + "</table>"
-                # <table style='border-collapse: collapse; width: 100%; text-align: center; background-color: #f0f5ef;'>
-                # <tr style='background-color: #e0e0e0;'>
-                #     <th style='color: red;'>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
-                # </tr>
-                # """ + "".join(calendar_rows) + "</table>"
 
                 st.markdown(html, unsafe_allow_html=True)
 
