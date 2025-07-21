@@ -367,12 +367,12 @@ for metric in metrics:
     ax.set_xlim(metric['min'], metric['max'])
     ax.set_ylim(0, 1)
     ax.set_yticks([])
-    ax.set_title(metric['name'], fontsize=10)
+    ax.set_title(metric['name'], fontsize=10, pad=15)
 
     # 👉 범례를 위쪽 가운데에 작게 표시
     ax.legend(
         loc='upper center',
-        bbox_to_anchor=(0.5, 1.35),  # x중앙, y축 위로
+        bbox_to_anchor=(0.5, 1.4),  # x중앙, y축 위로
         ncol=3,
         fontsize=8,
         frameon=False
