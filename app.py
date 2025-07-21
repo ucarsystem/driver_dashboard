@@ -48,7 +48,7 @@ cert_25_all = load_excel(medal_filepath, "25년 명단")
 # Streamlit UI 구성🚍
 # 제목
 st.markdown("""
-<h1 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h1>
+<h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h1>
 """, unsafe_allow_html=True)
 
 # 기본 정보
