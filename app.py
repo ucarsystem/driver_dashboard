@@ -87,10 +87,10 @@ with col1:
 
 with col2:
     st.markdown("""
-    <div style='line-height: 1.6; font-size: 16px;'>
+    <div style='line-height: 1.6; font-size: 24x;'>
         <b>달성율</b><br/>
         <span style='font-size: 24px; color: black;'><b>95%</b></span><br/><br/>
-        <span style='color: orange;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
+        <span style='color: red;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
     </div>
     """, unsafe_allow_html=True)
 
