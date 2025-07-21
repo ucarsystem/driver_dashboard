@@ -12,6 +12,7 @@ import matplotlib.font_manager as fm
 import matplotlib.ticker as ticker
 from openpyxl import load_workbook
 import calendar
+import streamlit.components.v1 as components
 import datetime
 import altair as alt
 
@@ -197,7 +198,8 @@ data = {
 calendar_html = generate_calendar_html(data, 2025, 6)
 
 with st.expander("📅 이번달 일별 달성률 보기"):
-    st.markdown(calendar_html, unsafe_allow_html=True)
+    # st.markdown(calendar_html, unsafe_allow_html=True)
+    components.html(calendar_html, height=500, scrolling=True)
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
@@ -298,7 +300,7 @@ st.markdown("""
 # draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 metrics = [
-    {"name": "달성율", "my": 45, "prev": 42, "avg": 50, "min": 60, "max": 100},
+    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 100},
     {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50},
     {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60}
 ]
