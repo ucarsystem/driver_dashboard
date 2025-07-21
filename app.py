@@ -195,7 +195,7 @@ data = {
     6: "F", 7: "B", 8: "C", 9: "A", 10: "A",
     11: "D", 12: "C", 13: "S", 14: "B", 15: "C"
 }
-calendar_html = generate_calendar_html(data, 2025, 6)
+calendar_html = generate_calendar_html(data, 2025, 7)
 
 with st.expander("📅 이번달 일별 달성률 보기"):
     # st.markdown(calendar_html, unsafe_allow_html=True)
