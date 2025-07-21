@@ -88,6 +88,7 @@ with col1:
 with col2:
     st.markdown("""
     <div style='line-height: 1.6; font-size: 24x;'>
+        <b></b><br/>
         <b>달성율</b><br/>
         <span style='font-size: 24px; color: black;'><b>95%</b></span><br/><br/>
         <span style='color: red;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
@@ -106,12 +107,12 @@ with col2:
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
                 **등급 기준표**  
-                - S : 95% 이상  
-                - A : 90~95%  
-                - B : 85~90%  
-                - C : 80~85%  
-                - D : 75~80%  
-                - F : 70~75%
+                - 최우수 S : 95% 이상  
+                - 우수 A : 90~95%  
+                - 양호 B : 85~90%  
+                - 중립 C : 80~85%  
+                - 노력 D : 75~80%  
+                - 초보 F : 70~75%
                 """)
 if "show_graph" not in st.session_state:
     st.session_state.show_graph = False
