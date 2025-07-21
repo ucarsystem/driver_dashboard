@@ -144,8 +144,7 @@ def generate_calendar_html(data, year, month):
 data = {
     1: "A", 2: "B", 3: "C", 4: "A", 5: "S",
     6: "F", 7: "B", 8: "C", 9: "A", 10: "A",
-    11: "D", 12: "C", 13: "S", 14: "B", 15: "C",
-    # ...
+    11: "D", 12: "C", 13: "S", 14: "B", 15: "C"
 }
 calendar_html = generate_calendar_html(data, 2025, 6)
 
