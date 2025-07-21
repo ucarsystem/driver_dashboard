@@ -156,50 +156,103 @@ with st.expander("📊 월별 달성률 보기", expanded=False):
     st.altair_chart(chart, use_container_width=True)
 
 # 일별 데이터 팝업
-def generate_calendar_html(data, year, month):
+def generate_calendar_html_v2(data, year, month):
     cal = calendar.Calendar()
     month_days = cal.monthdayscalendar(year, month)
 
     grade_color = {
-        "S": "green", "A": "green",
-        "B": "orange", "C": "orange",
-        "D": "red", "F": "red"
+        "S": "#0a860a",  # 진초록
+        "A": "#0a860a",
+        "B": "#007bff",  # 파랑
+        "C": "#007bff",
+        "D": "red",
+        "F": "red"
     }
 
-    html = "<table style='border-collapse: collapse; margin: auto;'>"
-    html += """
+    html = """
+    <style>
+        table.calendar {
+            border-collapse: collapse;
+            margin: auto;
+            font-family: 'Malgun Gothic', sans-serif;
+        }
+        table.calendar th {
+            background: #f0f0f0;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        table.calendar td {
+            border: 1px solid #aaa;
+            width: 90px;
+            height: 80px;
+            vertical-align: top;
+            padding: 4px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .day-num {
+            font-weight: bold;
+        }
+        .grade {
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .percent {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+    </style>
+    <table class="calendar">
         <tr>
-        <th style='color:red'>일</th><th>월</th><th>화</th>
-        <th>수</th><th>목</th><th>금</th><th>토</th></tr>
+            <th style='color:red'>일</th><th>월</th><th>화</th>
+            <th>수</th><th>목</th><th>금</th><th style='color:blue'>토</th>
+        </tr>
     """
 
     for week in month_days:
         html += "<tr>"
         for day in week:
             if day == 0:
-                html += "<td style='padding:15px;'></td>"
+                html += "<td></td>"
             else:
-                grade = data.get(day, "")
-                color = grade_color.get(grade, "black")
-                html += f"""
-                <td style='padding:15px; text-align:center; border:1px solid #ccc'>
-                    <div style='font-weight:bold;'>{day}</div>
-                    <div style='font-size:24px; color:{color}'>{grade}</div>
-                </td>
-                """
+                if day in data:
+                    grade = data[day]['grade']
+                    percent = data[day]['percent']
+                    color = grade_color.get(grade, "black")
+                    html += f"""
+                    <td>
+                        <div class="day-num">{day}</div>
+                        <div class="grade" style="color:{color}">{grade}등급</div>
+                        <div class="percent" style="color:{color}">({percent}%)</div>
+                    </td>
+                    """
+                else:
+                    html += f"<td><div class='day-num'>{day}</div></td>"
         html += "</tr>"
     html += "</table>"
     return html
-data = {
-    1: "A", 2: "B", 3: "C", 4: "A", 5: "S",
-    6: "F", 7: "B", 8: "C", 9: "A", 10: "A",
-    11: "D", 12: "C", 13: "S", 14: "B", 15: "C"
+calendar_data = {
+    2: {"grade": "S", "percent": 100},
+    3: {"grade": "A", "percent": 96},
+    4: {"grade": "B", "percent": 91},
+    5: {"grade": "S", "percent": 101},
+    9: {"grade": "S", "percent": 100},
+    10: {"grade": "A", "percent": 96},
+    11: {"grade": "C", "percent": 89},
+    16: {"grade": "B", "percent": 91},
+    18: {"grade": "A", "percent": 96},
+    19: {"grade": "S", "percent": 101},
+    20: {"grade": "S", "percent": 100},
+    23: {"grade": "S", "percent": 101},
+    24: {"grade": "A", "percent": 96},
+    25: {"grade": "C", "percent": 89},
+    30: {"grade": "S", "percent": 100},
 }
-calendar_html = generate_calendar_html(data, 2025, 7)
+calendar_html = generate_calendar_html_v2(calendar_data, 2025, 6)
 
 with st.expander("📅 이번달 일별 달성률 보기"):
-    # st.markdown(calendar_html, unsafe_allow_html=True)
-    components.html(calendar_html, height=500, scrolling=True)
+    components.html(calendar_html, height=600, scrolling=True)
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
@@ -300,7 +353,7 @@ st.markdown("""
 # draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 metrics = [
-    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 100},
+    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130},
     {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50},
     {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60}
 ]
@@ -314,8 +367,17 @@ for metric in metrics:
     ax.set_xlim(metric['min'], metric['max'])
     ax.set_ylim(0, 1)
     ax.set_yticks([])
-    ax.set_title(metric['name'], fontsize=12)
-    ax.legend(loc='center right', fontsize=8)
+    ax.set_title(metric['name'], fontsize=10)
+
+    # 👉 범례를 위쪽 가운데에 작게 표시
+    ax.legend(
+        loc='upper center',
+        bbox_to_anchor=(0.5, 1.35),  # x중앙, y축 위로
+        ncol=3,
+        fontsize=8,
+        frameon=False
+    )
+
     st.pyplot(fig)
 
 
