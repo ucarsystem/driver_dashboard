@@ -70,31 +70,22 @@ def draw_grade_circle(grade="A", label="우수", percent="95%"):
     ax.axis("off")
     st.pyplot(fig)
 
-# 🎯 상단 정보 레이아웃
-col1, col2, col3 = st.columns([1.5, 1.2, 1.3])
+#----------------------------예시1----------------------------
+#왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
+col1, col2, col3 = st.columns([1.5, 1.5, 1.5])
 
 with col1:
-    st.markdown("""
-    <div style='line-height: 1.6;'>
-        <b style='font-size:18px;'>운전자ID</b><br/>
-        <span style='font-size:13px;'>1587 님</span><br/><br/>
-        <b>소속운수사</b><br/>강화교통<br/><br/>
-        <b>노선</b><br/>800번
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
+with col2:
+    st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
+with col3:
+    st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
+
+col1, col2 = st.columns([1, 1.5])
+with col1:
+    draw_grade_circle(grade="A", label="우수", percent="95%")
 
 with col2:
-    def draw_grade_circle(grade="A", label="우수"):
-        fig, ax = plt.subplots(figsize=(2, 2))
-        ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-        ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
-        ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
-        ax.axis("off")
-        st.pyplot(fig)
-
-    draw_grade_circle("A", "우수")
-
-with col3:
     st.markdown("""
     <div style='line-height: 1.6; font-size: 16px;'>
         <b>달성율</b><br/>
@@ -102,24 +93,6 @@ with col3:
         <span style='color: orange;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
     </div>
     """, unsafe_allow_html=True)
-
-#----------------------------예시1----------------------------
-# 왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-# col1, col2, col3 = st.columns([1.5, 1.5, 1.5])
-
-# with col1:
-#     st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
-# with col2:
-#     st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
-# with col3:
-#     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
-
-# col1, col2 = st.columns([1, 1.5])
-# with col1:
-#     draw_grade_circle(grade="A", label="우수", percent="95%")
-
-# with col2:
-#     st.markdown("<br/><br/>**달성율**<br/><b style='font-size: 24px;'>95%</b>", unsafe_allow_html=True)
 
 #----------------------------예시2----------------------------
 # st.markdown("""
