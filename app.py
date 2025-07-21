@@ -12,6 +12,7 @@ import matplotlib.ticker as ticker
 from openpyxl import load_workbook
 import calendar
 import datetime
+import altair as alt
 
 # 한글 폰트 설정
 font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
@@ -56,6 +57,7 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 # """, unsafe_allow_html=True)
 user_name_input = st.text_input("운전자 이름을 입력하세요", value=st.session_state.get("user_name_input", ""))
 
+# 참고치 팝업
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
                 **등급 기준표**  
@@ -66,7 +68,109 @@ with st.expander("📌 참고치 보기"):
                 - D : 75~80%  
                 - F : 70~75%
                 """)
+if "show_graph" not in st.session_state:
+    st.session_state.show_graph = False
 
+if st.button("📊 일별/월별 달성률 보기"):
+    st.session_state.show_graph = not st.session_state.show_graph
+
+if st.session_state.show_graph:
+    st.markdown("#### 월별 달성률 추이")
+    st.bar_chart([70, 75, 80, 85, 92])  # 예시 데이터
+
+if st.button("📌 팝업으로 보기"):
+    with st.modal("등급 기준 팝업창"):
+        st.markdown("### 등급별 설명")
+        st.write("- S: 95% 이상\n- A: 90~95% ...")
+
+#일별/월별 달성률 팝업
+# 예시 데이터 (월별)
+data = pd.DataFrame({
+    "월": ["1월", "2월", "3월", "4월", "5월", "6월"],
+    "달성률": [81.2, 86.4, 89.1, 91.8, 94.2, 96.7],
+    "등급": ["D", "C", "C", "B", "A", "S"]
+})
+
+with st.expander("📊 일별/월별 달성률 보기", expanded=False):
+    st.subheader("월별 달성률 변화")
+
+    chart = alt.Chart(data).mark_bar().encode(
+        x="월",
+        y=alt.Y("달성률", scale=alt.Scale(domain=[0, 100])),
+        color=alt.Color("등급", scale=alt.Scale(
+            domain=["S", "A", "B", "C", "D", "F"],
+            range=["#4CAF50", "#8BC34A", "#FFEB3B", "#FFC107", "#FF5722", "#F44336"]
+        )),
+        tooltip=["월", "달성률", "등급"]
+    ).properties(height=300)
+
+    st.altair_chart(chart, use_container_width=True)
+
+# 일별 데이터 팝업
+def generate_calendar_html(data, year, month):
+    cal = calendar.Calendar()
+    month_days = cal.monthdayscalendar(year, month)
+
+    grade_color = {
+        "S": "green", "A": "green",
+        "B": "orange", "C": "orange",
+        "D": "red", "F": "red"
+    }
+
+    html = "<table style='border-collapse: collapse; margin: auto;'>"
+    html += """
+        <tr>
+        <th style='color:red'>일</th><th>월</th><th>화</th>
+        <th>수</th><th>목</th><th>금</th><th>토</th></tr>
+    """
+
+    for week in month_days:
+        html += "<tr>"
+        for day in week:
+            if day == 0:
+                html += "<td style='padding:15px;'></td>"
+            else:
+                grade = data.get(day, "")
+                color = grade_color.get(grade, "black")
+                html += f"""
+                <td style='padding:15px; text-align:center; border:1px solid #ccc'>
+                    <div style='font-weight:bold;'>{day}</div>
+                    <div style='font-size:24px; color:{color}'>{grade}</div>
+                </td>
+                """
+        html += "</tr>"
+    html += "</table>"
+    return html
+data = {
+    1: "A", 2: "B", 3: "C", 4: "A", 5: "S",
+    6: "F", 7: "B", 8: "C", 9: "A", 10: "A",
+    11: "D", 12: "C", 13: "S", 14: "B", 15: "C",
+    # ...
+}
+html = generate_calendar_html(data, 2025, 6)
+
+# 항목별 그래프수치표시
+def draw_gauge(my_position, prev_position, avg_position, title):
+    labels = ['하위', '40%', '30%', '20%', '10%', '상위']
+    x = [0, 1, 2, 3, 4, 5]
+
+    fig, ax = plt.subplots(figsize=(10, 1.5))
+    ax.hlines(0, 0, 5, color='lightgray', linewidth=10)
+    ax.plot(my_position, 0, marker='^', color='black', markersize=12, label='내 위치')
+    ax.plot(prev_position, 0, marker='v', color='gray', markersize=12, label='전달 위치')
+    ax.plot(avg_position, 0, marker='o', color='green', markersize=12, label='전체 평균')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_yticks([])
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.6), ncol=3)
+    ax.set_xlim(-0.5, 5.5)
+    ax.spines[['top', 'right', 'left', 'bottom']].set_visible(False)
+    st.markdown(f"#### {title}")
+    st.pyplot(fig)
+
+# 예시 호출
+st.markdown("그래프수치표시")
+draw_gauge(my_position=3, prev_position=4, avg_position=2, title="급감속")
 
 # ID목록 체크
 if st.button("운전자 정보 확인"):
