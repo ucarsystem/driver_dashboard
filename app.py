@@ -136,8 +136,8 @@ if "show_graph" not in st.session_state:
 # 예시 데이터 (월별)
 data = pd.DataFrame({
     "월": ["1월", "2월", "3월", "4월", "5월", "6월"],
-    "달성률": [81.2, 86.4, 89.1, 91.8, 94.2, 96.7],
-    "등급": ["D", "C", "C", "B", "A", "S"]
+    "달성률": [94.2, 86.4, 89.1, 91.8, 82.4, 96.7],
+    "등급": ["A", "C", "C", "B", "D", "S"]
 })
 
 with st.expander("📊 월별 달성률 보기", expanded=False):
@@ -196,10 +196,10 @@ def generate_calendar_html_v2(data, year, month):
         }
         .grade {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 18px;
         }
         .percent {
-            font-size: 12px;
+            font-size: 15px;
             margin-top: 2px;
         }
     </style>
