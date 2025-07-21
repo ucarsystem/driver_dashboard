@@ -56,6 +56,18 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 # """, unsafe_allow_html=True)
 user_name_input = st.text_input("운전자 이름을 입력하세요", value=st.session_state.get("user_name_input", ""))
 
+with st.expander("📌 참고치 보기"):
+                st.markdown("""
+                **등급 기준표**  
+                - S : 95% 이상  
+                - A : 90~95%  
+                - B : 85~90%  
+                - C : 80~85%  
+                - D : 75~80%  
+                - F : 70~75%
+                """)
+
+
 # ID목록 체크
 if st.button("운전자 정보 확인"):
     if company_input and user_id_input and user_name_input:
