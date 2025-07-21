@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image, ImageOps
 import matplotlib as mpl 
 import matplotlib.pyplot as plt 
+import matplotlib.patches as patches
 import matplotlib.font_manager as fm  
 import matplotlib.ticker as ticker
 from openpyxl import load_workbook
@@ -58,13 +59,37 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 기본 정보
-st.markdown("""
-<div style='border:1px solid #ccc; border-radius:10px; padding:20px;'>
-    <h2 style='color: green;'>S 등급 <span style='font-size:16px;'>(최우수)</span></h2>
-    <p>달성율: <b>95%</b></p>
-    <p style='color:orange;'>* 다음 S등급까지 5% 남았습니다.</p>
-</div>
-""", unsafe_allow_html=True)
+
+def draw_grade_circle(grade="A", label="우수", percent="95%"):
+    fig, ax = plt.subplots(figsize=(2, 2))
+    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+
+    ax.axis("off")
+    st.pyplot(fig)
+
+# 왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
+col1, col2, col3 = st.columns([1.5, 1, 1.5])
+
+with col1:
+    st.markdown("**0000 님**<br/>", unsafe_allow_html=True)
+    st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
+    st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
+
+with col2:
+    draw_grade_circle(grade="A", label="우수", percent="95%")
+
+with col3:
+    st.markdown("<br/><br/>**달성율**<br/><b style='font-size: 24px;'>95%</b>", unsafe_allow_html=True)
+# st.markdown("""
+# <div style='border:1px solid #ccc; border-radius:10px; padding:20px;'>
+#     <h2 style='color: green;'>S 등급 <span style='font-size:16px;'>(최우수)</span></h2>
+#     <p>달성율: <b>95%</b></p>
+#     <p style='color:orange;'>* 다음 S등급까지 5% 남았습니다.</p>
+# </div>
+# """, unsafe_allow_html=True)
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
