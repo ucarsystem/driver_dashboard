@@ -110,11 +110,11 @@ with st.expander("📌 참고치 보기"):
                 st.markdown("""
                 **등급 기준표**  
                 - 최우수 S : 95% 이상  
-                - 우 수 A : 90~95%  
-                - 양 호 B : 85~90%  
-                - 중 립 C : 80~85%  
-                - 노 력 D : 75~80%  
-                - 초 보 F : 70~75%
+                - 우  수 A : 90~95%  
+                - 양  호 B : 85~90%  
+                - 중  립 C : 80~85%  
+                - 노  력 D : 75~80%  
+                - 초  보 F : 70~75%
                 """)
 if "show_graph" not in st.session_state:
     st.session_state.show_graph = False
@@ -240,7 +240,7 @@ def draw_rank_bar(title, my_percent):
     # 스타일링
     ax.set_xticks([0, 20, 40, 60, 80, 100])
     ax.set_yticks([])
-    ax.set_title(title, fontsize=13)
+    ax.set_title(title, fontsize=11)
     ax.axis('off')
     st.pyplot(fig)
 
@@ -257,7 +257,7 @@ draw_rank_bar("▶ 동일노선 운전자 중", my_rank_route)
 
 # 노선 순위 참고
 st.markdown("""
-<div style='font-size: 14px; color: gray; margin-top:10px;'>
+<div style='font-size: 20px; color: gray; margin-top:10px;'>
     <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선:</b> 54위 (인천 전체 540개 노선 중)
 </div>
 """, unsafe_allow_html=True)
@@ -267,35 +267,54 @@ st.markdown("""
 <h3>📍 항목별 경제운전 위치</h3>
 """, unsafe_allow_html=True)
 
-def draw_percent_bar(label, my_percent, prev_percent, avg_percent):
-    fig, ax = plt.subplots(figsize=(6, 1))
-    ax.set_xlim(0, 100)
-    ax.axvline(my_percent, color='red', label='나의 위치')
-    ax.axvline(prev_percent, color='black', linestyle='--', label='전달 나의 위치')
-    ax.axvline(avg_percent, color='green', linewidth=8, alpha=0.4, label='전체 평균')
+# def draw_percent_bar(label, my_percent, prev_percent, avg_percent):
+#     fig, ax = plt.subplots(figsize=(6, 1))
+#     ax.set_xlim(0, 100)
+#     ax.axvline(my_percent, color='red', label='나의 위치')
+#     ax.axvline(prev_percent, color='black', linestyle='--', label='전달 나의 위치')
+#     ax.axvline(avg_percent, color='green', linewidth=8, alpha=0.4, label='전체 평균')
+#     ax.set_yticks([])
+#     ax.set_xticks([0, 20, 40, 60, 80, 100])
+#     ax.set_title(label)
+#     ax.legend(loc='upper right')
+#     st.pyplot(fig)
+
+# st.markdown("<h5>달성율</h5>", unsafe_allow_html=True)
+# draw_percent_bar("달성율", my_percent=45, prev_percent=42, avg_percent=50)
+
+# st.markdown("<h5>공회전율</h5>", unsafe_allow_html=True)
+# draw_percent_bar("공회전율", my_percent=20, prev_percent=30, avg_percent=22)
+
+# st.markdown("<h5>평균속도</h5>", unsafe_allow_html=True)
+# draw_percent_bar("평균속도", my_percent=27, prev_percent=25, avg_percent=28)
+
+# st.markdown("<h5>급감속</h5>", unsafe_allow_html=True)
+# draw_percent_bar("급감속", my_percent=30, prev_percent=32, avg_percent=28)
+
+# st.markdown("<h5>급가속</h5>", unsafe_allow_html=True)
+# draw_percent_bar("급가속", my_percent=18, prev_percent=20, avg_percent=15)
+
+# st.markdown("<h5>과속</h5>", unsafe_allow_html=True)
+# draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
+
+metrics = [
+    {"name": "달성율", "my": 45, "prev": 42, "avg": 50, "min": 60, "max": 100},
+    {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50},
+    {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60}
+]
+
+for metric in metrics:
+    fig, ax = plt.subplots(figsize=(5, 0.8))
+    ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
+    ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
+    ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
+
+    ax.set_xlim(metric['min'], metric['max'])
+    ax.set_ylim(0, 1)
     ax.set_yticks([])
-    ax.set_xticks([0, 20, 40, 60, 80, 100])
-    ax.set_title(label)
-    ax.legend(loc='upper right')
+    ax.set_title(metric['name'], fontsize=12)
+    ax.legend(loc='center right', fontsize=8)
     st.pyplot(fig)
-
-st.markdown("<h4>달성율</h4>", unsafe_allow_html=True)
-draw_percent_bar("달성율", my_percent=45, prev_percent=42, avg_percent=50)
-
-st.markdown("<h4>공회전율</h4>", unsafe_allow_html=True)
-draw_percent_bar("공회전율", my_percent=20, prev_percent=30, avg_percent=22)
-
-st.markdown("<h4>평균속도</h4>", unsafe_allow_html=True)
-draw_percent_bar("평균속도", my_percent=27, prev_percent=25, avg_percent=28)
-
-st.markdown("<h4>급감속</h4>", unsafe_allow_html=True)
-draw_percent_bar("급감속", my_percent=30, prev_percent=32, avg_percent=28)
-
-st.markdown("<h4>급가속</h4>", unsafe_allow_html=True)
-draw_percent_bar("급가속", my_percent=18, prev_percent=20, avg_percent=15)
-
-st.markdown("<h4>과속</h4>", unsafe_allow_html=True)
-draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 
 # # 예시 호출
