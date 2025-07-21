@@ -71,17 +71,20 @@ def draw_grade_circle(grade="A", label="우수", percent="95%"):
     st.pyplot(fig)
 
 # 왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-col1, col2, col3 = st.columns([1.5, 1, 1.5])
+col1, col2, col3 = st.columns([1.5, 1.5, 1.5])
 
 with col1:
-    st.markdown("**0000 님**<br/>", unsafe_allow_html=True)
+    st.markdown("**1587 사원**<br/>", unsafe_allow_html=True)
+with col2:
     st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
+with col3:
     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
 
-with col2:
+col1, col2 = st.columns([1, 1.5])
+with col1:
     draw_grade_circle(grade="A", label="우수", percent="95%")
 
-with col3:
+with col2:
     st.markdown("<br/><br/>**달성율**<br/><b style='font-size: 24px;'>95%</b>", unsafe_allow_html=True)
 # st.markdown("""
 # <div style='border:1px solid #ccc; border-radius:10px; padding:20px;'>
