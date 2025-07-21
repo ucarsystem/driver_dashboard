@@ -147,7 +147,10 @@ data = {
     11: "D", 12: "C", 13: "S", 14: "B", 15: "C",
     # ...
 }
-html = generate_calendar_html(data, 2025, 6)
+calendar_html = generate_calendar_html(data, 2025, 6)
+
+with st.expander("📅 일별 달성률 (달력형 보기)"):
+    st.markdown(calendar_html, unsafe_allow_html=True)
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
