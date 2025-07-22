@@ -136,7 +136,7 @@ data = pd.DataFrame({
 )
 
 with st.expander("📊 월별 달성률 보기", expanded=True):
-    st.subheader("월별 달성률 변화")
+    # st.subheader("월별 달성률 변화")
 
     # 막대 차트
     bar = alt.Chart(data).mark_bar().encode(
@@ -416,6 +416,25 @@ for metric in metrics:
 
 
 st.markdown("---")  # 구분선
+
+# 개인별 성과금(충남고려)
+st.markdown("""
+<h3>나의 성과와 보상 (충남고속 초첨)/h3>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div style='border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;'>
+    <h4>경제운전성과</h4>
+    <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
+        <li>나의 리워드 보상: <b>1,000원</b> <span style='color: gray;'>예상</span></li>
+        <li>연료절감액: <b>65,000원</b></li>
+        <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
+            <span style='color: gray;'>(🌳 나무 100그루 심는 효과)</span>
+        </li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
+
 
 # ✨ 슬로건
 st.markdown("""
