@@ -28,31 +28,7 @@ font_prop = fm.FontProperties(fname=font_path)
 plt.rcParams['font.family'] = font_prop.get_name()
 plt.rcParams['axes.unicode_minus'] = False
 
-# 기본 경로 설정
-file_dir = "./file"
-company_file = os.path.join(file_dir, "company_info.xlsx")
-id_check_file = os.path.join(file_dir, "인천ID.xlsx")
-file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
-
-# 엑셀 파일 로드 함수
-def load_excel(path, sheetname):
-    try:
-        return pd.read_excel(path, sheet_name=sheetname)
-    except Exception as e:
-        st.error(f"엑셀 파일 로드 오류: {e}")
-        return None
-    
-# 📂 운수사 목록 불러오기
-df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os.path.exists(company_file) else pd.DataFrame()
-company_list = df_company[0].dropna().tolist() if not df_company.empty else []
-df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
-
-#24년 인증제
-medal_filepath = os.path.join(file_dir, "인증제.xlsx")
-cert_24_all = load_excel(medal_filepath, "24년 명단")
-cert_25_all = load_excel(medal_filepath, "25년 명단")
-
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
 # 🌈 라이트 모드 강제 적용 CSS
 st.markdown("""
@@ -78,7 +54,7 @@ st.markdown("---")
 # 기본 정보
 
 #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-col1, col2, col3 = st.columns([1.5, 1.5, 1.5])
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
