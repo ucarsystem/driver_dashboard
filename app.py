@@ -52,6 +52,20 @@ medal_filepath = os.path.join(file_dir, "인증제.xlsx")
 cert_24_all = load_excel(medal_filepath, "24년 명단")
 cert_25_all = load_excel(medal_filepath, "25년 명단")
 
+st.set_page_config(layout="wide")
+
+# 🌈 라이트 모드 강제 적용 CSS
+st.markdown("""
+    <style>
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    .stApp {
+        background-color: white !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Streamlit UI 구성🚍
 # 제목
@@ -60,19 +74,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("---")
+
 # 기본 정보
 
-def draw_grade_circle(grade="A", label="우수", percent="95%"):
-    fig, ax = plt.subplots(figsize=(2, 2))
-    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    
-    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
-    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
-
-    ax.axis("off")
-    st.pyplot(fig)
-
-#----------------------------예시1----------------------------
 #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
 col1, col2, col3 = st.columns([1.5, 1.5, 1.5])
 
@@ -83,30 +87,36 @@ with col2:
 with col3:
     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
 
+def draw_grade_circle(grade="A", label="우수", percent="95%"):
+    fig, ax = plt.subplots(figsize=(2, 2))
+    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+    ax.axis("off")
+    st.pyplot(fig)
+
+# 등급 원형 + 오른쪽 달성율 텍스트
 col1, col2 = st.columns([1, 1.5])
+
 with col1:
     draw_grade_circle(grade="A", label="우수", percent="95%")
 
+# <div style='line-height: 1.6; font-size: 24x;'>
+# <b>달성율</b><br/>
+# <span style='font-size: 24px; color: black;'><b>95%</b></span><br/><br/>
+# <span style='color: red;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
 with col2:
     st.markdown("""
-    <div style='line-height: 1.6; font-size: 24x;'>
+    <div style='margin-top: 10px'>
         <b></b><br/>
-        <b></b><br/>
-        <b></b><br/>
-        <b>달성율</b><br/>
-        <span style='font-size: 24px; color: black;'><b>95%</b></span><br/><br/>
-        <span style='color: red;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
+        <p style='font-size: 18px;'><b>달성율</b></p>
+        <p style='font-size: 22px; font-weight: bold;'>95%</p>
+        <p style='font-size: 14px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
     </div>
     """, unsafe_allow_html=True)
 
-#----------------------------예시2----------------------------
-# st.markdown("""
-# <div style='border:1px solid #ccc; border-radius:10px; padding:20px;'>
-#     <h2 style='color: green;'>S 등급 <span style='font-size:16px;'>(최우수)</span></h2>
-#     <p>달성율: <b>95%</b></p>
-#     <p style='color:orange;'>* 다음 S등급까지 5% 남았습니다.</p>
-# </div>
-# """, unsafe_allow_html=True)
+
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
