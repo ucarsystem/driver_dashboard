@@ -148,7 +148,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     # )
 
     text = alt.Chart(data).mark_text(
-        dy=-10,
+        dy=-4,
         fontWeight="bold"
     ).encode(
         x="월",
