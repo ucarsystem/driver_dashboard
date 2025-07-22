@@ -132,7 +132,7 @@ data = pd.DataFrame({
 # Altair용 등급 색상 매핑
 등급색상 = alt.Scale(
     domain=["S", "A", "B", "C", "D", "F"],
-    range=["#4CAF50", "#8BC34A", "#03A9F4", "#FFC107", "#FF5722", "#F44336"]
+    range=["#4CAF50", "#4CAF50", "#FFC107", "#FFC107", "#FF2222", "#FF2222"]
 )
 
 with st.expander("📊 월별 달성률 보기", expanded=True):
@@ -144,7 +144,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         y=alt.Y("달성률", scale=alt.Scale(domain=[60, 120])),
         color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
-    )
+    ).properties(height=300)
 
     # 막대 위에 등급 텍스트 표시
     text = alt.Chart(data).mark_text(
