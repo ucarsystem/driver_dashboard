@@ -43,8 +43,32 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
+# 기본 경로 설정
+file_dir = "./file"
+company_file = os.path.join(file_dir, "company_info.xlsx")
+id_check_file = os.path.join(file_dir, "인천ID.xlsx")
+file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
+
+# 엑셀 파일 로드 함수
+def load_excel(path, sheetname):
+    try:
+        return pd.read_excel(path, sheet_name=sheetname)
+    except Exception as e:
+        st.error(f"엑셀 파일 로드 오류: {e}")
+        return None
+    
+# 📂 운수사 목록 불러오기
+df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os.path.exists(company_file) else pd.DataFrame()
+company_list = df_company[0].dropna().tolist() if not df_company.empty else []
+df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
+
+
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
+
+company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
+user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 
 # 제목
 st.markdown("""
