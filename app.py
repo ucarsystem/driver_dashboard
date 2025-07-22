@@ -415,7 +415,22 @@ for metric in metrics:
     st.pyplot(fig)
 
 
-# # 예시 호출
-# st.markdown("그래프수치표시")
-# draw_gauge(my_position=3, prev_position=4, avg_position=2, title="급감속")
+st.markdown("---")  # 구분선
 
+# ✨ 슬로건
+st.markdown("""
+<div style='text-align: center; font-size: 20px; font-weight: bold; color: #2E7D32;'>
+    🌿 오늘도 경제운전, 내일은 더 안전하게! 🌿
+</div>
+""", unsafe_allow_html=True)
+
+# ▶️ 교육 영상 버튼
+st.markdown("""
+<div style='text-align: center; margin-top: 20px;'>
+    <a href='https://www.youtube.com/watch?v=tIJCvwWXGpE' target='_blank'>
+        <button style='padding: 10px 25px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;'>
+            🎥 교육 동영상 보러가기
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
