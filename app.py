@@ -419,7 +419,7 @@ st.markdown("---")  # 구분선
 
 # 개인별 성과금(충남고려)
 st.markdown("""
-<h3>나의 성과와 보상 (충남고속 초첨)/h3>
+<h3>나의 성과와 보상 (충남고속 초첨)</h3>
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -435,6 +435,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("---")  # 구분선
 
 # ✨ 슬로건
 st.markdown("""
