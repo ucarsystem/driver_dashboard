@@ -59,6 +59,7 @@ st.markdown("""
 <h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h1>
 """, unsafe_allow_html=True)
 
+st.markdown("---")
 # 기본 정보
 
 def draw_grade_circle(grade="A", label="우수", percent="95%"):
@@ -110,50 +111,68 @@ with col2:
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
                 **등급 기준표**  
-                - 최우수 S : 95% 이상  
-                - 우  수 A : 90~95%  
-                - 양  호 B : 85~90%  
-                - 중  립 C : 80~85%  
-                - 노  력 D : 75~80%  
-                - 초  보 F : 70~75%
+                - 최우수 S : 100% 이상  
+                - 우  수 A : 95~100%  
+                - 양  호 B : 90~95%  
+                - 중  립 C : 85~90%  
+                - 노  력 D : 80~85%  
+                - 초  보 F : 65~80%
                 """)
 if "show_graph" not in st.session_state:
     st.session_state.show_graph = False
 
-# if st.button("📊 일별/월별 달성률 보기"):
-#     st.session_state.show_graph = not st.session_state.show_graph
-
-# if st.session_state.show_graph:
-#     st.markdown("#### 월별 달성률 추이")
-#     st.bar_chart([70, 75, 80, 85, 92])  # 예시 데이터
-
-# if st.button("📌 팝업으로 보기"):
-#     with st.modal("등급 기준 팝업창"):
-#         st.markdown("### 등급별 설명")
-#         st.write("- S: 95% 이상\n- A: 90~95% ...")
-
 #일별/월별 달성률 팝업
 # 예시 데이터 (월별)
 data = pd.DataFrame({
-    "월": ["1월", "2월", "3월", "4월", "5월", "6월"],
-    "달성률": [94.2, 86.4, 89.1, 91.8, 82.4, 96.7],
-    "등급": ["A", "C", "C", "B", "D", "S"]
+    "월": ["1월", "2월", "3월", "4월", "5월", "6월", "7월(예상)"],
+    "달성률": [92, 97, 89.1, 91.8, 82.4, 100, 95],
+    "등급": ["B", "A", "C", "B", "D", "S", "A"]
 })
 
-with st.expander("📊 월별 달성률 보기", expanded=False):
+# Altair용 등급 색상 매핑
+등급색상 = alt.Scale(
+    domain=["S", "A", "B", "C", "D", "F"],
+    range=["#4CAF50", "#8BC34A", "#03A9F4", "#FFC107", "#FF5722", "#F44336"]
+)
+
+with st.expander("📊 월별 달성률 보기", expanded=True):
     st.subheader("월별 달성률 변화")
 
-    chart = alt.Chart(data).mark_bar().encode(
-        x="월",
-        y=alt.Y("달성률", scale=alt.Scale(domain=[0, 100])),
-        color=alt.Color("등급", scale=alt.Scale(
-            domain=["S", "A", "B", "C", "D", "F"],
-            range=["#4CAF50", "#8BC34A", "#FFEB3B", "#FFC107", "#FF5722", "#F44336"]
-        )),
+    # 막대그래프
+    bar = alt.Chart(data).mark_bar().encode(
+        x=alt.X("월", axis=alt.Axis(labelAngle=0)),  # 👉 labelAngle=0으로 가로 표시
+        y=alt.Y("달성률", scale=alt.Scale(domain=[60, 120])),
+        color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
-    ).properties(height=300)
+    )
 
-    st.altair_chart(chart, use_container_width=True)
+    # 막대 위에 등급 텍스트 표시
+    text = alt.Chart(data).mark_text(
+        align='center',
+        baseline='bottom',
+        dy=-5,  # 높이 조절
+        fontSize=14,
+        fontWeight="bold"
+    ).encode(
+        x="월",
+        y="달성률",
+        text="등급",
+        color=alt.value("black")  # 또는 등급별 색상 매핑 가능
+    )
+
+    st.altair_chart(bar + text, use_container_width=True)
+
+    # chart = alt.Chart(data).mark_bar().encode(
+    #     x=alt.X("월", axis=alt.Axis(labelAngle=0)),  # 👉 labelAngle=0으로 가로 표시
+    #     y=alt.Y("달성률", scale=alt.Scale(domain=[55, 125])),
+    #     color=alt.Color("등급", scale=alt.Scale(
+    #         domain=["S", "A", "B", "C", "D", "F"],
+    #         range=["#4CAF50", "#8BC34A", "#FFEB3B", "#FFC107", "#FF5722", "#F44336"]
+    #     )),
+    #     tooltip=["월", "달성률", "등급"]
+    # ).properties(height=300)
+
+    # st.altair_chart(chart, use_container_width=True)
 
 # 일별 데이터 팝업
 def generate_calendar_html_v2(data, year, month):
@@ -249,9 +268,9 @@ calendar_data = {
     25: {"grade": "C", "percent": 89},
     30: {"grade": "S", "percent": 100},
 }
-calendar_html = generate_calendar_html_v2(calendar_data, 2025, 6)
+calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
-with st.expander("📅 이번달 일별 달성률 보기"):
+with st.expander("📅 7월 일별 달성률 보기"):
     components.html(calendar_html, height=600, scrolling=True)
 
 # 항목별 그래프수치표시
@@ -317,6 +336,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("---")
 # 경제운전 위치 - 퍼센트 기준 바
 st.markdown("""
 <h3>📍 항목별 경제운전 위치</h3>
