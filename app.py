@@ -127,7 +127,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     # 막대 차트
     bar = alt.Chart(data).mark_bar().encode(
         x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
-        y=alt.Y("달성률", scale=alt.Scale(domain=[60, 120]), title="달성률"),
+        y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
         # y2=alt.Y2(value=60),  # ✅ 여기 수정!
         color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
