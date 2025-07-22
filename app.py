@@ -44,6 +44,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Streamlit UI 구성🚍
+st.set_page_config(
+    page_title="나의 ECO 주행성과 보러가기",
+    layout="wide"
+)
+
 # 제목
 st.markdown("""
 <h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h2>
