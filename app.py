@@ -318,6 +318,8 @@ def draw_rank_bar(title, my_percent):
     ax.axis('off')
     st.pyplot(fig)
 
+st.markdown("---")
+
 st.markdown("### 📍 나의 경제운전 위치(달성율 기준)", unsafe_allow_html=True)
 
 # 예시 값
@@ -325,9 +327,9 @@ my_rank_incheon = 30.2  # 인천시 전체 순위 백분율
 my_rank_company = 45.0  # 운수사 내 순위 백분율
 my_rank_route = 55.0    # 동일노선 내 순위 백분율
 
-draw_rank_bar("▶ 인천시 전체 운전자 중", my_rank_incheon)
-draw_rank_bar("▶ 운수사 전체 운전자 중", my_rank_company)
-draw_rank_bar("▶ 동일노선 운전자 중", my_rank_route)
+draw_rank_bar("▼ 인천시 전체 운전자 중", my_rank_incheon)
+draw_rank_bar("▼ 운수사 전체 운전자 중", my_rank_company)
+draw_rank_bar("▼ 동일노선 운전자 중", my_rank_route)
 
 # 노선 순위 참고
 st.markdown("""
