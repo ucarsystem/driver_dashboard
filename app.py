@@ -47,7 +47,7 @@ st.markdown("""
         h1, h2, h3, h4 {
             font-size: 20px !important;
         }
-        p, span, li, .markdown-text-container {
+        p, td, span, li, .markdown-text-container {
             font-size: 13px !important;   
         }
     }
@@ -101,7 +101,7 @@ st.markdown("---")
 #     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
 
 st.markdown("""
-<table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px;'>
+<table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
   <tr>
     <td><b>사원ID</b><br>1587님</td>
     <td><b>소속운수사</b><br>강화교통</td>
