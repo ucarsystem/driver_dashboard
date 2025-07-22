@@ -131,7 +131,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         # y2=alt.Y2(value=60),  # ✅ 여기 수정!
         color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
-    ).properties(height=200)
+    ).properties(height=300)
 
     # 막대 위에 등급 텍스트 표시
     # text = alt.Chart(data).mark_text(
