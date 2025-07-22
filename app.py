@@ -45,7 +45,7 @@ st.markdown("""
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
         h1, h2, h3, h4 {
-            font-size: 22px !important;
+            font-size: 20px !important;
         }
         p, span, li, .markdown-text-container {
             font-size: 13px !important;   
@@ -91,14 +91,24 @@ st.markdown("---")
 # 기본 정보
 
 #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-col1, col2, col3 = st.columns(3)
+# col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
-with col2:
-    st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
-with col3:
-    st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
+# with col1:
+#     st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
+# with col2:
+#     st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
+# with col3:
+#     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
+
+st.markdown("""
+<table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px;'>
+  <tr>
+    <td><b>사원ID</b><br>1587님</td>
+    <td><b>소속운수사</b><br>강화교통</td>
+    <td><b>노선</b><br>800번</td>
+  </tr>
+</table>
+""", unsafe_allow_html=True)
 
 def draw_grade_circle(grade="A", label="우수", percent="95%"):
     fig, ax = plt.subplots(figsize=(2, 2))
