@@ -132,16 +132,16 @@ data = pd.DataFrame({
 # Altair용 등급 색상 매핑
 등급색상 = alt.Scale(
     domain=["S", "A", "B", "C", "D", "F"],
-    range=["#4CAF50", "#4CAF50", "#FFC107", "#FFC107", "#FF2222", "#FF2222"]
+    range=["#0a860a", "#0a860a", "#007bff", "#007bff", "#CA0000", "#CA0000"]
 )
 
 with st.expander("📊 월별 달성률 보기", expanded=True):
     st.subheader("월별 달성률 변화")
 
-    # 막대그래프
+    # 막대 차트
     bar = alt.Chart(data).mark_bar().encode(
-        x=alt.X("월", axis=alt.Axis(labelAngle=0)),  # 👉 labelAngle=0으로 가로 표시
-        y=alt.Y("달성률", scale=alt.Scale(domain=[60, 120])),
+        x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
+        y=alt.Y("달성률", scale=alt.Scale(domain=[60, 120]), title="달성률"),
         color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
     ).properties(height=300)
@@ -150,7 +150,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     text = alt.Chart(data).mark_text(
         align='center',
         baseline='bottom',
-        dy=-5,  # 높이 조절
+        dy=-2,  # 높이 조절
         fontSize=14,
         fontWeight="bold"
     ).encode(
@@ -184,8 +184,8 @@ def generate_calendar_html_v2(data, year, month):
         "A": "#0a860a",
         "B": "#007bff",  # 파랑
         "C": "#007bff",
-        "D": "red",
-        "F": "red"
+        "D": "#CA0000",
+        "F": "#CA0000"
     }
 
     html = """
