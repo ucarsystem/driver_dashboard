@@ -44,6 +44,11 @@ st.markdown("""
         background-color: white !important;
         color: black !important;
     }
+    /*입력창 placeholder 대비 강화*/
+    input::placeholder {
+        color: #666 !important;
+        opacity: 1 !important;
+    }
             
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
