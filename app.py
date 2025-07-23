@@ -48,7 +48,7 @@ st.markdown("""
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
         h1, h2, h3, h4 {
-            font-size: 18px !important;
+            font-size: 20px !important;
         }
         p, td, span, li, .markdown-text-container {
             font-size: 13px !important;   
