@@ -147,8 +147,8 @@ st.markdown("""
 def draw_grade_circle_base64(grade="A", label="우수"):
     fig, ax = plt.subplots(figsize=(2, 2))
     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
-    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
     ax.axis("off")
 
     # 이미지 저장을 메모리 버퍼로
