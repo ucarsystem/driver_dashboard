@@ -59,7 +59,6 @@ st.markdown("""
         width: 100px;
         display: flex; 
         align-items: center; 
-        gap: 25px; 
         flex-wrap: nowrap;
     }
 
