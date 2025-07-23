@@ -270,7 +270,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         background='white'  # 전체 배경 색상 고정!
     )   
 
-    st.altair_chart(bar + text, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
 
 
 # 일별 데이터 팝업
