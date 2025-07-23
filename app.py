@@ -2,6 +2,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
 import os
+import io
+import base64
 import requests
 import numpy as np
 from PIL import Image, ImageOps
@@ -110,34 +112,58 @@ st.markdown("""
 </table>
 """, unsafe_allow_html=True)
 
-def draw_grade_circle(grade="A", label="우수", percent="95%"):
+# def draw_grade_circle(grade="A", label="우수", percent="95%"):
+#     fig, ax = plt.subplots(figsize=(2, 2))
+#     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    
+#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
+#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+#     ax.axis("off")
+#     st.pyplot(fig)
+
+def draw_grade_circle_base64(grade="A", label="우수"):
     fig, ax = plt.subplots(figsize=(2, 2))
     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    
     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
     ax.axis("off")
-    st.pyplot(fig)
+
+    # 이미지 저장을 메모리 버퍼로
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return image_base64
 
 # 등급 원형 + 오른쪽 달성율 텍스트
-col1, col2 = st.columns([1, 1.5])
+# col1, col2 = st.columns(2)
 
-with col1:
-    draw_grade_circle(grade="A", label="우수", percent="95%")
+# with col1:
+#     draw_grade_circle_base64(grade="A", label="우수")
 
-# <div style='line-height: 1.6; font-size: 24x;'>
-# <b>달성율</b><br/>
-# <span style='font-size: 24px; color: black;'><b>95%</b></span><br/><br/>
-# <span style='color: red;'>* 다음 S등급까지 5% 남았습니다.</span><br/>
-with col2:
-    st.markdown("""
-    <div style='margin-top: 10px'>
-        <b></b><br/>
-        <p style='font-size: 18px;'><b>달성율</b></p>
-        <p style='font-size: 22px; font-weight: bold;'>95%</p>
-        <p style='font-size: 14px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+# with col2:
+#     st.markdown("""
+#     <div style='margin-top: 10px'>
+#         <b></b><br/>
+#         <p style='font-size: 18px;'><b>달성율</b></p>
+#         <p style='font-size: 22px; font-weight: bold;'>95%</p>
+#         <p style='font-size: 14px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+#     </div>
+#     """, unsafe_allow_html=True)
+
+circle_base64 = draw_grade_circle_base64("A", "우수")
+
+st.markdown(f"""
+<div style="display: flex; align-items: center; gap: 25px; flex-wrap: nowrap;">
+    <img src="data:image/png;base64,{circle_base64}" width="120" />
+    <div style="line-height: 1.6;">
+        <p style='font-size: 16px; font-weight: bold; color:black;'>달성율</p>
+        <p style='font-size: 20px; font-weight: bold; color:black;'>95%</p>
+        <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 
 # 참고치 팝업
