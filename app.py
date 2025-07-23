@@ -93,6 +93,18 @@ st.markdown("""
         }
     }
     
+    /* 노선 순위표시 */
+    .line-grade {
+        font-size: 24px; 
+        color: gray; 
+        margin-top:10px;
+    }
+    
+    @media (min-width: 768px) {
+        .line-grade{
+            font-size: 15px
+        }
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -451,7 +463,7 @@ draw_rank_bar("▼ 동일노선 운전자 중", my_rank_route)
 
 # 노선 순위 참고
 st.markdown("""
-<div style='font-size: 20px; color: gray; margin-top:10px;'>
+<div class='line-grade'>
     <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선:</b> 54위 (인천 전체 540개 노선 중)
 </div>
 """, unsafe_allow_html=True)
