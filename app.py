@@ -76,7 +76,7 @@ st.markdown("""
     
     /* 이미지 크기 - 반응형 */
     .grade-wrapper img {
-        width: 100px;
+        width: 180px;
     }
 
     @media (min-width: 768px) {
@@ -85,7 +85,7 @@ st.markdown("""
         }
             
         .grade-wrapper img {
-            width: 150px;
+            width: 180px;
         }
         
         .grade-content {
