@@ -17,6 +17,7 @@ import calendar
 import streamlit.components.v1 as components
 import datetime
 import altair as alt
+from io import BytesIO
 
 # 한글 폰트 설정
 # font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
@@ -52,7 +53,33 @@ st.markdown("""
         p, td, span, li, .markdown-text-container {
             font-size: 13px !important;   
         }
+
+    /* 반응형 등급+달성율 */
+    .grade-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
     }
+    .grade-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+    @media (min-width: 768px) {
+        .grade-wrapper {
+            flex-direction: row;
+            justify-content: start;
+            gap: 30px;
+        }
+        .grade-content {
+            align-items: flex-start;
+            font-size: 16px;
+        }
+    }
+    
     </style>
 """, unsafe_allow_html=True)
 
@@ -93,15 +120,6 @@ st.markdown("---")
 # 기본 정보
 
 #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-# col1, col2, col3 = st.columns(3)
-
-# with col1:
-#     st.markdown("**사원ID**<br/>1587님", unsafe_allow_html=True)
-# with col2:
-#     st.markdown("**소속운수사**<br/>강화교통", unsafe_allow_html=True)
-# with col3:
-#     st.markdown("**노선**<br/>800번", unsafe_allow_html=True)
-
 st.markdown("""
 <table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
   <tr>
@@ -121,21 +139,6 @@ st.markdown("""
 #     ax.axis("off")
 #     st.pyplot(fig)
 
-def draw_grade_circle_base64(grade="A", label="우수"):
-    fig, ax = plt.subplots(figsize=(2, 2))
-    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
-    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
-    ax.axis("off")
-
-    # 이미지 저장을 메모리 버퍼로
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
-    buf.seek(0)
-    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-    plt.close(fig)
-    return image_base64
-
 # 등급 원형 + 오른쪽 달성율 텍스트
 # col1, col2 = st.columns(2)
 
@@ -152,18 +155,45 @@ def draw_grade_circle_base64(grade="A", label="우수"):
 #     </div>
 #     """, unsafe_allow_html=True)
 
+@st.cache_data(show_spinner=False)
+def draw_grade_circle_base64(grade="A", label="우수"):
+    fig, ax = plt.subplots(figsize=(2, 2))
+    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+    ax.axis("off")
+
+    # 이미지 저장을 메모리 버퍼로
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return image_base64
+
 circle_base64 = draw_grade_circle_base64("A", "우수")
 
 st.markdown(f"""
-<div style="display: flex; align-items: center; gap: 25px; flex-wrap: nowrap;">
+<div class='grade-wrapper'>
     <img src="data:image/png;base64,{circle_base64}" width="120" />
-    <div style="line-height: 1.6;">
-        <p style='font-size: 16px; font-weight: bold; color:black;'>달성율</p>
-        <p style='font-size: 20px; font-weight: bold; color:black;'>95%</p>
+    <div class="grade-content">
+        <p style='font-weight: bold;'>달성율</p>
+        <p style='font-size: 20px; font-weight: bold;'>95%</p>
         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# st.markdown(f"""
+# <div style="display: flex; align-items: center; gap: 25px; flex-wrap: nowrap;">
+#     <img src="data:image/png;base64,{circle_base64}" width="120" />
+#     <div style="line-height: 1.6;">
+#         <p style='font-size: 16px; font-weight: bold; color:black;'>달성율</p>
+#         <p style='font-size: 20px; font-weight: bold; color:black;'>95%</p>
+#         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+#     </div>
+# </div>
+# """, unsafe_allow_html=True)
 
 
 # 참고치 팝업
