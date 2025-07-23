@@ -245,14 +245,6 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
         color=alt.Color("등급", scale=등급색상),
         tooltip=["월", "달성률", "등급"]
-    ).properties(
-         height=300, 
-         width=500
-    ).configure_view(
-         fill='white' # 바탕흰색고정
-    ).configure_axis(
-         labelColor='black', # 축 레이블 고정
-         titleColor='black'
     )
 
     text = alt.Chart(data).mark_text(
@@ -264,6 +256,16 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         y="달성률",
         text="등급",
         color=alt.Color("등급", scale=등급색상, legend=None)
+    )
+
+    chart = alt.layer(bar, text).properties(
+        width=500,
+        height=300
+    ).configure_view(
+        fill='white'  # 바탕 흰색 고정
+    ).configure_axis(
+        labelColor='black',
+        titleColor='black'
     )
 
     st.altair_chart(bar + text, use_container_width=True)
