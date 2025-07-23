@@ -56,7 +56,7 @@ st.markdown("""
 
     /* 반응형 등급+달성율 */
     .grade-wrapper {
-        width: 100px;
+        width: 200px;
         align-items: center; 
         gap: 25px; 
         flex-wrap: nowrap;
