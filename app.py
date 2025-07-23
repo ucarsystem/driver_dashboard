@@ -274,6 +274,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     st.altair_chart(chart, use_container_width=True)
 
 st.markdown(chart.to_dict())
+
 # 일별 데이터 팝업
 def generate_calendar_html_v2(data, year, month):
     cal = calendar.Calendar()
@@ -291,23 +292,26 @@ def generate_calendar_html_v2(data, year, month):
     html = """
     <style>
         table.calendar {
+            table-layout: fixed;
+            width: 100%;
             border-collapse: collapse;
             margin: auto;
             font-family: 'Malgun Gothic', sans-serif;
         }
-        table.calendar th {
-            background: #f0f0f0;
-            padding: 6px;
-            text-align: center;
-            font-weight: bold;
-        }
-        table.calendar td {
+        table.calendar th, table.calendar td {
+            width: 14.28%;
             border: 1px solid #aaa;
-            width: 90px;
-            height: 80px;
-            vertical-align: top;
             padding: 4px;
             text-align: center;
+            vertical-align: top;
+        }
+        table.calendar th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        table.calendar td {
+            height: 80px;
             font-size: 13px;
         }
         .day-num {
@@ -320,6 +324,19 @@ def generate_calendar_html_v2(data, year, month):
         .percent {
             font-size: 15px;
             margin-top: 2px;
+        }
+
+        @media screen and (max-width: 480px) {
+            table.calendar td {
+                font-size: 12px;
+                height: 70px;
+            }
+            .grade {
+                font-size: 15px;
+            }
+            .percent {
+                font-size: 13px;
+            }
         }
     </style>
     <table class="calendar">
