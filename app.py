@@ -266,7 +266,9 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     ).configure_axis(
         labelColor='black',
         titleColor='black'
-    )
+    ).configure(
+    background='white'  # 전체 배경 색상 고정!
+    )   
 
     st.altair_chart(bar + text, use_container_width=True)
 
