@@ -521,6 +521,10 @@ for metric in metrics:
     ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
+    # 왼쪽: 나쁨 / 오른쪽: 좋음
+    ax.text(metric['min'], 0.5, '나쁨', ha='left', va='center', fontsize=9, color='gray', fontweight='bold')
+    ax.text(metric['max'], 0.5, '좋음', ha='right', va='center', fontsize=9, color='gray', fontweight='bold')
+
     # 👉 범례를 위쪽 가운데에 작게 표시
     ax.legend(
         loc='upper center',
