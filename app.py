@@ -56,15 +56,40 @@ st.markdown("""
 
     /* 반응형 등급+달성율 */
     .grade-wrapper {
-        width: 200px;
-        align-items: center; 
-        gap: 25px; 
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
         flex-wrap: nowrap;
+    }
+    /* 텍스트 영역 */
+    .grade-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 14px;
+        text-align: left;
+    }
+    
+    /* 이미지 크기 - 반응형 */
+    .grade-wrapper img {
+        width: 100px;
     }
 
     @media (min-width: 768px) {
+        .grade-wrapper {
+            justify-content: start;
+        }
+            
         .grade-wrapper img {
             width: 150px;
+        }
+        
+        .grade-content {
+            font-size: 16px;
         }
     }
     
@@ -165,7 +190,7 @@ st.markdown(f"""
 <div class='grade-wrapper'>
     <img src="data:image/png;base64,{circle_base64}">
     <div class="grade-content">
-        <p style='font-weight: bold;'>달성율</p>
+        <p style='font-weight: bold;'>달성률</p>
         <p style='font-size: 20px; font-weight: bold;'>95%</p>
         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
     </div>
