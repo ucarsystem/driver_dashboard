@@ -56,27 +56,12 @@ st.markdown("""
 
     /* 반응형 등급+달성율 */
     .grade-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
+        width: 100px;
     }
-    .grade-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-size: 14px;
-        margin-top: 10px;
-    }
+
     @media (min-width: 768px) {
-        .grade-wrapper {
-            flex-direction: row;
-            justify-content: start;
-            gap: 30px;
-        }
-        .grade-content {
-            align-items: flex-start;
-            font-size: 16px;
+        .grade-wrapper img {
+            width: 150px;
         }
     }
     
@@ -175,7 +160,7 @@ circle_base64 = draw_grade_circle_base64("A", "우수")
 
 st.markdown(f"""
 <div class='grade-wrapper'>
-    <img src="data:image/png;base64,{circle_base64}" width="120" />
+    <img src="data:image/png;base64,{circle_base64}">
     <div class="grade-content">
         <p style='font-weight: bold;'>달성율</p>
         <p style='font-size: 20px; font-weight: bold;'>95%</p>
