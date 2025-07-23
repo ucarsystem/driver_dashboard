@@ -44,16 +44,11 @@ st.markdown("""
         background-color: white !important;
         color: black !important;
     }
-    /*입력창 placeholder 대비 강화*/
-    input::placeholder {
-        color: #666 !important;
-        opacity: 1 !important;
-    }
             
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
         h1, h2, h3, h4 {
-            font-size: 20px !important;
+            font-size: 18px !important;
         }
         p, td, span, li, .markdown-text-container {
             font-size: 13px !important;   
@@ -272,7 +267,7 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         labelColor='black',
         titleColor='black'
     ).configure(
-    background='white'  # 전체 배경 색상 고정!
+        background='white'  # 전체 배경 색상 고정!
     )   
 
     st.altair_chart(bar + text, use_container_width=True)
