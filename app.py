@@ -287,7 +287,6 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         background='white'  # 전체 배경 색상 고정!
     )   
 
-    
     st.altair_chart(chart, use_container_width=True)
 
 
@@ -516,18 +515,27 @@ metrics = [
 
 for metric in metrics:
     fig, ax = plt.subplots(figsize=(5, 0.8))
+
+    # 공회전율이면 축 방향 반전
+    is_reverse = (metric['name'] == '공회전율')
+
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
     ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
 
-    ax.set_xlim(metric['min'], metric['max'])
+    # x축 방향
+    if is_reverse:
+        ax.set_xlim(metric['max'], metric['min'])  # 좌우 반전
+    else:
+        ax.set_xlim(metric['min'], metric['max'])
+
     ax.set_ylim(0, 1)
     ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
     # 왼쪽: 나쁨 / 오른쪽: 좋음
-    ax.text(metric['min'], 0.5, '나쁨', ha='left', va='center', fontsize=9, color='gray', fontweight='bold')
-    ax.text(metric['max'], 0.5, '좋음', ha='right', va='center', fontsize=9, color='gray', fontweight='bold')
+    ax.text(metric['min'], 1.05, '나쁨', ha='left', va='center', fontsize=9, color='gray', fontweight='bold')
+    ax.text(metric['max'], 1.05, '좋음', ha='right', va='center', fontsize=9, color='gray', fontweight='bold')
 
     # 👉 범례를 위쪽 가운데에 작게 표시
     ax.legend(
