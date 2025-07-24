@@ -508,39 +508,43 @@ st.markdown("""
 # draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 metrics = [
-    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130},
-    {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50},
-    {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60}
+    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130, "reverse": False},
+    {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50, "reverse": True},
+    {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60, "reverse": False}
 ]
 
-for metric in metrics:
-    fig, ax = plt.subplots(figsize=(5, 0.8))
+fig, axes = plt.subplots(len(metrics), 1, figsize=(5, 3), constrained_layout=True)
 
-    # 공회전율이면 축 방향 반전
-    is_reverse = (metric['name'] == '공회전율')
 
+for i, metric in enumerate(metrics):
+    ax = axes[i]
+
+    # x축 방향
+    if metric["reverse"]:
+        ax.set_xlim(metric['max'], metric['min'])  # 좌우 반전
+    else:
+        ax.set_xlim(metric['min'], metric['max'])
+    
+    ax.set_ylim(0, 1)
+    ax.set_yticks([])
+
+    # 나의 위치 / 전달 위치
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
     ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
 
-    # x축 방향
-    if is_reverse:
-        ax.set_xlim(metric['max'], metric['min'])  # 좌우 반전
-    else:
-        ax.set_xlim(metric['min'], metric['max'])
-
-    ax.set_ylim(0, 1)
-    ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
     # 왼쪽: 나쁨 / 오른쪽: 좋음
-    ax.text(metric['min'], 1.05, '나쁨', ha='left', va='center', fontsize=9, color='gray', fontweight='bold')
-    ax.text(metric['max'], 1.05, '좋음', ha='right', va='center', fontsize=9, color='gray', fontweight='bold')
+    ax.text(ax.get_xlim()[0] - 2, 0.5, "나쁨", fontsize=10, va="center", ha="right", rotation=90,
+            fontweight="bold", color="red")
+    ax.text(ax.get_xlim()[1] + 2, 0.5, "좋음", fontsize=10, va="center", ha="left", rotation=90,
+            fontweight="bold", color="blue")
 
     # 👉 범례를 위쪽 가운데에 작게 표시
     ax.legend(
         loc='upper center',
-        bbox_to_anchor=(0.5, 1.4),  # x중앙, y축 위로
+        bbox_to_anchor=(0.5, 1.5),  # x중앙, y축 위로
         ncol=3,
         fontsize=8,
         frameon=False
