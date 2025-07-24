@@ -95,7 +95,7 @@ st.markdown("""
     
     /* 노선 순위표시 */
     .line-grade {
-        font-size: 24px; 
+        font-size: 30px; 
         color: gray; 
         margin-top:10px;
     }
@@ -467,7 +467,7 @@ draw_rank_bar("▼ 동일노선 운전자 중", my_rank_route)
 # 노선 순위 참고
 st.markdown("""
 <div class='line-grade'>
-    <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선:</b> 54위 (인천 전체 540개 노선 중)
+    <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선: 54위</b> (인천 전체 540개 노선 중)
 </div>
 """, unsafe_allow_html=True)
 
@@ -543,7 +543,7 @@ for i, metric in enumerate(metrics):
     if i == 0:
         ax.legend(
             loc='upper center',
-            bbox_to_anchor=(0.5, 1.7),
+            bbox_to_anchor=(0.5, 1.9),
             ncol=3,
             fontsize=8,
             frameon=False
