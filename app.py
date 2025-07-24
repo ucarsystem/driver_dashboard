@@ -513,7 +513,7 @@ metrics = [
     {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60, "reverse": False}
 ]
 
-fig, axes = plt.subplots(nrows=len(metrics), figsize=(5, 3))
+fig, axes = plt.subplots(nrows=len(metrics), figsize=(5, 5))
 # fig, axes = plt.subplots(len(metrics), 1, figsize=(5, 3), constrained_layout=True) * len(metrics)
 
 for i, metric in enumerate(metrics):
