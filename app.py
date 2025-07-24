@@ -508,7 +508,7 @@ st.markdown("""
 # draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 metrics = [
-    {"name": "달성율", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130, "reverse": False},
+    {"name": "달성률", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130, "reverse": False},
     {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50, "reverse": True},
     {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60, "reverse": False}
 ]
@@ -543,7 +543,7 @@ for i, metric in enumerate(metrics):
     if i == 0:
         ax.legend(
             loc='upper center',
-            bbox_to_anchor=(0.5, 1.4),
+            bbox_to_anchor=(0.5, 1.7),
             ncol=3,
             fontsize=8,
             frameon=False
