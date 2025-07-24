@@ -79,7 +79,7 @@ st.markdown("""
         width: 180px;
     }
 
-    @media (min-width: 768px) {
+    @media (max-width: 480px) {
         .grade-wrapper {
             justify-content: start;
         }
@@ -95,14 +95,14 @@ st.markdown("""
     
     /* 노선 순위표시 */
     .line-grade {
-        font-size: 30px; 
+        font-size: 20px; 
         color: gray; 
         margin-top:10px;
     }
     
-    @media (min-width: 768px) {
+    @media (max-width: 480px) {
         .line-grade{
-            font-size: 11px
+            font-size: 12px
         }
     }
     </style>
