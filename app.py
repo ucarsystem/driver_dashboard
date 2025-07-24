@@ -579,12 +579,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ▶️ 교육 영상 버튼
-# st.markdown("""
-# <div style='text-align: center; margin-top: 20px;'>
-#     <a href='https://www.youtube.com/watch?v=tIJCvwWXGpE' target='_blank'>
-#         <button style='padding: 10px 25px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;'>
-#             🎥 교육 동영상 보러가기
-#         </button>
-#     </a>
-# </div>
-# """, unsafe_allow_html=True)
+st.markdown("""
+<div style='text-align: center; margin-top: 20px;'>
+    <a href='https://www.youtube.com/watch?v=tIJCvwWXGpE' target='_blank'>
+        <button style='padding: 10px 25px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;'>
+            🎥 교육 동영상 보러가기
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
