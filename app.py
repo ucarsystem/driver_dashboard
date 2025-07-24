@@ -513,45 +513,46 @@ metrics = [
     {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60, "reverse": False}
 ]
 
-fig, axes = plt.subplots(len(metrics), 1, figsize=(5, 3), constrained_layout=True)
-
+fig, axes = plt.subplots(nrows=len(metrics), figsize=(5, 2.2 * len(metrics)))
+# fig, axes = plt.subplots(len(metrics), 1, figsize=(5, 3), constrained_layout=True)
 
 for i, metric in enumerate(metrics):
     ax = axes[i]
 
-    # x축 방향
-    if metric["reverse"]:
-        ax.set_xlim(metric['max'], metric['min'])  # 좌우 반전
-    else:
-        ax.set_xlim(metric['min'], metric['max'])
+    # 수치 기준 방향 설정
+    min_val = metric['min']
+    max_val = metric['max']
+    if metric['reverse']:
+        ax.invert_xaxis()  # 공회전율은 작을수록 좋음
     
-    ax.set_ylim(0, 1)
-    ax.set_yticks([])
-
-    # 나의 위치 / 전달 위치
+    # 기본 바탕
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
     ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
 
+    ax.set_xlim(min_val, max_val)
+    ax.set_ylim(0, 1)
+    ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
-    # 왼쪽: 나쁨 / 오른쪽: 좋음
-    ax.text(ax.get_xlim()[0] - 2, 0.5, "나쁨", fontsize=10, va="center", ha="right", rotation=90,
-            fontweight="bold", color="red")
-    ax.text(ax.get_xlim()[1] + 2, 0.5, "좋음", fontsize=10, va="center", ha="left", rotation=90,
-            fontweight="bold", color="blue")
+    # "나쁨 / 좋음" 텍스트를 바깥에 표시
+    ax.text(min_val - (max_val - min_val) * 0.03, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+    ax.text(max_val + (max_val - min_val) * 0.03, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
-    # 👉 범례를 위쪽 가운데에 작게 표시
-    ax.legend(
-        loc='upper center',
-        bbox_to_anchor=(0.5, 1.5),  # x중앙, y축 위로
-        ncol=3,
-        fontsize=8,
-        frameon=False
-    )
+    # 범례 한 번만 표시
+    if i == 0:
+        ax.legend(
+            loc='upper center',
+            bbox_to_anchor=(0.5, 1.4),
+            ncol=3,
+            fontsize=8,
+            frameon=False
+        )
+    else:
+        ax.legend().remove()
 
+plt.tight_layout()
 st.pyplot(fig)
-
 
 st.markdown("---")  # 구분선
 
