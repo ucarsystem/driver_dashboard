@@ -550,7 +550,7 @@ for i, metric in enumerate(metrics):
         frameon=False
     )
 
-    st.pyplot(fig)
+st.pyplot(fig)
 
 
 st.markdown("---")  # 구분선
