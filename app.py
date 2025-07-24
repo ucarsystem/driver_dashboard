@@ -102,7 +102,7 @@ st.markdown("""
     
     @media (min-width: 768px) {
         .line-grade{
-            font-size: 15px
+            font-size: 11px
         }
     }
     </style>
@@ -275,9 +275,14 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
         height=300
     ).configure_view(
         fill='white'  # 바탕 흰색 고정
-    ).configure_axis(
+    ).configure_axisX(
         labelColor='black',
-        titleColor='black'
+        titleColor='black',
+        tickColor='black'
+    ).configure_axisY(
+        labelColor='black',
+        titleColor='black',
+        tickColor='black'
     ).configure(
         background='white'  # 전체 배경 색상 고정!
     )   
@@ -285,7 +290,6 @@ with st.expander("📊 월별 달성률 보기", expanded=True):
     
     st.altair_chart(chart, use_container_width=True)
 
-st.markdown(chart.to_dict())
 
 # 일별 데이터 팝업
 def generate_calendar_html_v2(data, year, month):
