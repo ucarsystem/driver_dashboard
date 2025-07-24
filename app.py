@@ -132,6 +132,19 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
 
+st.markdown("""
+    <style>
+    .stSelectbox div[data-baseweb="select"] > div {
+        background-color: white !important;
+        color: black !important;
+    }
+    .stTextInput input {
+        background-color: white !important;
+        color: black !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 
