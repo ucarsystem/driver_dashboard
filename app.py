@@ -67,6 +67,51 @@ st.markdown("""
         }
 
     /* 반응형 등급+달성율 */
+    .grade-flex-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .grade-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+            
+    .grade-text p {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .grade-text .main {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .grade-text .sub {
+        font-size: 13px;
+        color: red;
+    }
+    /* 📱 모바일: 이미지 작게, 텍스트 크게 */
+    @media screen and (max-width: 480px) {
+        .grade-flex-container img {
+            width: 120px;
+        }
+        .grade-text p {
+            font-size: 18px !important;
+        }
+        .grade-text .main {
+            font-size: 24px !important;
+        }
+        .grade-text .sub {
+            font-size: 15px !important;
+        }
+    }
+            
     .grade-wrapper {
         display: flex;
         flex-direction: row !important;  /* 항상 가로로 정렬 */
@@ -87,7 +132,7 @@ st.markdown("""
     }
     
     /* 이미지 크기 - 반응형 */
-    .grade-wrapper img {
+    .grade-flex-container img {
         width: 180px;
     }
 
@@ -231,27 +276,19 @@ def draw_grade_circle_base64(grade="A", label="우수"):
 
 circle_base64 = draw_grade_circle_base64("A", "우수")
 
+
 st.markdown(f"""
-<div class='grade-wrapper'>
+<div class="grade-flex-container">
     <img src="data:image/png;base64,{circle_base64}">
-    <div class="grade-content">
-        <p style='font-weight: bold;'>달성률</p>
-        <p style='font-size: 20px; font-weight: bold;'>95%</p>
-        <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+    <div class="grade-text">
+        <p><b>달성률</b></p>
+        <p class="main">95%</p>
+        <p class="sub">* 다음 S등급까지 5% 남았습니다.</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# st.markdown(f"""
-# <div style="display: flex; align-items: center; gap: 25px; flex-wrap: nowrap;">
-#     <img src="data:image/png;base64,{circle_base64}" width="120" />
-#     <div style="line-height: 1.6;">
-#         <p style='font-size: 16px; font-weight: bold; color:black;'>달성율</p>
-#         <p style='font-size: 20px; font-weight: bold; color:black;'>95%</p>
-#         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-#     </div>
-# </div>
-# """, unsafe_allow_html=True)
+
 
 
 # 참고치 팝업
