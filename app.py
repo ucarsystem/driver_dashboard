@@ -75,6 +75,10 @@ st.markdown("""
         gap: 20px;
         margin: 20px 0;
     }
+            
+    .grade-flex-container img {
+        width: 180px;
+    }
     
     .grade-text {
         display: flex;
@@ -111,7 +115,7 @@ st.markdown("""
             font-size: 15px !important;
         }
     }
-            
+/*여기서부터*/
     .grade-wrapper {
         display: flex;
         flex-direction: row !important;  /* 항상 가로로 정렬 */
@@ -132,7 +136,7 @@ st.markdown("""
     }
     
     /* 이미지 크기 - 반응형 */
-    .grade-flex-container img {
+    .grade-wrapper img {
         width: 180px;
     }
 
@@ -149,7 +153,8 @@ st.markdown("""
             font-size: 16px;
         }
     }
-    
+/*여기까지*/
+            
     /* 노선 순위표시 */
     .line-grade {
         font-size: 20px; 
@@ -288,6 +293,16 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown(f"""
+<div class='grade-wrapper'>
+    <img src="data:image/png;base64,{circle_base64}">
+    <div class="grade-content">
+        <p style='font-weight: bold;'>달성률</p>
+        <p style='font-size: 20px; font-weight: bold;'>95%</p>
+        <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 
 
