@@ -283,6 +283,37 @@ def draw_grade_circle_base64(grade="A", label="우수"):
 
 circle_base64 = draw_grade_circle_base64("A", "우수")
 
+st.markdown(f"""
+<style>
+/* 모바일 텍스트 사이즈 조정 */
+@media screen and (max-width: 480px) {{
+    .circle-img {{
+        width: 120px !important;
+    }}
+    .grade-info p {{
+        font-size: 16px !important;
+    }}
+    .grade-info .main {{
+        font-size: 22px !important;
+    }}
+    .grade-info .sub {{
+        font-size: 14px !important;
+    }}
+}}
+</style>
+<table style='width: 100%; table-layout: fixed;'>
+    <tr>
+        <td style='width: 180px; text-align: center;'>
+            <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
+        </td>
+        <td class='grade-info' style='text-align: left; vertical-align: middle;'>
+            <p><b>달성률</b></p>
+            <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
+            <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+        </td>
+    </tr>
+</table>
+""", unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="grade-flex-container">
