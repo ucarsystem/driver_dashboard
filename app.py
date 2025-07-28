@@ -69,7 +69,7 @@ st.markdown("""
     /* 반응형 등급+달성율 */
     .grade-flex-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: row !important;
         align-items: center;
         justify-content: center;
         gap: 20px;
