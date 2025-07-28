@@ -68,12 +68,14 @@ st.markdown("""
 
     /* 반응형 등급+달성율 */
     .grade-flex-container {
-        display: flex;
+        display: inline-flex !important;  /* 핵심: inline-flex로 강제 */
         flex-direction: row !important;
         align-items: center;
         justify-content: center;
         gap: 20px;
         margin: 20px 0;
+        width: auto !important;  /* Streamlit 기본 block 방지 */
+        max-width: 100%;
     }
             
     .grade-flex-container img {
@@ -103,7 +105,7 @@ st.markdown("""
     /* 📱 모바일: 이미지 작게, 텍스트 크게 */
     @media screen and (max-width: 480px) {
         .grade-flex-container img {
-            width: 120px;
+            width: 120px !important;
         }
         .grade-text p {
             font-size: 18px !important;
