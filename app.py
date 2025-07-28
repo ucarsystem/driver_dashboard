@@ -157,7 +157,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+company_list = ["운수사를 선택하세요"] + company_list
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
+company_input = st.selectbox(
+    "운수사를 입력하세요",
+    options=company_list,
+    index=0  # 기본으로 안내 문구 선택되게
+)
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 조회버튼 = st.button("조회하기")
 
