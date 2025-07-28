@@ -157,8 +157,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-company_list = ["운수사를 선택하세요"] + company_list
-company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
+company_list = ["운수사를 선택하세요"] + company_list[1:]
+# company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
 company_input = st.selectbox(
     "운수사를 입력하세요",
     options=company_list,
