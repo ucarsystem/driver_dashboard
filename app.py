@@ -36,15 +36,11 @@ plt.rcParams['axes.unicode_minus'] = False
 # 🌈 라이트 모드 강제 적용 CSS
 st.markdown("""
     <style>
-    body {
+    body, .stApp {
         background-color: white !important;
         color: black !important;
     }
-    .stApp {
-        background-color: white !important;
-        color: black !important;
-    }
-            
+
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
         h1, h2, h3, h4 {
@@ -57,7 +53,7 @@ st.markdown("""
     /* 반응형 등급+달성율 */
     .grade-wrapper {
         display: flex;
-        flex-direction: row;
+        flex-direction: row !important;
         align-items: center;
         gap: 20px;
         justify-content: center;
