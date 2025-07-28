@@ -40,6 +40,22 @@ st.markdown("""
         background-color: white !important;
         color: black !important;
     }
+    
+    /*입력창 placeholder 대비 강화*/
+    input::placeholder {
+        color: #666 !important;
+        opacity: 1 !important;
+    }
+    
+    /* 기본 버튼 스타일 수정 */
+    button[kind="primary"], .stButton > button {
+        background-color: transparent !important;
+        color: #222 !important;
+        border: 2px solid #666 !important;
+        padding: 0.5rem 1.2rem !important;
+        font-weight: bold !important;
+        border-radius: 8px !important;
+    }
 
     /* 모바일에서 제목 크기 축소 */
     @media screen and (max-width: 480px) {
@@ -143,6 +159,8 @@ st.markdown("""
 
 company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
+조회버튼 = st.button("조회하기")
+
 
 # 제목
 st.markdown("""
