@@ -240,104 +240,77 @@ st.markdown("""
 </table>
 """, unsafe_allow_html=True)
 
-# def draw_grade_circle(grade="A", label="우수", percent="95%"):
+# @st.cache_data(show_spinner=False)
+# def draw_grade_circle_base64(grade="A", label="우수"):
 #     fig, ax = plt.subplots(figsize=(2, 2))
 #     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    
-#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=16, color='white', fontweight='bold')
-#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=10, color='white')
+#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
+#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
 #     ax.axis("off")
-#     st.pyplot(fig)
 
-# 등급 원형 + 오른쪽 달성율 텍스트
-# col1, col2 = st.columns(2)
+#     # 이미지 저장을 메모리 버퍼로
+#     buf = io.BytesIO()
+#     fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
+#     buf.seek(0)
+#     image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+#     plt.close(fig)
+#     return image_base64
 
-# with col1:
-#     draw_grade_circle_base64(grade="A", label="우수")
+# circle_base64 = draw_grade_circle_base64("A", "우수")
 
-# with col2:
-#     st.markdown("""
-#     <div style='margin-top: 10px'>
-#         <b></b><br/>
-#         <p style='font-size: 18px;'><b>달성율</b></p>
-#         <p style='font-size: 22px; font-weight: bold;'>95%</p>
-#         <p style='font-size: 14px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+# st.markdown(f"""
+# <style>
+# /* 모바일 텍스트 사이즈 조정 */
+# @media screen and (max-width: 480px) {{
+#     .circle-img {{
+#         width: 120px !important;
+#     }}
+#     .grade-info p {{
+#         font-size: 16px !important;
+#     }}
+#     .grade-info .main {{
+#         font-size: 22px !important;
+#     }}
+#     .grade-info .sub {{
+#         font-size: 14px !important;
+#     }}
+# }}
+# </style>
+# <table style='width: 100%; table-layout: fixed;'>
+#     <tr>
+#         <td style='width: 180px; text-align: center;'>
+#             <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
+#         </td>
+#         <td class='grade-info' style='text-align: left; vertical-align: middle;'>
+#             <p><b>달성률</b></p>
+#             <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
+#             <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+#         </td>
+#     </tr>
+# </table>
+# """, unsafe_allow_html=True)
+
+# st.markdown(f"""
+# <div class="grade-flex-container">
+#     <img src="data:image/png;base64,{circle_base64}">
+#     <div class="grade-text">
+#         <p><b>달성률</b></p>
+#         <p class="main">95%</p>
+#         <p class="sub">* 다음 S등급까지 5% 남았습니다.</p>
 #     </div>
-#     """, unsafe_allow_html=True)
+# </div>
+# """, unsafe_allow_html=True)
 
-@st.cache_data(show_spinner=False)
-def draw_grade_circle_base64(grade="A", label="우수"):
-    fig, ax = plt.subplots(figsize=(2, 2))
-    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
-    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
-    ax.axis("off")
-
-    # 이미지 저장을 메모리 버퍼로
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
-    buf.seek(0)
-    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-    plt.close(fig)
-    return image_base64
-
-circle_base64 = draw_grade_circle_base64("A", "우수")
-
-st.markdown(f"""
-<style>
-/* 모바일 텍스트 사이즈 조정 */
-@media screen and (max-width: 480px) {{
-    .circle-img {{
-        width: 120px !important;
-    }}
-    .grade-info p {{
-        font-size: 16px !important;
-    }}
-    .grade-info .main {{
-        font-size: 22px !important;
-    }}
-    .grade-info .sub {{
-        font-size: 14px !important;
-    }}
-}}
-</style>
-<table style='width: 100%; table-layout: fixed;'>
-    <tr>
-        <td style='width: 180px; text-align: center;'>
-            <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
-        </td>
-        <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-            <p><b>달성률</b></p>
-            <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
-            <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-        </td>
-    </tr>
-</table>
-""", unsafe_allow_html=True)
-
-st.markdown(f"""
-<div class="grade-flex-container">
-    <img src="data:image/png;base64,{circle_base64}">
-    <div class="grade-text">
-        <p><b>달성률</b></p>
-        <p class="main">95%</p>
-        <p class="sub">* 다음 S등급까지 5% 남았습니다.</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown(f"""
-<div class='grade-wrapper'>
-    <img src="data:image/png;base64,{circle_base64}">
-    <div class="grade-content">
-        <p style='font-weight: bold;'>달성률</p>
-        <p style='font-size: 20px; font-weight: bold;'>95%</p>
-        <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
+# st.markdown(f"""
+# <div class='grade-wrapper'>
+#     <img src="data:image/png;base64,{circle_base64}">
+#     <div class="grade-content">
+#         <p style='font-weight: bold;'>달성률</p>
+#         <p style='font-size: 20px; font-weight: bold;'>95%</p>
+#         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+#     </div>
+# </div>
+# """, unsafe_allow_html=True)
 
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
