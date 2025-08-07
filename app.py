@@ -400,7 +400,7 @@ def generate_calendar_html_v2(data, year, month):
         table.calendar {
             table-layout: fixed;
             width: 100%;
-            max-width: 800px;,
+            max-width: 800px;
             border-collapse: collapse;
             margin: auto;
             font-family: 'Malgun Gothic', sans-serif;
@@ -498,8 +498,8 @@ calendar_data = {
 calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
 with st.expander("📅 7월 일별 달성률 보기"):
-    components.html(calendar_html, scrolling=True)
-    # height=600
+    components.html(calendar_html, height=600, scrolling=True)
+
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
