@@ -240,55 +240,55 @@ st.markdown("""
 </table>
 """, unsafe_allow_html=True)
 
-# @st.cache_data(show_spinner=False)
-# def draw_grade_circle_base64(grade="A", label="우수"):
-#     fig, ax = plt.subplots(figsize=(2, 2))
-#     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
-#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
-#     ax.axis("off")
+@st.cache_data(show_spinner=False)
+def draw_grade_circle_base64(grade="A", label="우수"):
+    fig, ax = plt.subplots(figsize=(2, 2))
+    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
+    ax.axis("off")
 
-#     # 이미지 저장을 메모리 버퍼로
-#     buf = io.BytesIO()
-#     fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
-#     buf.seek(0)
-#     image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-#     plt.close(fig)
-#     return image_base64
+    # 이미지 저장을 메모리 버퍼로
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return image_base64
 
-# circle_base64 = draw_grade_circle_base64("A", "우수")
+circle_base64 = draw_grade_circle_base64("A", "우수")
 
-# st.markdown(f"""
-# <style>
-# /* 모바일 텍스트 사이즈 조정 */
-# @media screen and (max-width: 480px) {{
-#     .circle-img {{
-#         width: 120px !important;
-#     }}
-#     .grade-info p {{
-#         font-size: 16px !important;
-#     }}
-#     .grade-info .main {{
-#         font-size: 22px !important;
-#     }}
-#     .grade-info .sub {{
-#         font-size: 14px !important;
-#     }}
-# }}
-# </style>
-# <table style='width: 100%; table-layout: fixed;'>
-#     <tr>
-#         <td style='width: 180px; text-align: center;'>
-#             <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
-#         </td>
-#         <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-#             <p><b>달성률</b></p>
-#             <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
-#             <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-#         </td>
-#     </tr>
-# </table>
-# """, unsafe_allow_html=True)
+st.markdown(f"""
+<style>
+/* 모바일 텍스트 사이즈 조정 */
+@media screen and (max-width: 480px) {{
+    .circle-img {{
+        width: 120px !important;
+    }}
+    .grade-info p {{
+        font-size: 16px !important;
+    }}
+    .grade-info .main {{
+        font-size: 22px !important;
+    }}
+    .grade-info .sub {{
+        font-size: 14px !important;
+    }}
+}}
+</style>
+<table style='width: 100%; table-layout: fixed;'>
+    <tr>
+        <td style='width: 180px; text-align: center;'>
+            <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
+        </td>
+        <td class='grade-info' style='text-align: left; vertical-align: middle;'>
+            <p><b>달성률</b></p>
+            <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
+            <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+        </td>
+    </tr>
+</table>
+""", unsafe_allow_html=True)
 
 # st.markdown(f"""
 # <div class="grade-flex-container">
@@ -400,6 +400,7 @@ def generate_calendar_html_v2(data, year, month):
         table.calendar {
             table-layout: fixed;
             width: 100%;
+            max-width: 800px;,
             border-collapse: collapse;
             margin: auto;
             font-family: 'Malgun Gothic', sans-serif;
@@ -433,15 +434,18 @@ def generate_calendar_html_v2(data, year, month):
         }
 
         @media screen and (max-width: 480px) {
+            table.calendar th, table.calendar td {
+                width: 14.28%;
+            }
             table.calendar td {
                 font-size: 12px;
                 height: 70px;
             }
             .grade {
-                font-size: 15px;
+                font-size: 12px;
             }
             .percent {
-                font-size: 13px;
+                font-size: 12px;
             }
         }
     </style>
@@ -495,6 +499,7 @@ calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
 with st.expander("📅 7월 일별 달성률 보기"):
     components.html(calendar_html, height=600, scrolling=True)
+    # height=600
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
