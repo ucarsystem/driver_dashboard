@@ -498,7 +498,7 @@ calendar_data = {
 calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
 with st.expander("📅 7월 일별 달성률 보기"):
-    components.html(calendar_html, height=600, scrolling=True)
+    components.html(calendar_html, scrolling=True)
     # height=600
 
 # 항목별 그래프수치표시
