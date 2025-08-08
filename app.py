@@ -399,26 +399,24 @@ def generate_calendar_html_v2(data, year, month):
     <style>
         /* 바깥 래퍼: 넓은 화면에선 1000~1200px로, 모바일에선 100% */
         .cal-wrap { width:100%; }
-        .cal-inner { max-width: 1100px; margin: 0 auto; }
-        /* 필요 시 화면이 너무 좁으면 가로 스크롤 허용 */
-        .cal-scroll { overflow-x:auto; } 
 
         table.calendar {
             table-layout: fixed;
             min-width: 720px;
             width: 100%;
             border-collapse: collapse;
-            
             margin: auto;
             font-family: 'Malgun Gothic', sans-serif;
+            box-sizing:border-box;
         }
         table.calendar th, table.calendar td {
             width: calc(100% / 7); /* ✅ 7등분 */
             
             border: 1px solid #aaa;
-            padding: 4px;
+            padding: 6px 4px;
             text-align: center;
             vertical-align: top;
+            box-sizing:border-box;
         }
         table.calendar th {
             background: #f0f0f0;
@@ -442,25 +440,18 @@ def generate_calendar_html_v2(data, year, month):
         }
 
         @media screen and (max-width: 480px) {
-            .cal-inner { max-width: 100%; }
-            table.calendar { min-width: 600px; } 
-            table.calendar td {
-                font-size: 12px;
-                height: 70px;
-            }
+            table.calendar td{ height:70px; font-size:12px; }
             .grade, .percent {
                 font-size: 12px;
             }
         }
     </style>
     <div class="cal-wrap">
-      <div class="cal-inner">
-        <div class="cal-scroll">
-          <table class="calendar">
-            <tr>
-              <th style='color:red'>일</th><th>월</th><th>화</th>
-              <th>수</th><th>목</th><th>금</th><th style='color:blue'>토</th>
-            </tr>
+      <table class="calendar">
+        <tr>
+          <th style='color:red'>일</th><th>월</th><th>화</th>
+          <th>수</th><th>목</th><th>금</th><th style='color:blue'>토</th>
+        </tr>
                 
     """
 
@@ -484,13 +475,7 @@ def generate_calendar_html_v2(data, year, month):
                 else:
                     html += f"<td><div class='day-num'>{day}</div></td>"
         html += "</tr>"
-    html += """
-          </table>
-        </div>
-      </div>
-    </div>
-    """
-
+    html += "</table></div>"
     return html
 
 calendar_data = {
@@ -513,7 +498,7 @@ calendar_data = {
 calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
 with st.expander("📅 7월 일별 달성률 보기", expanded=True):
-    components.html(calendar_html, height=620, scrolling=True)
+    st.markdown(calendar_html, unsafe_allow_html=True)
 
 
 # 항목별 그래프수치표시
