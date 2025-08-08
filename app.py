@@ -18,7 +18,7 @@ import streamlit.components.v1 as components
 import datetime
 import altair as alt
 from io import BytesIO
-import textwrap
+from textwrap import dedent
 
 # 한글 폰트 설정
 # font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
@@ -648,24 +648,44 @@ st.markdown("""
 <h3>나의 성과와 보상 (충남고속 대상)</h3>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div style='border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;'>
-    
-    <h4>1. 나의보상</h4>
-    <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
-        <li>나의 리워드 보상: <b>1,000원</b> <span style='color: gray;'>(예상)</span></li>
-    </ul>
-    
-    <h4>2. 나의성과</h4>
-    <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
-        <li>연료절감액: <b>65,000원</b></li>
-        <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
-            <span style='color: gray;'>(🌳 나무 100그루 심는 효과)</span>
-        </li>
-        <li>사고위험감소: 00%감소</li>
-    </ul>
+html = dedent("""
+<div style="border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;">
+  <h4 style="margin:0 0 8px 0;">1. 나의 보상</h4>
+  <ul style="line-height:1.8; list-style-type:none; padding-left:0; font-size:16px;">
+    <li>나의 리워드 보상: <b>1,000원</b> <span style="color:gray;">(예상)</span></li>
+  </ul>
+
+  <h4 style="margin:16px 0 8px 0;">2. 나의 성과</h4>
+  <ul style="line-height:1.8; list-style-type:none; padding-left:0; font-size:16px;">
+    <li>연료절감액: <b>65,000원</b></li>
+    <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
+      <span style="color:gray;">(🌳 나무 100그루 심는 효과)</span>
+    </li>
+    <li>사고위험감소: 00% 감소</li>
+  </ul>
 </div>
-""", unsafe_allow_html=True)
+""")
+
+st.markdown(html, unsafe_allow_html=True)
+
+# st.markdown("""
+# <div style='border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;'>
+    
+#     <h4>1. 나의보상</h4>
+#     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
+#         <li>나의 리워드 보상: <b>1,000원</b> <span style='color: gray;'>(예상)</span></li>
+#     </ul>
+    
+#     <h4>2. 나의성과</h4>
+#     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
+#         <li>연료절감액: <b>65,000원</b></li>
+#         <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
+#             <span style='color: gray;'>(🌳 나무 100그루 심는 효과)</span>
+#         </li>
+#         <li>사고위험감소: 00%감소</li>
+#     </ul>
+# </div>
+# """, unsafe_allow_html=True)
 
 st.markdown("---")  # 구분선
 
