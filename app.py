@@ -650,14 +650,13 @@ st.markdown("""
 
 st.markdown("""
 <div style='border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;'>
-    <h4>나의 성과와 보상</h4>
     
-    <h3>1. 나의보상</h3>
+    <h4>1. 나의보상</h4>
     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
         <li>나의 리워드 보상: <b>1,000원</b> <span style='color: gray;'>(예상)</span></li>
     </ul>
     
-    <h3>2. 나의성과</h3>
+    <h4>2. 나의성과</h4>
     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
         <li>연료절감액: <b>65,000원</b></li>
         <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
