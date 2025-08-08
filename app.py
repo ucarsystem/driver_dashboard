@@ -396,88 +396,57 @@ def generate_calendar_html_v2(data, year, month):
         "F": "#CA0000"
     }
 
-    html = textwrap.dedent("""
-    <style>
-    /* 바깥 래퍼: 넓은 화면에선 1000~1200px로, 모바일에선 100% */
-    .cal-wrap { width:100%; }
+    # 공통 인라인 스타일
+    wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
+    table_style = (
+        "table-layout:fixed; width:100%; min-width:840px; "
+        "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
+    )
+    thtd_style = (
+        "width:14.2857%; border:1px solid #aaa; padding:4px; "
+        "text-align:center; vertical-align:top;"
+    )
+    th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
+    td_style = thtd_style + "height:80px; font-size:13px;"
+    day_style = "font-weight:bold;"
+    grade_style = "font-weight:bold; font-size:18px;"
+    pct_style = "font-size:15px; margin-top:2px;"
 
-    table.calendar {
-        table-layout: fixed;
-        min-width: 720px;
-        width: 100%;
-        border-collapse: collapse;
-        margin: auto;
-        font-family: 'Malgun Gothic', sans-serif;
-        box-sizing:border-box;
-    }
-    table.calendar th, table.calendar td {
-        width: calc(100% / 7); /* ✅ 7등분 */
-        
-        border: 1px solid #aaa;
-        padding: 6px 4px;
-        text-align: center;
-        vertical-align: top;
-        box-sizing:border-box;
-    }
-    table.calendar th {
-        background: #f0f0f0;
-        font-weight: bold;
-        font-size: 15px;
-    }
-    table.calendar td {
-        height: 80px;
-        font-size: 13px;
-    }
-    .day-num {
-        font-weight: bold;
-    }
-    .grade {
-        font-weight: bold;
-        font-size: 18px;
-    }
-    .percent {
-        font-size: 15px;
-        margin-top: 2px;
-    }
-
-    @media screen and (max-width: 480px) {
-        table.calendar td{ height:70px; font-size:12px; }
-        .grade, .percent {
-            font-size: 12px;
-        }
-    }
-    </style>
-    <div class="cal-wrap">
-      <table class="calendar">
-        <tr>
-          <th style='color:red'>일</th><th>월</th><th>화</th>
-          <th>수</th><th>목</th><th>금</th><th style='color:blue'>토</th>
-        </tr>
-                
-    """)
+    html = []
+    html.append(f'<div style="{wrap_style}">')
+    html.append(f'<table style="{table_style}">')
+    html.append("<tr>")
+    html.append(f'<th style="{th_style}color:red">일</th>')
+    for h in ["월","화","수","목","금"]:
+        html.append(f'<th style="{th_style}">{h}</th>')
+    html.append(f'<th style="{th_style}color:blue">토</th>')
+    html.append("</tr>")
 
     for week in month_days:
-        html += "<tr>"
+        html.append("<tr>")
         for day in week:
             if day == 0:
-                html += "<td></td>"
+                html.append(f'<td style="{td_style}"></td>')
             else:
                 if day in data:
-                    grade = data[day]['grade']
-                    percent = data[day]['percent']
-                    color = grade_color.get(grade, "black")
-                    html += f"""
-                    <td>
-                        <div class="day-num">{day}</div>
-                        <div class="grade" style="color:{color}">{grade}등급</div>
-                        <div class="percent" style="color:{color}">({percent}%)</div>
-                    </td>
-                    """
+                    g = data[day]["grade"]
+                    p = data[day]["percent"]
+                    c = grade_color.get(g, "black")
+                    html.append(
+                        f'<td style="{td_style}">'
+                        f'<div style="{day_style}">{day}</div>'
+                        f'<div style="{grade_style} color:{c}">{g}등급</div>'
+                        f'<div style="{pct_style} color:{c}">({p}%)</div>'
+                        f'</td>'
+                    )
                 else:
-                    html += f"<td><div class='day-num'>{day}</div></td>"
-        html += "</tr>"
-    html += "</table></div>"
-    return html
+                    html.append(
+                        f'<td style="{td_style}"><div style="{day_style}">{day}</div></td>'
+                    )
+        html.append("</tr>")
+    html.append("</table></div>")
+    return "".join(html)
+    
 
 calendar_data = {
     2: {"grade": "S", "percent": 100},
