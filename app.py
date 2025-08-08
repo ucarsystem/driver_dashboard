@@ -399,7 +399,7 @@ def generate_calendar_html_v2(data, year, month):
     <style>
         table.calendar {
             table-layout: fixed;
-            max-width: 800px;
+            max-width: 1000px;
             width: 100%;
             border-collapse: collapse;
             
