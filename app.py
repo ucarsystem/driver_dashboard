@@ -399,7 +399,7 @@ def generate_calendar_html_v2(data, year, month):
     # 공통 인라인 스타일
     wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
     table_style = (
-        "table-layout:fixed; width:100%; min-width:840px; "
+        "table-layout:fixed; width:100%; min-width:700px; "
         "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
     )
     thtd_style = (
