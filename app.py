@@ -607,9 +607,10 @@ fig, axes = plt.subplots(nrows=len(metrics), figsize=(5, 5))
 for i, metric in enumerate(metrics):
     ax = axes[i]
 
-    # 수치 기준 방향 설정
     min_val = metric['min']
     max_val = metric['max']
+
+    # 공회전율은 작을수록 좋음 → x축은 그대로 두고 텍스트 위치 반대
     if metric['reverse']:
         bad_side = max_val
         good_side = min_val
@@ -617,7 +618,7 @@ for i, metric in enumerate(metrics):
         bad_side = min_val
         good_side = max_val
 
-    # 기본 바탕
+    # 내 위치, 전달 위치, 평균 표시
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
     ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
@@ -627,19 +628,12 @@ for i, metric in enumerate(metrics):
     ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
-    # "나쁨 / 좋음" 텍스트를 바깥에 표시
-    ax.text(min_val - (max_val - min_val) * 0.03, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-    ax.text(max_val + (max_val - min_val) * 0.03, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+    # 나쁨/좋음 텍스트
+    ax.text(bad_side + (max_val - min_val) * 0.03, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+    ax.text(good_side - (max_val - min_val) * 0.03, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
-    # 범례 한 번만 표시
     if i == 0:
-        ax.legend(
-            loc='upper center',
-            bbox_to_anchor=(0.5, 1.9),
-            ncol=3,
-            fontsize=8,
-            frameon=False
-        )
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.9), ncol=3, fontsize=8, frameon=False)
     else:
         ax.legend().remove()
 
