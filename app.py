@@ -610,33 +610,43 @@ for i, metric in enumerate(metrics):
     min_val = metric['min']
     max_val = metric['max']
 
-    # 공회전율은 작을수록 좋음 → x축은 그대로 두고 텍스트 위치 반대
-    if metric['reverse']:
+    # 여백 비율
+    margin_ratio = 0.08
+    plot_min = min_val - (max_val - min_val) * margin_ratio
+    plot_max = max_val + (max_val - min_val) * margin_ratio
+
+    # 좋음/나쁨 위치 계산
+    if metric['reverse']:  # 공회전율
         bad_side = max_val
         good_side = min_val
-    else:
+    else:  # 달성률, 평균속도
         bad_side = min_val
         good_side = max_val
 
-    # 내 위치, 전달 위치, 평균 표시
+    # 표시
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
     ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
 
-    ax.set_xlim(min_val, max_val)
+    ax.set_xlim(plot_min, plot_max)
     ax.set_ylim(0, 1)
     ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
-    # 나쁨/좋음 텍스트
-    ax.text(bad_side + (max_val - min_val) * 0.03, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-    ax.text(good_side - (max_val - min_val) * 0.03, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+    # 나쁨 / 좋음 텍스트를 그래프 바깥쪽에
+    ax.text(bad_side - (max_val - min_val) * 0.02 if metric['reverse'] else bad_side + (max_val - min_val) * 0.02,
+            0.5, '나쁨', ha='left' if not metric['reverse'] else 'right',
+            va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+
+    ax.text(good_side + (max_val - min_val) * 0.02 if metric['reverse'] else good_side - (max_val - min_val) * 0.02,
+            0.5, '좋음', ha='right' if not metric['reverse'] else 'left',
+            va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
     if i == 0:
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.9), ncol=3, fontsize=8, frameon=False)
     else:
         ax.legend().remove()
-
+        
 plt.tight_layout()
 st.pyplot(fig)
 
