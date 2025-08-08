@@ -611,7 +611,7 @@ for i, metric in enumerate(metrics):
     max_val = metric['max']
 
     # 여백 비율
-    margin_ratio = 0.08
+    margin_ratio = 0.15
     plot_min = min_val - (max_val - min_val) * margin_ratio
     plot_max = max_val + (max_val - min_val) * margin_ratio
 
@@ -633,20 +633,20 @@ for i, metric in enumerate(metrics):
     ax.set_yticks([])
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
-    # 나쁨 / 좋음 텍스트를 그래프 바깥쪽에
-    ax.text(bad_side - (max_val - min_val) * 0.02 if metric['reverse'] else bad_side + (max_val - min_val) * 0.02,
-            0.5, '나쁨', ha='left' if not metric['reverse'] else 'right',
-            va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+    # 나쁨 / 좋음 표 밖 표시
+    if metric['reverse']:  # 공회전율: 작을수록 좋음
+        ax.text(plot_max, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+        ax.text(plot_min, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+    else:  # 달성률, 평균속도
+        ax.text(plot_min, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+        ax.text(plot_max, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
-    ax.text(good_side + (max_val - min_val) * 0.02 if metric['reverse'] else good_side - (max_val - min_val) * 0.02,
-            0.5, '좋음', ha='right' if not metric['reverse'] else 'left',
-            va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
-
+    # 범례는 첫 번째 그래프에만
     if i == 0:
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.9), ncol=3, fontsize=8, frameon=False)
     else:
         ax.legend().remove()
-        
+
 plt.tight_layout()
 st.pyplot(fig)
 
