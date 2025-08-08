@@ -395,56 +395,56 @@ def generate_calendar_html_v2(data, year, month):
         "F": "#CA0000"
     }
 
-    html = """
+    html = textwrap.dedent("""
     <style>
-        /* 바깥 래퍼: 넓은 화면에선 1000~1200px로, 모바일에선 100% */
-        .cal-wrap { width:100%; }
+    /* 바깥 래퍼: 넓은 화면에선 1000~1200px로, 모바일에선 100% */
+    .cal-wrap { width:100%; }
 
-        table.calendar {
-            table-layout: fixed;
-            min-width: 720px;
-            width: 100%;
-            border-collapse: collapse;
-            margin: auto;
-            font-family: 'Malgun Gothic', sans-serif;
-            box-sizing:border-box;
-        }
-        table.calendar th, table.calendar td {
-            width: calc(100% / 7); /* ✅ 7등분 */
-            
-            border: 1px solid #aaa;
-            padding: 6px 4px;
-            text-align: center;
-            vertical-align: top;
-            box-sizing:border-box;
-        }
-        table.calendar th {
-            background: #f0f0f0;
-            font-weight: bold;
-            font-size: 15px;
-        }
-        table.calendar td {
-            height: 80px;
-            font-size: 13px;
-        }
-        .day-num {
-            font-weight: bold;
-        }
-        .grade {
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .percent {
-            font-size: 15px;
-            margin-top: 2px;
-        }
+    table.calendar {
+        table-layout: fixed;
+        min-width: 720px;
+        width: 100%;
+        border-collapse: collapse;
+        margin: auto;
+        font-family: 'Malgun Gothic', sans-serif;
+        box-sizing:border-box;
+    }
+    table.calendar th, table.calendar td {
+        width: calc(100% / 7); /* ✅ 7등분 */
+        
+        border: 1px solid #aaa;
+        padding: 6px 4px;
+        text-align: center;
+        vertical-align: top;
+        box-sizing:border-box;
+    }
+    table.calendar th {
+        background: #f0f0f0;
+        font-weight: bold;
+        font-size: 15px;
+    }
+    table.calendar td {
+        height: 80px;
+        font-size: 13px;
+    }
+    .day-num {
+        font-weight: bold;
+    }
+    .grade {
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .percent {
+        font-size: 15px;
+        margin-top: 2px;
+    }
 
-        @media screen and (max-width: 480px) {
-            table.calendar td{ height:70px; font-size:12px; }
-            .grade, .percent {
-                font-size: 12px;
-            }
+    @media screen and (max-width: 480px) {
+        table.calendar td{ height:70px; font-size:12px; }
+        .grade, .percent {
+            font-size: 12px;
         }
+    }
     </style>
     <div class="cal-wrap">
       <table class="calendar">
@@ -453,7 +453,7 @@ def generate_calendar_html_v2(data, year, month):
           <th>수</th><th>목</th><th>금</th><th style='color:blue'>토</th>
         </tr>
                 
-    """
+    """)
 
     for week in month_days:
         html += "<tr>"
@@ -499,7 +499,6 @@ calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 
 with st.expander("📅 7월 일별 달성률 보기", expanded=True):
     st.markdown(calendar_html, unsafe_allow_html=True)
-
 
 # 항목별 그래프수치표시
 def draw_gauge(my_position, prev_position, avg_position, title):
