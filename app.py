@@ -399,9 +399,10 @@ def generate_calendar_html_v2(data, year, month):
     <style>
         table.calendar {
             table-layout: fixed;
-            width: 100%;
             max-width: 800px;
+            width: 100%;
             border-collapse: collapse;
+            
             margin: auto;
             font-family: 'Malgun Gothic', sans-serif;
         }
@@ -434,9 +435,6 @@ def generate_calendar_html_v2(data, year, month):
         }
 
         @media screen and (max-width: 480px) {
-            table.calendar th, table.calendar td {
-                width: 14.28%;
-            }
             table.calendar td {
                 font-size: 12px;
                 height: 70px;
