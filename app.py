@@ -18,6 +18,7 @@ import streamlit.components.v1 as components
 import datetime
 import altair as alt
 from io import BytesIO
+import textwrap
 
 # 한글 폰트 설정
 # font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
