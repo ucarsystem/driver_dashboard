@@ -651,7 +651,7 @@ st.markdown("""
 html = dedent("""
 <div style="border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;">
   <h4 style="margin:0 0 8px 0;">1. 나의 보상</h4>
-  <ul style="line-height:1.8; list-style-type:none; padding-left:0; font-size:16px;">
+  <ul style="line-height:1.8; background-color:yellow; list-style-type:none; padding-left:0; font-size:20px;">
     <li>나의 리워드 보상: <b>1,000원</b> <span style="color:gray;">(예상)</span></li>
   </ul>
 
