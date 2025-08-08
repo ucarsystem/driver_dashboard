@@ -560,9 +560,6 @@ st.markdown("""
 
 st.markdown("---")
 # 경제운전 위치 - 퍼센트 기준 바
-st.markdown("""
-<h3>📍 항목별 경제운전 위치</h3>
-""", unsafe_allow_html=True)
 
 # def draw_percent_bar(label, my_percent, prev_percent, avg_percent):
 #     fig, ax = plt.subplots(figsize=(6, 1))
@@ -594,6 +591,10 @@ st.markdown("""
 # st.markdown("<h5>과속</h5>", unsafe_allow_html=True)
 # draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
+st.markdown("""
+<h3>📍 항목별 경제운전 위치</h3>
+""", unsafe_allow_html=True)
+
 metrics = [
     {"name": "달성률", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130, "reverse": False},
     {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50, "reverse": True},
@@ -610,8 +611,12 @@ for i, metric in enumerate(metrics):
     min_val = metric['min']
     max_val = metric['max']
     if metric['reverse']:
-        ax.invert_xaxis()  # 공회전율은 작을수록 좋음
-    
+        bad_side = max_val
+        good_side = min_val
+    else:
+        bad_side = min_val
+        good_side = max_val
+
     # 기본 바탕
     ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
     ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
@@ -623,8 +628,8 @@ for i, metric in enumerate(metrics):
     ax.set_title(metric['name'], fontsize=10, pad=15)
 
     # "나쁨 / 좋음" 텍스트를 바깥에 표시
-    ax.text(min_val - (max_val - min_val) * 0.03, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-    ax.text(max_val + (max_val - min_val) * 0.03, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+    ax.text(min_val - (max_val - min_val) * 0.03, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+    ax.text(max_val + (max_val - min_val) * 0.03, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
     # 범례 한 번만 표시
     if i == 0:
@@ -661,31 +666,12 @@ html = dedent("""
     <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
       <span style="color:gray;">(🌳 나무 100그루 심는 효과)</span>
     </li>
-    <li>사고위험감소: 00% 감소</li>
+    <li>사고위험감소: <b>00% 감소</b></li>
   </ul>
 </div>
 """)
 
 st.markdown(html, unsafe_allow_html=True)
-
-# st.markdown("""
-# <div style='border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;'>
-    
-#     <h4>1. 나의보상</h4>
-#     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
-#         <li>나의 리워드 보상: <b>1,000원</b> <span style='color: gray;'>(예상)</span></li>
-#     </ul>
-    
-#     <h4>2. 나의성과</h4>
-#     <ul style='line-height: 1.8; list-style-type: none; padding-left: 0; font-size:16px;'>
-#         <li>연료절감액: <b>65,000원</b></li>
-#         <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
-#             <span style='color: gray;'>(🌳 나무 100그루 심는 효과)</span>
-#         </li>
-#         <li>사고위험감소: 00%감소</li>
-#     </ul>
-# </div>
-# """, unsafe_allow_html=True)
 
 st.markdown("---")  # 구분선
 
