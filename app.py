@@ -611,7 +611,7 @@ for i, metric in enumerate(metrics):
     max_val = metric['max']
 
     # 여백 비율
-    margin_ratio = 0.4
+    margin_ratio = 0.05
     plot_min = min_val - (max_val - min_val) * margin_ratio
     plot_max = max_val + (max_val - min_val) * margin_ratio
 
@@ -636,11 +636,11 @@ for i, metric in enumerate(metrics):
     # 나쁨 / 좋음 표 밖 표시
     gap_factor = 0.07  # 커질수록 더 멀리
     if metric['reverse']:  # 공회전율: 작을수록 좋음
-        ax.text(plot_max, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-        ax.text(plot_min, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+        ax.text(max_val + (max_val - min_val) * gap_factor, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+        ax.text(min_val - (max_val - min_val) * gap_factor, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
     else:  # 달성률, 평균속도
-        ax.text(plot_min, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-        ax.text(plot_max, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
+        ax.text(min_val - (max_val - min_val) * gap_factor, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
+        ax.text(max_val + (max_val - min_val) * gap_factor, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
 
     # 범례는 첫 번째 그래프에만
     if i == 0:
