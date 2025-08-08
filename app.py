@@ -408,12 +408,32 @@ def generate_calendar_html_v2(data, year, month):
     )
     th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
     td_style = thtd_style + "height:80px; font-size:13px;"
-    day_style = "font-weight:bold;"
-    grade_style = "font-weight:bold; font-size:18px;"
-    pct_style = "font-size:15px; margin-top:2px;"
+
+    # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
+    day_cls = "cal-day"
+    grade_cls = "cal-grade"
+    pct_cls = "cal-pct"
+
+    # day_style = "font-weight:bold;"
+    # grade_style = "font-weight:bold; font-size:18px;"
+    # pct_style = "font-size:15px; margin-top:2px;"
+
+    # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
+    mobile_css = """
+    <style>
+    @media (max-width: 480px) {
+      .calwrap table { min-width: 0 !important; width: 100% !important; }
+      .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
+      .calwrap .cal-grade { font-size: 14px !important; }
+      .calwrap .cal-pct   { font-size: 12px !important; }
+      .calwrap .cal-day   { font-size: 12px !important; }
+    }
+    </style>
+    """
 
     html = []
-    html.append(f'<div style="{wrap_style}">')
+    html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
+    html.append(f'<div class="calwrap" style="{wrap_style}">')
     html.append(f'<table style="{table_style}">')
     html.append("<tr>")
     html.append(f'<th style="{th_style}color:red">일</th>')
@@ -434,14 +454,16 @@ def generate_calendar_html_v2(data, year, month):
                     c = grade_color.get(g, "black")
                     html.append(
                         f'<td style="{td_style}">'
-                        f'<div style="{day_style}">{day}</div>'
-                        f'<div style="{grade_style} color:{c}">{g}등급</div>'
-                        f'<div style="{pct_style} color:{c}">({p}%)</div>'
+                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                        f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
+                        f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
                         f'</td>'
                     )
                 else:
                     html.append(
-                        f'<td style="{td_style}"><div style="{day_style}">{day}</div></td>'
+                        f'<td style="{td_style}">'
+                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                        f'</td>'
                     )
         html.append("</tr>")
     html.append("</table></div>")
