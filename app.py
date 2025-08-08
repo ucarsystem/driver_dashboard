@@ -611,7 +611,7 @@ for i, metric in enumerate(metrics):
     max_val = metric['max']
 
     # 여백 비율
-    margin_ratio = 0.15
+    margin_ratio = 0.3
     plot_min = min_val - (max_val - min_val) * margin_ratio
     plot_max = max_val + (max_val - min_val) * margin_ratio
 
