@@ -242,78 +242,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 @st.cache_data(show_spinner=False)
-def draw_grade_progress_ring_base64(
-    grade="A",               # 등급
-    label="등급",            # 등급 라벨 (예: "우수")
-    achieved_pct=95,         # 현재 달성률(%)
-    max_pct=120,             # 링 100%로 환산하는 최대치(%)
-    incentive_won=280000,    # 예상 월 인센티브(원)
-    figsize=(6, 3.4),        # 카드 비율 (두 번째 이미지 느낌)
-    ring_width=0.11,         # 링 두께 (반지름 대비)
-    bg_color="#0d0f10",      # 카드 배경
-    fg_base="#2a2d31",       # 미채움 링 색
-    cmap_name="RdYlGn",      # 진행 링 컬러맵
-    dpi=200,
-    show_detail=False
-):
-    # 안전 처리
-    max_pct = max(1e-6, float(max_pct))
-    value = max(0.0, float(achieved_pct))
-    frac = min(value / max_pct, 1.0)   # 0~1
-    angle = 360.0 * frac
-
-    fig = plt.figure(figsize=figsize, dpi=dpi)
-    ax = fig.add_axes([0, 0, 1, 1])
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+def draw_grade_circle_base64(grade="A", label="우수"):
+    fig, ax = plt.subplots(figsize=(2, 2))
+    ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
+    ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
+    ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
     ax.axis("off")
 
-    # 둥근 카드 배경
-    card = patches.FancyBboxPatch(
-        (0.02, 0.06), 0.96, 0.88,
-        boxstyle="round,pad=0.02,rounding_size=0.04",
-        linewidth=0.0, facecolor=bg_color)
-    ax.add_patch(card)
-
-    # 링 위치/크기
-    cx, cy = 0.33, 0.52
-    r = 0.40
-    inner_r = r * (1 - ring_width)
-
-    # 기본(미채움) 링
-    base_wedge = patches.Wedge((cx, cy), r, 0, 360, width=r-inner_r,
-                               facecolor=fg_base, linewidth=0)
-    ax.add_patch(base_wedge)
-
-    # 진행 링 (12시부터 시계 방향)
-    cmap = mpl.cm.get_cmap(cmap_name)
-    prog_color = cmap(frac)
-    prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
-                               facecolor=prog_color, linewidth=0, antialiased=True)
-    ax.add_patch(prog_wedge)
-
-    # 외곽선 약간
-    ax.add_patch(patches.Circle((cx, cy), r, fill=False,
-                                linewidth=1.0, edgecolor="#3a3f44", alpha=0.9))
-
-    # 텍스트들
-    ax.text(cx, cy + r*0.45, f"{grade} {label}",
-            ha="center", va="center", fontsize=18,
-            color="#7ee084" if frac >= 0.75 else "#c8d1d6", fontweight="bold")
-
-    ax.text(cx, cy, f"{int(round(value))}%",
-            ha="center", va="center", fontsize=52, color="white", fontweight="bold")
-
-    ax.text(cx, cy - r*0.42, "예상 월 인센티브",
-            ha="center", va="center", fontsize=14, color="#aeb6bb")
-
-    ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
-            ha="center", va="center", fontsize=24, color="white", fontweight="bold")
-
-    if show_detail:
-        ax.text(0.82, 0.50, "(상세)", ha="center", va="center",
-                fontsize=14, color="#8c9296")
-
-    # 투명 배경 PNG → base64
+    # 이미지 저장을 메모리 버퍼로
     buf = io.BytesIO()
     fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
     buf.seek(0)
@@ -321,24 +257,7 @@ def draw_grade_progress_ring_base64(
     plt.close(fig)
     return image_base64
 
-
-# --- 여기서부터는 페이지에 출력하는 부분 (기존 테이블 레이아웃 유지) ---
-
-# 예시 값
-grade = "A"
-label = "등급"      # 또는 "우수"
-achieved_pct = 95   # 현재 달성률
-max_pct = 120       # 총 120%를 링 100%로 간주
-incentive_won = 280000
-
-# S 등급까지 남은 퍼센트(예: 100%를 S 기준으로 가정)
-remain_to_S = max(0, 100 - achieved_pct)
-remain_text = f"* 다음 S등급까지 {remain_to_S}% 남았습니다." if remain_to_S > 0 else "* S등급 달성!"
-
-circle_base64 = draw_grade_progress_ring_base64(
-    grade=grade, label=label, achieved_pct=achieved_pct,
-    max_pct=max_pct, incentive_won=incentive_won, show_detail=True
-)
+circle_base64 = draw_grade_circle_base64("A", "우수")
 
 st.markdown(f"""
 <style>
@@ -358,69 +277,40 @@ st.markdown(f"""
     }}
 }}
 </style>
-
 <table style='width: 100%; table-layout: fixed;'>
-  <tr>
-    <td style='width: 220px; text-align: center;'>
-      <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 220px;">
-    </td>
-    <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-      <p><b>달성률</b></p>
-      <p class='main' style='font-size: 20px; font-weight: bold;'>{achieved_pct}%</p>
-      <p class='sub' style='font-size: 13px; color: red;'>{remain_text}</p>
-    </td>
-  </tr>
+    <tr>
+        <td style='width: 180px; text-align: center;'>
+            <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
+        </td>
+        <td class='grade-info' style='text-align: left; vertical-align: middle;'>
+            <p><b>달성률</b></p>
+            <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
+            <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+        </td>
+    </tr>
 </table>
 """, unsafe_allow_html=True)
 
-# @st.cache_data(show_spinner=False)
-# def draw_grade_circle_base64(grade="A", label="우수"):
-#     fig, ax = plt.subplots(figsize=(2, 2))
-#     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
-#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
-#     ax.axis("off")
-
-#     # 이미지 저장을 메모리 버퍼로
-#     buf = io.BytesIO()
-#     fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
-#     buf.seek(0)
-#     image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-#     plt.close(fig)
-#     return image_base64
-
-# circle_base64 = draw_grade_circle_base64("A", "우수")
+# st.markdown(f"""
+# <div class="grade-flex-container">
+#     <img src="data:image/png;base64,{circle_base64}">
+#     <div class="grade-text">
+#         <p><b>달성률</b></p>
+#         <p class="main">95%</p>
+#         <p class="sub">* 다음 S등급까지 5% 남았습니다.</p>
+#     </div>
+# </div>
+# """, unsafe_allow_html=True)
 
 # st.markdown(f"""
-# <style>
-# /* 모바일 텍스트 사이즈 조정 */
-# @media screen and (max-width: 480px) {{
-#     .circle-img {{
-#         width: 120px !important;
-#     }}
-#     .grade-info p {{
-#         font-size: 16px !important;
-#     }}
-#     .grade-info .main {{
-#         font-size: 22px !important;
-#     }}
-#     .grade-info .sub {{
-#         font-size: 14px !important;
-#     }}
-# }}
-# </style>
-# <table style='width: 100%; table-layout: fixed;'>
-#     <tr>
-#         <td style='width: 180px; text-align: center;'>
-#             <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
-#         </td>
-#         <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-#             <p><b>달성률</b></p>
-#             <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
-#             <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-#         </td>
-#     </tr>
-# </table>
+# <div class='grade-wrapper'>
+#     <img src="data:image/png;base64,{circle_base64}">
+#     <div class="grade-content">
+#         <p style='font-weight: bold;'>달성률</p>
+#         <p style='font-size: 20px; font-weight: bold;'>95%</p>
+#         <p style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
+#     </div>
+# </div>
 # """, unsafe_allow_html=True)
 
 # 참고치 팝업
