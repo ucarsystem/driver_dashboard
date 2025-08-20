@@ -248,13 +248,12 @@ def draw_grade_progress_ring_base64(
     achieved_pct=95,         # 현재 달성률(%)
     max_pct=120,             # 링 100%로 환산하는 최대치(%)
     incentive_won=280000,    # 예상 월 인센티브(원)
-    figsize=(6, 3.4),        # 카드 비율 (두 번째 이미지 느낌)
-    ring_width=0.11,         # 링 두께 (반지름 대비)
-    bg_color="#0d0f10",      # 카드 배경
-    fg_base="#2a2d31",       # 미채움 링 색
-    cmap_name="RdYlGn",      # 진행 링 컬러맵
+    figsize=(4.5, 4.5),        # 카드 비율 (두 번째 이미지 느낌)
+    ring_width=0.12,         # 링 두께 (반지름 대비)
+    bg_color="#ffffff",      # 카드 배경
+    fg_base="#e6e7ea",       # 미채움 링 색
+    cmap_name="RdYlGn",      # 진행 링 색상(낮음=적, 높음=초록)
     dpi=200,
-    show_detail=False
 ):
     # 안전 처리
     max_pct = max(1e-6, float(max_pct))
@@ -272,46 +271,44 @@ def draw_grade_progress_ring_base64(
         (0.02, 0.06), 0.96, 0.88,
         boxstyle="round,pad=0.02,rounding_size=0.04",
         linewidth=0.0, facecolor=bg_color)
-    ax.add_patch(card)
+    # ax.add_patch(card)
 
     # 링 위치/크기
-    cx, cy = 0.33, 0.52
-    r = 0.40
+    cx, cy = 0.50, 0.58
+    r = 0.38
     inner_r = r * (1 - ring_width)
 
     # 기본(미채움) 링
     base_wedge = patches.Wedge((cx, cy), r, 0, 360, width=r-inner_r,
                                facecolor=fg_base, linewidth=0)
-    ax.add_patch(base_wedge)
+    # ax.add_patch(base_wedge)
 
     # 진행 링 (12시부터 시계 방향)
     cmap = mpl.cm.get_cmap(cmap_name)
     prog_color = cmap(frac)
     prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
                                facecolor=prog_color, linewidth=0, antialiased=True)
-    ax.add_patch(prog_wedge)
+    # ax.add_patch(prog_wedge)
 
-    # 외곽선 약간
-    ax.add_patch(patches.Circle((cx, cy), r, fill=False,
-                                linewidth=1.0, edgecolor="#3a3f44", alpha=0.9))
+    # --- 텍스트: 등급(녹색), 나머지 검정 ---
+    grade_color = "#2e7d32"     # 녹색
+    text_color = "#000000"      # 검정
 
-    # 텍스트들
-    ax.text(cx, cy + r*0.45, f"{grade} {label}",
-            ha="center", va="center", fontsize=18,
-            color="#7ee084" if frac >= 0.75 else "#c8d1d6", fontweight="bold")
+    ax.text(cx, cy + r*0.46, f"{grade} {label}",
+        ha="center", va="center", fontsize=20,
+        color=grade_color, fontweight="bold")
 
     ax.text(cx, cy, f"{int(round(value))}%",
-            ha="center", va="center", fontsize=52, color="white", fontweight="bold")
+            ha="center", va="center", fontsize=54,
+            color=text_color, fontweight="bold")
 
-    ax.text(cx, cy - r*0.42, "예상 월 인센티브",
-            ha="center", va="center", fontsize=14, color="#aeb6bb")
+    ax.text(cx, cy - r*0.40, "예상 월 인센티브",
+            ha="center", va="center", fontsize=14, color=text_color)
 
     ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
-            ha="center", va="center", fontsize=24, color="white", fontweight="bold")
+            ha="center", va="center", fontsize=24,
+            color=text_color, fontweight="bold")
 
-    if show_detail:
-        ax.text(0.82, 0.50, "(상세)", ha="center", va="center",
-                fontsize=14, color="#8c9296")
 
     # 투명 배경 PNG → base64
     buf = io.BytesIO()
@@ -337,40 +334,15 @@ remain_text = f"* 다음 S등급까지 {remain_to_S}% 남았습니다." if remai
 
 circle_base64 = draw_grade_progress_ring_base64(
     grade=grade, label=label, achieved_pct=achieved_pct,
-    max_pct=max_pct, incentive_won=incentive_won, show_detail=True
+    max_pct=max_pct, incentive_won=incentive_won
 )
 
+# 이미지 한 줄 전용 + 아래 문구(검정색)
 st.markdown(f"""
-<style>
-/* 모바일 텍스트 사이즈 조정 */
-@media screen and (max-width: 480px) {{
-    .circle-img {{
-        width: 120px !important;
-    }}
-    .grade-info p {{
-        font-size: 16px !important;
-    }}
-    .grade-info .main {{
-        font-size: 22px !important;
-    }}
-    .grade-info .sub {{
-        font-size: 14px !important;
-    }}
-}}
-</style>
-
-<table style='width: 100%; table-layout: fixed;'>
-  <tr>
-    <td style='width: 220px; text-align: center;'>
-      <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 220px;">
-    </td>
-    <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-      <p><b>달성률</b></p>
-      <p class='main' style='font-size: 20px; font-weight: bold;'>{achieved_pct}%</p>
-      <p class='sub' style='font-size: 13px; color: red;'>{remain_text}</p>
-    </td>
-  </tr>
-</table>
+<div style="width:100%; text-align:center;">
+  <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
+  <div style="margin-top:10px; color:#000000; font-size:14px;">{notice_text}</div>
+</div>
 """, unsafe_allow_html=True)
 
 # @st.cache_data(show_spinner=False)
