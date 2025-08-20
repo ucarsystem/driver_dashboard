@@ -341,7 +341,7 @@ circle_base64 = draw_grade_progress_ring_base64(
 st.markdown(f"""
 <div style="width:100%; text-align:center;">
   <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
-  <div style="margin-top:10px; color:#000000; font-size:14px;">{notice_text}</div>
+  <div style="margin-top:10px; color:#000000; font-size:18px;">{notice_text}</div>
 </div>
 """, unsafe_allow_html=True)
 
