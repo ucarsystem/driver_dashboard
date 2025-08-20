@@ -330,7 +330,7 @@ incentive_won = 280000
 
 # S 등급까지 남은 퍼센트(예: 100%를 S 기준으로 가정)
 remain_to_S = max(0, 100 - achieved_pct)
-remain_text = f"* 다음 S등급까지 {remain_to_S}% 남았습니다." if remain_to_S > 0 else "* S등급 달성!"
+notice_text  = f"* 다음 S등급까지 {remain_to_S}% 남았습니다." if remain_to_S > 0 else "* S등급 달성!"
 
 circle_base64 = draw_grade_progress_ring_base64(
     grade=grade, label=label, achieved_pct=achieved_pct,
