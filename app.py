@@ -271,7 +271,7 @@ def draw_grade_progress_ring_base64(
         (0.02, 0.06), 0.96, 0.88,
         boxstyle="round,pad=0.02,rounding_size=0.04",
         linewidth=0.0, facecolor=bg_color)
-    # ax.add_patch(card)
+    ax.add_patch(card)
 
     # 링 위치/크기
     cx, cy = 0.50, 0.58
@@ -281,14 +281,14 @@ def draw_grade_progress_ring_base64(
     # 기본(미채움) 링
     base_wedge = patches.Wedge((cx, cy), r, 0, 360, width=r-inner_r,
                                facecolor=fg_base, linewidth=0)
-    # ax.add_patch(base_wedge)
+    ax.add_patch(base_wedge)
 
     # 진행 링 (12시부터 시계 방향)
     cmap = mpl.cm.get_cmap(cmap_name)
     prog_color = cmap(frac)
     prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
                                facecolor=prog_color, linewidth=0, antialiased=True)
-    # ax.add_patch(prog_wedge)
+    ax.add_patch(prog_wedge)
 
     # --- 텍스트: 등급(녹색), 나머지 검정 ---
     grade_color = "#2e7d32"     # 녹색
