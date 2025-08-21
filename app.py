@@ -363,7 +363,7 @@ with st.expander("📌 참고치 보기"):
 
                 <hr style="border: 1px solid #ccc;">
                             
-                <div style="margin:15px 0;">
+                <div style="margin:15px;">
                 <b>등급 참고치</b><br>
                 - 최우수 S : 100% 이상  
                 - 우  수 A : 95~100%  
