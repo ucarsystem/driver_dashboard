@@ -350,7 +350,7 @@ st.markdown(f"""
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 # 참고치 팝업
-with st.expander("📌 참고치 보기"):
+with st.expander("📌 상세보기"):
                 st.markdown("""
                 <div style="font-size:15px; line-height:1.6;">
                 
@@ -361,7 +361,7 @@ with st.expander("📌 참고치 보기"):
                 <span style="font-size:13px; color:gray;">(현재의 실적으로 1개월 추정)</span>
                 </div>
 
-                <hr style="border: 1px solid #ccc;">
+                <hr style="border: 0.5px solid #ccc;">
                             
                 <div style="margin:15px;">
                 <b>등급 참고치</b><br>
@@ -374,7 +374,7 @@ with st.expander("📌 참고치 보기"):
                   이 하 / 평가불가
                 </div>
                 
-                <hr style="border: 1px solid #ccc;">
+                <hr style="border: 0.2px solid #ccc;">
                             
                 <div style="margin:15px;">
                 <b>달성률 참고치</b><br>
