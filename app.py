@@ -355,7 +355,7 @@ with st.expander("📌 상세보기"):
                 <div style="font-size:15px; line-height:1.6;">
                 
                 <div style="margin:15px;">
-                <b>금월 나의 인센티브 (1개월 추정)</b><br>
+                <span style="font-size:17px;"><b>금월 나의 인센티브 (1개월 추정)</b></span><br>
                 - 예상 기여액 : 2,800,000원<br>
                 - 예상 배분액 : 280,000원<br>
                 <span style="font-size:13px; color:gray;">(현재의 실적으로 1개월 추정)</span>
@@ -364,7 +364,7 @@ with st.expander("📌 상세보기"):
                 <hr style="border: 0.5px solid #ccc;">
                             
                 <div style="margin:15px;">
-                <b>등급 참고치</b><br>
+                <span style="font-size:17px;"><b>등급 참고치</b></span><br>
                 - 최우수 S : 100% 이상<br>  
                 - 우  수 A : 95~100%<br>  
                 - 양  호 B : 90~95%<br>  
@@ -377,7 +377,7 @@ with st.expander("📌 상세보기"):
                 <hr style="border: 0.2px solid #ccc;">
                             
                 <div style="margin:15px;">
-                <b>달성률 참고치</b><br>
+                <span style="font-size:17px;"><b>달성률 참고치</b></span><br>
                 최하위 75% ~ 최상위 100% 이상<br>
                 <span style="font-size:13px; color:gray;">* 75% 이하는 연료절감 참여 전 수치</span>
                 </div>
