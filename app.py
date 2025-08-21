@@ -352,9 +352,9 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
                 st.markdown("""
-                <div style="font-size:15px; line-height:1.6; text-align:center;">
+                <div style="font-size:15px; line-height:1.6;">
                 
-                <div style="margin-bottom:15px;">
+                <div style="margin:15px;">
                 <b>금월 나의 인센티브 (1개월 추정)</b><br>
                 - 예상 기여액 : 2,800,000원<br>
                 - 예상 배분액 : 280,000원<br>
@@ -376,7 +376,7 @@ with st.expander("📌 참고치 보기"):
                 
                 <hr style="border: 1px solid #ccc;">
                             
-                <div style="margin-top:15px;">
+                <div style="margin:15px;">
                 <b>달성률 참고치</b><br>
                 최하위 75% ~ 최상위 100% 이상<br>
                 <span style="font-size:13px; color:gray;">* 75% 이하는 연료절감 참여 전 수치</span>
@@ -384,6 +384,7 @@ with st.expander("📌 참고치 보기"):
                 </div>
                 """, 
                 unsafe_allow_html= True)
+
 if "show_graph" not in st.session_state:
     st.session_state.show_graph = False
 
