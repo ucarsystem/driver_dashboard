@@ -346,7 +346,8 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-
+# 단순 줄바꿈
+st.markdown("<br><br>", unsafe_allow_html=True)
 
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
