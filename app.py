@@ -561,23 +561,25 @@ def draw_rank_bar(
     min_value: int,
     max_value: int,
     current_value: int,
-    width=6.0, height=1.1, dpi=220,
-    bar_left=0.08, bar_right=0.92, bar_y=0.55,
+    width=6.0, height=1.15, dpi=220,
+    bar_left=0.12, bar_right=0.88, bar_y=0.55,
     segments=6,
     line_color="#9AA3AB",      # 점선 색
     tick_color="#9AA3AB",      # 눈금 색
     label_color="#2B2F33",     # 좌/우 라벨 색
     marker_color="#1F4AA0",    # 삼각형 마커/내 위치 텍스트 색
-    bg="white"
+    bg="white",
+    # ⬇️ 새 파라미터
+    outside_gap=0.02,          # 바에서 라벨까지 간격(좌/우 동일)
+    end_tick_len=0.08,         # 양 끝(좌/우) 긴 눈금 길이
+    mid_tick_len=0.03,         # 중간 눈금 길이
 ):
     """
     최하위~최상위 사이 점선 바에 현재 값을 삼각형으로 표시한 이미지를 base64로 반환.
     """
     # 안전 처리
-    min_value = float(min_value)
-    max_value = float(max_value)
-    current_value = float(current_value)
-    span = max(max_value - min_value, 1e-6)
+    min_v = float(min_value); max_v = float(max_value)
+    cur_v = float(current_value); span = max(max_v - min_v, 1e-6)
 
     # figure
     fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
@@ -587,26 +589,34 @@ def draw_rank_bar(
     # 점선 바
     ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
               colors=line_color, linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+    
+    # 끝(좌/우) 긴 눈금
+    ax.vlines(x=bar_left,  ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
+              colors=tick_color, linewidth=1.8, zorder=2)
+    ax.vlines(x=bar_right, ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
+              colors=tick_color, linewidth=1.8, zorder=2)
 
     # 눈금 (segments 등분)
     for i in range(segments + 1):
         x = bar_left + (bar_right - bar_left) * (i / segments)
-        ax.vlines(x=x, ymin=bar_y-0.03, ymax=bar_y+0.03, colors=tick_color, linewidth=1.2, zorder=2)
+        ax.vlines(x=x, ymin=bar_y-mid_tick_len, ymax=bar_y+mid_tick_len,
+                  colors=tick_color, linewidth=1.2, zorder=2)
 
     # 좌/우 라벨
-    ax.text(bar_left, bar_y+0.10, "최하위", ha="left", va="center",
-            fontsize=12, color=label_color)
-    ax.text(bar_left, bar_y-0.14, f"{min_value:,.0f}원", ha="left", va="center",
-            fontsize=12, color=label_color)
+    # 왼쪽: 텍스트 오른쪽 정렬(ha='right')로 바 왼쪽 밖에 붙임
+    ax.text(bar_left - outside_gap, bar_y+0.10, "최하위",
+            ha="right", va="center", fontsize=12, color=label_color)
+    ax.text(bar_left - outside_gap, bar_y-0.14, f"{min_v:,.0f}원",
+            ha="right", va="center", fontsize=12, color=label_color)
 
-    ax.text(bar_right, bar_y+0.10, "최상위", ha="right", va="center",
-            fontsize=12, color=label_color)
-    ax.text(bar_right, bar_y-0.14, f"{max_value:,.0f}원", ha="right", va="center",
-            fontsize=12, color=label_color)
+    # 오른쪽: 텍스트 왼쪽 정렬(ha='left')로 바 오른쪽 밖에 붙임
+    ax.text(bar_right + outside_gap, bar_y+0.10, "최상위",
+            ha="left", va="center", fontsize=12, color=label_color)
+    ax.text(bar_right + outside_gap, bar_y-0.14, f"{max_v:,.0f}원",
+            ha="left", va="center", fontsize=12, color=label_color)
 
-    # 현재 위치 x좌표
-    frac = (current_value - min_value) / span
-    frac = max(0.0, min(1.0, frac))
+    # 현재 값 위치
+    frac = max(0.0, min(1.0, (cur_v - min_v) / span))
     x_cur = bar_left + (bar_right - bar_left) * frac
 
     # 삼각형 마커
@@ -614,7 +624,7 @@ def draw_rank_bar(
             color=marker_color, zorder=3)
 
     # "내 위치 : …원" (바 아래)
-    ax.text(x_cur, bar_y-0.26, f"내 위치 : {current_value:,.0f}원",
+    ax.text(x_cur, bar_y-0.26, f"내 위치 : {cur_v:,.0f}원",
             ha="center", va="center", fontsize=12, color=marker_color)
 
     # 저장 → base64
@@ -639,7 +649,7 @@ st.markdown(f"<img src='data:image/png;base64,{img_city}' style='width:100%; max
 # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
 img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
 
-st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 st.markdown("**▼ 운수사 전체 운전자 중**")
 st.markdown(f"<img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'>",
             unsafe_allow_html=True)
@@ -647,7 +657,7 @@ st.markdown(f"<img src='data:image/png;base64,{img_company}' style='width:100%; 
 # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
 img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
 
-st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 st.markdown("**▼ 동일노선 운전자 중**")
 st.markdown(f"<img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'>",
             unsafe_allow_html=True)
