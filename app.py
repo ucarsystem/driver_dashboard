@@ -358,7 +358,7 @@ with st.expander("📌 상세보기"):
                 <span style="font-size:17px;"><b>금월 나의 인센티브 (1개월 추정)</b></span><br>
                 - 예상 기여액 : 2,800,000원<br>
                 - 예상 배분액 : 280,000원<br>
-                <span style="font-size:13px; color:gray;">(현재의 실적으로 1개월 추정)</span>
+                <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span>
                 </div>
 
                 <hr style="border: 0.5px solid #ccc;">
@@ -379,7 +379,7 @@ with st.expander("📌 상세보기"):
                 <div style="margin:15px;">
                 <span style="font-size:17px;"><b>달성률 참고치</b></span><br>
                 최하위 75% ~ 최상위 100% 이상<br>
-                <span style="font-size:13px; color:gray;">* 75% 이하는 연료절감 참여 전 수치</span>
+                <span style="font-size:15px; color:gray;">* 75% 미만은 연료절감 참여 전 수치</span>
                 </div>
                 </div>
                 """, 
@@ -553,64 +553,106 @@ calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
 with st.expander("📅 7월 일별 달성률 보기", expanded=True):
     st.markdown(calendar_html, unsafe_allow_html=True)
 
-# 항목별 그래프수치표시
-def draw_gauge(my_position, prev_position, avg_position, title):
-    labels = ['하위', '40%', '30%', '20%', '10%', '상위']
-    x = [0, 1, 2, 3, 4, 5]
-
-    fig, ax = plt.subplots(figsize=(10, 1.5))
-    ax.hlines(0, 0, 5, color='lightgray', linewidth=10)
-    ax.plot(my_position, 0, marker='^', color='black', markersize=12, label='내 위치')
-    ax.plot(prev_position, 0, marker='v', color='gray', markersize=12, label='전달 위치')
-    ax.plot(avg_position, 0, marker='o', color='green', markersize=12, label='전체 평균')
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.set_yticks([])
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.6), ncol=3)
-    ax.set_xlim(-0.5, 5.5)
-    ax.spines[['top', 'right', 'left', 'bottom']].set_visible(False)
-    st.markdown(f"#### {title}")
-    st.pyplot(fig)
-
-
-def draw_rank_bar(title, my_percent):
-    fig, ax = plt.subplots(figsize=(6, 1.2))
-    ax.set_xlim(0, 100)
-    ax.set_ylim(0, 1)
-    ax.hlines(0.5, 0, 100, colors='lightgray')
-    
-    # 5등분 점선
-    for x in [0, 20, 40, 60, 80, 100]:
-        ax.vlines(x, 0.45, 0.55, colors='gray', linestyles='dotted')
-    
-    # 위치 점 표시
-    ax.plot(my_percent, 0.5, 'o', color='black', markersize=12)
-    
-    # 라벨 표시
-    ax.text(0, 0.7, '하위', ha='left', va='center', fontsize=10)
-    ax.text(100, 0.7, '상위', ha='right', va='center', fontsize=10)
-    ax.text(my_percent, 0.2, f"내 위치: {my_percent:.1f}%", ha='center', fontsize=10, color='black')
-    
-    # 스타일링
-    ax.set_xticks([0, 20, 40, 60, 80, 100])
-    ax.set_yticks([])
-    ax.set_title(title, fontsize=11)
-    ax.axis('off')
-    st.pyplot(fig)
-
 st.markdown("---")
 
-st.markdown("### 📍 나의 경제운전 위치(달성율 기준)", unsafe_allow_html=True)
+# --- rank bar 생성 함수 ---
+@st.cache_data(show_spinner=False)
+def draw_rank_bar(
+    min_value: int,
+    max_value: int,
+    current_value: int,
+    width=6.0, height=1.1, dpi=220,
+    bar_left=0.08, bar_right=0.92, bar_y=0.55,
+    segments=6,
+    line_color="#9AA3AB",      # 점선 색
+    tick_color="#9AA3AB",      # 눈금 색
+    label_color="#2B2F33",     # 좌/우 라벨 색
+    marker_color="#1F4AA0",    # 삼각형 마커/내 위치 텍스트 색
+    bg="white"
+):
+    """
+    최하위~최상위 사이 점선 바에 현재 값을 삼각형으로 표시한 이미지를 base64로 반환.
+    """
+    # 안전 처리
+    min_value = float(min_value)
+    max_value = float(max_value)
+    current_value = float(current_value)
+    span = max(max_value - min_value, 1e-6)
+
+    # figure
+    fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
+    ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
+
+    # 점선 바
+    ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
+              colors=line_color, linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+
+    # 눈금 (segments 등분)
+    for i in range(segments + 1):
+        x = bar_left + (bar_right - bar_left) * (i / segments)
+        ax.vlines(x=x, ymin=bar_y-0.03, ymax=bar_y+0.03, colors=tick_color, linewidth=1.2, zorder=2)
+
+    # 좌/우 라벨
+    ax.text(bar_left, bar_y+0.10, "최하위", ha="left", va="center",
+            fontsize=12, color=label_color)
+    ax.text(bar_left, bar_y-0.14, f"{min_value:,.0f}원", ha="left", va="center",
+            fontsize=12, color=label_color)
+
+    ax.text(bar_right, bar_y+0.10, "최상위", ha="right", va="center",
+            fontsize=12, color=label_color)
+    ax.text(bar_right, bar_y-0.14, f"{max_value:,.0f}원", ha="right", va="center",
+            fontsize=12, color=label_color)
+
+    # 현재 위치 x좌표
+    frac = (current_value - min_value) / span
+    frac = max(0.0, min(1.0, frac))
+    x_cur = bar_left + (bar_right - bar_left) * frac
+
+    # 삼각형 마커
+    ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10,
+            color=marker_color, zorder=3)
+
+    # "내 위치 : …원" (바 아래)
+    ax.text(x_cur, bar_y-0.26, f"내 위치 : {current_value:,.0f}원",
+            ha="center", va="center", fontsize=12, color=marker_color)
+
+    # 저장 → base64
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
+    buf.seek(0)
+    img64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return img64
 
 
-# 예시 값
-my_rank_incheon = 30.2  # 인천시 전체 순위 백분율
-my_rank_company = 45.0  # 운수사 내 순위 백분율
-my_rank_route = 55.0    # 동일노선 내 순위 백분율
+# ----------------- 화면 출력 예시 -----------------
+st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_allow_html=True)
 
-draw_rank_bar("▼ 인천시 전체 운전자 중", my_rank_incheon)
-draw_rank_bar("▼ 운수사 전체 운전자 중", my_rank_company)
-draw_rank_bar("▼ 동일노선 운전자 중", my_rank_route)
+# 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
+img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
+
+st.markdown("**▼ 인천시 전체 운전자 중**")
+st.markdown(f"<img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'>",
+            unsafe_allow_html=True)
+
+# 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
+img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
+
+st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+st.markdown("**▼ 운수사 전체 운전자 중**")
+st.markdown(f"<img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'>",
+            unsafe_allow_html=True)
+
+# 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
+img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
+
+st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+st.markdown("**▼ 동일노선 운전자 중**")
+st.markdown(f"<img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'>",
+            unsafe_allow_html=True)
+
+
 
 # 노선 순위 참고
 st.markdown("""
@@ -620,37 +662,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("---")
-# 경제운전 위치 - 퍼센트 기준 바
 
-# def draw_percent_bar(label, my_percent, prev_percent, avg_percent):
-#     fig, ax = plt.subplots(figsize=(6, 1))
-#     ax.set_xlim(0, 100)
-#     ax.axvline(my_percent, color='red', label='나의 위치')
-#     ax.axvline(prev_percent, color='black', linestyle='--', label='전달 나의 위치')
-#     ax.axvline(avg_percent, color='green', linewidth=8, alpha=0.4, label='전체 평균')
-#     ax.set_yticks([])
-#     ax.set_xticks([0, 20, 40, 60, 80, 100])
-#     ax.set_title(label)
-#     ax.legend(loc='upper right')
-#     st.pyplot(fig)
-
-# st.markdown("<h5>달성율</h5>", unsafe_allow_html=True)
-# draw_percent_bar("달성율", my_percent=45, prev_percent=42, avg_percent=50)
-
-# st.markdown("<h5>공회전율</h5>", unsafe_allow_html=True)
-# draw_percent_bar("공회전율", my_percent=20, prev_percent=30, avg_percent=22)
-
-# st.markdown("<h5>평균속도</h5>", unsafe_allow_html=True)
-# draw_percent_bar("평균속도", my_percent=27, prev_percent=25, avg_percent=28)
-
-# st.markdown("<h5>급감속</h5>", unsafe_allow_html=True)
-# draw_percent_bar("급감속", my_percent=30, prev_percent=32, avg_percent=28)
-
-# st.markdown("<h5>급가속</h5>", unsafe_allow_html=True)
-# draw_percent_bar("급가속", my_percent=18, prev_percent=20, avg_percent=15)
-
-# st.markdown("<h5>과속</h5>", unsafe_allow_html=True)
-# draw_percent_bar("과속", my_percent=90, prev_percent=92, avg_percent=88)
 
 st.markdown("""
 <h3>📍 항목별 경제운전 위치</h3>
