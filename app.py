@@ -253,6 +253,7 @@ def draw_grade_progress_ring_base64(
     bg_color="#ffffff",      # 카드 배경
     fg_base="#e6e7ea",       # 미채움 링 색
     cmap_name="RdYlGn",      # 진행 링 색상(낮음=적, 높음=초록)
+    start_angle=-90,
     dpi=200,
 ):
     # 안전 처리
@@ -263,7 +264,7 @@ def draw_grade_progress_ring_base64(
 
     fig = plt.figure(figsize=figsize, dpi=dpi)
     ax = fig.add_axes([0, 0, 1, 1])
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_aspect("equal")
     ax.axis("off")
 
     # 둥근 카드 배경
@@ -274,8 +275,8 @@ def draw_grade_progress_ring_base64(
     ax.add_patch(card)
 
     # 링 위치/크기
-    cx, cy = 0.50, 0.58
-    r = 0.38
+    cx, cy = 0.50, 0.50    # 세로 중앙으로 이동
+    r = 0.42               # 원 크기
     inner_r = r * (1 - ring_width)
 
     # 기본(미채움) 링
@@ -312,7 +313,7 @@ def draw_grade_progress_ring_base64(
 
     # 투명 배경 PNG → base64
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
+    fig.savefig(buf, format="png", bbox_inches=None, transparent=True)
     buf.seek(0)
     image_base64 = base64.b64encode(buf.read()).decode("utf-8")
     plt.close(fig)
@@ -345,55 +346,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# @st.cache_data(show_spinner=False)
-# def draw_grade_circle_base64(grade="A", label="우수"):
-#     fig, ax = plt.subplots(figsize=(2, 2))
-#     ax.add_patch(patches.Circle((0.5, 0.5), 0.48, color='green'))
-#     ax.text(0.5, 0.6, f"{grade}등급", ha='center', va='center', fontsize=20, color='white', fontweight='bold')
-#     ax.text(0.5, 0.4, f"({label})", ha='center', va='center', fontsize=15, color='white')
-#     ax.axis("off")
 
-#     # 이미지 저장을 메모리 버퍼로
-#     buf = io.BytesIO()
-#     fig.savefig(buf, format="png", bbox_inches="tight", transparent=True)
-#     buf.seek(0)
-#     image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-#     plt.close(fig)
-#     return image_base64
-
-# circle_base64 = draw_grade_circle_base64("A", "우수")
-
-# st.markdown(f"""
-# <style>
-# /* 모바일 텍스트 사이즈 조정 */
-# @media screen and (max-width: 480px) {{
-#     .circle-img {{
-#         width: 120px !important;
-#     }}
-#     .grade-info p {{
-#         font-size: 16px !important;
-#     }}
-#     .grade-info .main {{
-#         font-size: 22px !important;
-#     }}
-#     .grade-info .sub {{
-#         font-size: 14px !important;
-#     }}
-# }}
-# </style>
-# <table style='width: 100%; table-layout: fixed;'>
-#     <tr>
-#         <td style='width: 180px; text-align: center;'>
-#             <img class='circle-img' src="data:image/png;base64,{circle_base64}" style="width: 180px;">
-#         </td>
-#         <td class='grade-info' style='text-align: left; vertical-align: middle;'>
-#             <p><b>달성률</b></p>
-#             <p class='main' style='font-size: 20px; font-weight: bold;'>95%</p>
-#             <p class='sub' style='font-size: 13px; color: red;'>* 다음 S등급까지 5% 남았습니다.</p>
-#         </td>
-#     </tr>
-# </table>
-# """, unsafe_allow_html=True)
 
 # 참고치 팝업
 with st.expander("📌 참고치 보기"):
