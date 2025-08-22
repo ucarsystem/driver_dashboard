@@ -648,21 +648,22 @@ st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_a
 # 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
 img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
 
-st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 인천시 전체 운전자 중</div>", unsafe_allow_html=True)
+st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>▼ 인천시 전체 운전자 중</div>", unsafe_allow_html=True)
 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
 img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
 
 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 운수사 전체 운전자 중</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>▼ 운수사 전체 운전자 중</div>", unsafe_allow_html=True)
 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
 img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
 
 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 동일노선 운전자 중</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>▼ 동일노선 운전자 중</div>", unsafe_allow_html=True)
 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 
