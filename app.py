@@ -587,6 +587,11 @@ def draw_rank_bar(
     ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
     # ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
 
+    # 👇 좌우로 여유를 줘서 바깥 라벨이 잘리지 않게 함
+    ax.set_xlim(-pad_x, 1 + pad_x)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+
     # 점선 바
     ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
               colors=line_color, linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
@@ -598,7 +603,7 @@ def draw_rank_bar(
               colors=tick_color, linewidth=1.8, zorder=2)
 
     # 눈금 (segments 등분)
-    for i in range(segments + 1):
+    for i in range(1, segments):
         x = bar_left + (bar_right - bar_left) * (i / segments)
         ax.vlines(x=x, ymin=bar_y-mid_tick_len, ymax=bar_y+mid_tick_len,
                   colors=tick_color, linewidth=1.2, zorder=2)
