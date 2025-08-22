@@ -740,8 +740,6 @@ def draw_rank_bar_pct(
     return img64
 
 
-# ====== 화면 구성 ======
-st.markdown("### 📍 항목별 위치(퍼센트 기준)")
 
 items = [
     ("월엽(관리, 환경)", 20),
@@ -753,7 +751,7 @@ items = [
 
 for idx, (title, pct) in enumerate(items):
     # 제목(가운데 정렬, 굵게)
-    st.markdown(f"<div style='text-align:center; font-weight:700; font-size:16px;'>{title}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; font-weight:700; font-size:20px;'>{title}</div>", unsafe_allow_html=True)
 
     # 바그래프
     img64 = draw_rank_bar_pct(pct, min_pct=0, max_pct=100)
@@ -764,32 +762,7 @@ for idx, (title, pct) in enumerate(items):
         st.markdown("<hr style='border:0; border-top:1px solid #d9dbe0; margin:8px 0 14px 0;'>", unsafe_allow_html=True)
 
 
-st.markdown("---")  # 구분선
 
-# 개인별 성과금(충남고려)
-st.markdown("""
-<h3>나의 성과와 보상 (충남고속 대상)</h3>
-""", unsafe_allow_html=True)
-
-html = dedent("""
-<div style="border:1px solid #ddd; padding:20px; border-radius:10px; background-color:#f9f9f9; margin-top:30px;">
-  <h4 style="margin:0 0 8px 0;">1. 나의 보상</h4>
-  <ul style="line-height:1.8; background-color:yellow; list-style-type:none; padding-left:0; font-size:20px;">
-    <li>나의 리워드 보상: <b>1,000원</b> <span style="color:gray;">(예상)</span></li>
-  </ul>
-
-  <h4 style="margin:16px 0 8px 0;">2. 나의 성과</h4>
-  <ul style="line-height:1.8; list-style-type:none; padding-left:0; font-size:16px;">
-    <li>연료절감액: <b>65,000원</b></li>
-    <li>온실가스 배출량 감소: <b>00톤 CO₂</b><br/>
-      <span style="color:gray;">(🌳 나무 100그루 심는 효과)</span>
-    </li>
-    <li>사고위험감소: <b>00% 감소</b></li>
-  </ul>
-</div>
-""")
-
-st.markdown(html, unsafe_allow_html=True)
 
 st.markdown("---")  # 구분선
 
