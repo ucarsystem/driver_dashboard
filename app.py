@@ -573,6 +573,7 @@ def draw_rank_bar(
     outside_gap=0.02,          # 바에서 라벨까지 간격(좌/우 동일)
     end_tick_len=0.08,         # 양 끝(좌/우) 긴 눈금 길이
     mid_tick_len=0.03,         # 중간 눈금 길이
+    pad_x = 0.06               # 좌우 여백 (텍스트 잘림 방지용)
 ):
     """
     최하위~최상위 사이 점선 바에 현재 값을 삼각형으로 표시한 이미지를 base64로 반환.
@@ -584,7 +585,7 @@ def draw_rank_bar(
     # figure
     fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
     ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
+    # ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
 
     # 점선 바
     ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
@@ -642,26 +643,22 @@ st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_a
 # 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
 img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
 
-st.markdown("**▼ 인천시 전체 운전자 중**")
-st.markdown(f"<img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'>",
-            unsafe_allow_html=True)
+st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 인천시 전체 운전자 중</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
 img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
 
 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-st.markdown("**▼ 운수사 전체 운전자 중**")
-st.markdown(f"<img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'>",
-            unsafe_allow_html=True)
+st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 운수사 전체 운전자 중</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
 img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
 
 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-st.markdown("**▼ 동일노선 운전자 중**")
-st.markdown(f"<img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'>",
-            unsafe_allow_html=True)
-
+st.markdown("<div style='font-weight:700; font-size:18px;'>▼ 동일노선 운전자 중</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 
 # 노선 순위 참고
