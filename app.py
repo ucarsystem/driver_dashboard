@@ -677,65 +677,92 @@ st.markdown("""
 st.markdown("---")
 
 
-st.markdown("""
-<h3>📍 항목별 경제운전 위치</h3>
-""", unsafe_allow_html=True)
+st.markdown("### 📍 평가 점수 올리기", unsafe_allow_html=True)
 
-metrics = [
-    {"name": "달성률", "my": 90, "prev": 85, "avg": 85, "min": 60, "max": 130, "reverse": False},
-    {"name": "공회전율", "my": 20, "prev": 30, "avg": 25, "min": 10, "max": 50, "reverse": True},
-    {"name": "평균속도", "my": 26, "prev": 28, "avg": 25, "min": 10, "max": 60, "reverse": False}
+# --- 퍼센트 전용 바그래프(좌: 최하위/우: 최상위) ---
+@st.cache_data(show_spinner=False)
+def draw_rank_bar_pct(
+    value_pct: float,                # 내 위치(%)
+    min_pct: float = 0.0,
+    max_pct: float = 100.0,
+    width=6.0, height=1.10, dpi=220,
+    bar_left=0.12, bar_right=0.88, bar_y=0.55,
+    segments=6,
+    line_color="#9AA3AB",            # 점선 색
+    tick_color="#9AA3AB",            # 눈금 색
+    left_label_color="#E53935",      # 최하위(빨강)
+    right_label_color="#1F4AA0",     # 최상위(파랑)
+    marker_color="#1F4AA0",          # 삼각형/내 위치 텍스트
+    text_color="#2B2F33",
+    bg="white",
+    outside_gap=0.02,                # 바와 라벨 간격
+    end_tick_len=0.085,              # 양끝 긴 눈금 길이
+    mid_tick_len=0.032,              # 중간 눈금 길이
+    pad_x=0.07                       # 좌우 여백(텍스트 잘림 방지)
+):
+    mn, mx = float(min_pct), float(max_pct)
+    v = float(value_pct)
+    span = max(mx - mn, 1e-6)
+    frac = max(0.0, min(1.0, (v - mn) / span))
+    x_cur = bar_left + (bar_right - bar_left) * frac
+
+    fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
+    ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
+    ax.set_xlim(-pad_x, 1 + pad_x); ax.set_ylim(0, 1); ax.axis("off")
+
+    # 점선 바
+    ax.hlines(bar_y, bar_left, bar_right, colors=line_color,
+              linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+
+    # 양끝 긴 눈금
+    ax.vlines(bar_left,  bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
+    ax.vlines(bar_right, bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
+
+    # 중간 눈금
+    for i in range(1, segments):
+        x = bar_left + (bar_right - bar_left) * (i / segments)
+        ax.vlines(x, bar_y-mid_tick_len, bar_y+mid_tick_len, colors=tick_color, linewidth=1.2, zorder=2)
+
+    # 좌/우 라벨(바 밖)
+    ax.text(bar_left - outside_gap,  bar_y+0.10, "최하위", ha="right", va="center", fontsize=12, color=left_label_color)
+    ax.text(bar_right + outside_gap, bar_y+0.10, "최상위", ha="left",  va="center", fontsize=12, color=right_label_color)
+
+    # 내 위치 마커/텍스트
+    ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10, color=marker_color, zorder=3)
+    ax.text(x_cur, bar_y-0.26, f"내 위치 ({int(round(v))}%)", ha="center", va="center",
+            fontsize=12, color=marker_color)
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
+    buf.seek(0)
+    img64 = base64.b64encode(buf.read()).decode("utf-8")
+    plt.close(fig)
+    return img64
+
+
+# ====== 화면 구성 ======
+st.markdown("### 📍 항목별 위치(퍼센트 기준)")
+
+items = [
+    ("월엽(관리, 환경)", 20),
+    ("공회전(관리, 환경)", 43),
+    ("급가속(안전, 경제)", 73),
+    ("급감속(안전, 경제)", 38),
+    ("평균속도(안전, 경제)", 62),
 ]
 
-fig, axes = plt.subplots(nrows=len(metrics), figsize=(5, 5))
-# fig, axes = plt.subplots(len(metrics), 1, figsize=(5, 3), constrained_layout=True) * len(metrics)
+for idx, (title, pct) in enumerate(items):
+    # 제목(가운데 정렬, 굵게)
+    st.markdown(f"<div style='text-align:center; font-weight:700; font-size:16px;'>{title}</div>", unsafe_allow_html=True)
 
-for i, metric in enumerate(metrics):
-    ax = axes[i]
+    # 바그래프
+    img64 = draw_rank_bar_pct(pct, min_pct=0, max_pct=100)
+    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img64}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-    min_val = metric['min']
-    max_val = metric['max']
+    # 항목 사이 구분선
+    if idx < len(items) - 1:
+        st.markdown("<hr style='border:0; border-top:1px solid #d9dbe0; margin:8px 0 14px 0;'>", unsafe_allow_html=True)
 
-    # 여백 비율
-    margin_ratio = 0.05
-    plot_min = min_val - (max_val - min_val) * margin_ratio
-    plot_max = max_val + (max_val - min_val) * margin_ratio
-
-    # 좋음/나쁨 위치 계산
-    if metric['reverse']:  # 공회전율
-        bad_side = max_val
-        good_side = min_val
-    else:  # 달성률, 평균속도
-        bad_side = min_val
-        good_side = max_val
-
-    # 표시
-    ax.axvline(metric['my'], color='red', label='나의 위치', linewidth=2)
-    ax.axvline(metric['prev'], color='black', linestyle='--', label='전달 나의 위치')
-    ax.axvspan(metric['avg'] - 2, metric['avg'] + 2, color='lightgreen', label='전체 평균')
-
-    ax.set_xlim(plot_min, plot_max)
-    ax.set_ylim(0, 1)
-    ax.set_yticks([])
-    ax.set_title(metric['name'], fontsize=10, pad=15)
-
-    # 나쁨 / 좋음 표 밖 표시
-    gap_factor = 0.07  # 커질수록 더 멀리
-    if metric['reverse']:  # 공회전율: 작을수록 좋음
-        ax.text(max_val + (max_val - min_val) * gap_factor, 0.5, '나쁨', ha='left', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-        ax.text(min_val - (max_val - min_val) * gap_factor, 0.5, '좋음', ha='right', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
-    else:  # 달성률, 평균속도
-        ax.text(min_val - (max_val - min_val) * gap_factor, 0.5, '나쁨', ha='right', va='center', fontsize=10, color='red', fontweight='bold', rotation=90)
-        ax.text(max_val + (max_val - min_val) * gap_factor, 0.5, '좋음', ha='left', va='center', fontsize=10, color='blue', fontweight='bold', rotation=90)
-
-    # 범례는 첫 번째 그래프에만
-    if i == 0:
-        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.9), ncol=3, fontsize=8, frameon=False)
-    else:
-        ax.legend().remove()
-
-plt.tight_layout()
-st.pyplot(fig)
 
 st.markdown("---")  # 구분선
 
