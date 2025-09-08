@@ -21,11 +21,6 @@ from io import BytesIO
 from textwrap import dedent
 
 # 한글 폰트 설정
-# font_path = "./malgun.ttf"  # 또는 절대 경로로 설정 (예: C:/install/FINAL_APP/dashboard/malgun.ttf)
-# font_prop = fm.FontProperties(fname=font_path)
-# plt.rcParams['font.family'] = font_prop.get_name()
-# plt.rcParams['axes.unicode_minus'] = False
-
 font_path = os.path.join(os.path.dirname(__file__), 'malgun.ttf')
 fm.fontManager.addfont(font_path)
 font_prop = fm.FontProperties(fname=font_path)
@@ -178,7 +173,8 @@ st.markdown("""
 file_dir = "./file"
 company_file = os.path.join(file_dir, "company_info.xlsx")
 id_check_file = os.path.join(file_dir, "인천ID.xlsx")
-file_url_template = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_{year}년{month}월.xlsx"
+excel_path = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_25년08월.xlsx"
+main_path = os.path.join(file_dir, "인천 개인별 대시보드_25년08월.xlsx")
 
 # 엑셀 파일 로드 함수
 def load_excel(path, sheetname):
@@ -187,12 +183,26 @@ def load_excel(path, sheetname):
     except Exception as e:
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
+
+# 
+def _to_str(x):
+    return "" if pd.isna(x) else str(x).strip()
+
+def _to_float(x, default=None):
+    try:
+        if pd.isna(x): return default
+        return float(x)
+    except Exception:
+        return default
+
     
 # 📂 운수사 목록 불러오기
 df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os.path.exists(company_file) else pd.DataFrame()
 company_list = df_company[0].dropna().tolist() if not df_company.empty else []
 df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
 
+# ── 엑셀 로드 & 필터
+df_driver = load_excel(main_path, sheet_name="운전자별")
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
@@ -218,8 +228,40 @@ company_input = st.selectbox(
     index=0  # 기본으로 안내 문구 선택되게
 )
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
+year_month = "2508" 
 조회버튼 = st.button("조회하기")
 
+# 안전 변환
+df_driver["운전자ID"] = df_driver["운전자ID"].astype(str).str.strip()
+if "운수사" in df_driver.columns:
+    df_driver["운수사"] = df_driver["운수사"].astype(str).str.strip()
+elif "운수사코드" in df_driver.columns:
+    # 파일마다 '운수사' 대신 '운수사코드'일 수 있어 대체 사용
+    df_driver["운수사"] = df_driver["운수사코드"].astype(str).str.strip()
+else:
+    df_driver["운수사"] = ""
+
+# 🟢 타입만 맞춰서 비교 (정규화 X, 문자열 비교만)
+df_driver["년월"] = df_driver["년월"].astype(str).str.strip()
+year_month = str(year_month).strip()  # "2508" 형태 유지
+
+# 필터링
+filtered = df_driver[
+    (df_driver["운수사"] == _to_str(company_input)) &
+    (df_driver["운전자ID"] == _to_str(user_id_input)) &
+    (df_driver["년월"] == year_month)
+]
+
+if not filtered.empty:
+    row = filtered.iloc[0]
+    st.success(f"✅ 운수사 {company_input} (ID: {user_id_input}) 정보 조회 성공")
+
+    st.markdown("---")
+
+    #값 정의
+    route_number = row['노선번호']         # 1) 상단 표: 노선번호
+    this_grade = row['등급']               # 2) 진행링: 등급
+    this_percent = row['가중달성율']        # 2) 진행링: 달성률
 
 # 제목
 st.markdown("""
@@ -228,24 +270,24 @@ st.markdown("""
 
 st.markdown("---")
 
+
 # 기본 정보
 
 #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-st.markdown("""
+st.markdown(f"""
 <table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
   <tr>
-    <td><b>사원ID</b><br>1587님</td>
-    <td><b>소속운수사</b><br>강화교통</td>
-    <td><b>노선</b><br>800번</td>
+    <td><b>사원ID</b><br>{user_id_input}님</td>
+    <td><b>소속운수사</b><br>{company_input}</td>
+    <td><b>노선</b><br>{route_number}번</td>
   </tr>
 </table>
 """, unsafe_allow_html=True)
 
 @st.cache_data(show_spinner=False)
 def draw_grade_progress_ring_base64(
-    grade="A",               # 등급
-    label="등급",            # 등급 라벨 (예: "우수")
-    achieved_pct=95,         # 현재 달성률(%)
+    grade,               # 등급
+    achieved_pct,         # 현재 달성률(%)
     max_pct=120,             # 링 100%로 환산하는 최대치(%)
     incentive_won=280000,    # 예상 월 인센티브(원)
     figsize=(4.5, 4.5),        # 카드 비율 (두 번째 이미지 느낌)
@@ -256,6 +298,33 @@ def draw_grade_progress_ring_base64(
     start_angle=-90,
     dpi=200,
 ):
+    
+    """
+    등급에 따라 링 색상, 라벨 텍스트 다르게 표시
+    """
+    # --- 1. 등급별 링 색상 ---
+    color_map = {
+        "S": "#2e7d32",  # 녹색
+        "A": "#2e7d32",  # 녹색
+        "B": "#1F4AA0",  # 남색
+        "C": "#1F4AA0",  # 남색
+        "D": "#CA0000",  # 적색
+        "F": "#CA0000",  # 적색
+    }
+    prog_color = color_map.get(str(grade).upper(), "#2e7d32")
+
+    # --- 2. 등급별 라벨 ---
+    label_map = {
+        "S": "최우수",
+        "A": "우수",
+        "B": "양호",
+        "C": "중립",
+        "D": "노력",
+        "F": "초보",
+    }
+    label = label_map.get(str(grade).upper(), "")
+
+
     # 안전 처리
     max_pct = max(1e-6, float(max_pct))
     value = max(0.0, float(achieved_pct))
@@ -292,12 +361,11 @@ def draw_grade_progress_ring_base64(
     ax.add_patch(prog_wedge)
 
     # --- 텍스트: 등급(녹색), 나머지 검정 ---
-    grade_color = "#2e7d32"     # 녹색
     text_color = "#000000"      # 검정
 
-    ax.text(cx, cy + r*0.46, f"{grade} {label}",
-        ha="center", va="center", fontsize=20,
-        color=grade_color, fontweight="bold")
+    ax.text(cx, cy + r*0.46, f"{grade}등급({label})",
+            ha="center", va="center", fontsize=18,
+            color=prog_color, fontweight="bold")
 
     ax.text(cx, cy, f"{int(round(value))}%",
             ha="center", va="center", fontsize=54,
@@ -307,8 +375,7 @@ def draw_grade_progress_ring_base64(
             ha="center", va="center", fontsize=14, color=text_color)
 
     ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
-            ha="center", va="center", fontsize=24,
-            color=text_color, fontweight="bold")
+            ha="center", va="center", fontsize=24, color=text_color, fontweight="bold")
 
 
     # 투명 배경 PNG → base64
@@ -322,19 +389,31 @@ def draw_grade_progress_ring_base64(
 
 # --- 여기서부터는 페이지에 출력하는 부분 (기존 테이블 레이아웃 유지) ---
 
-# 예시 값
-grade = "A"
-label = "등급"      # 또는 "우수"
-achieved_pct = 95   # 현재 달성률
+# 값정의
+grade = this_grade
+achieved_pct = this_percent   # 현재 달성률
 max_pct = 120       # 총 120%를 링 100%로 간주
 incentive_won = 280000
 
-# S 등급까지 남은 퍼센트(예: 100%를 S 기준으로 가정)
-remain_to_S = max(0, 100 - achieved_pct)
-notice_text  = f"* 다음 S등급까지 {remain_to_S}% 남았습니다." if remain_to_S > 0 else "* S등급 달성!"
+def get_notice_text(grade, achieved_pct):
+    g = str(grade).upper()
+    if g == "S":
+        return "*S등급 달성중입니다. 이대로 경제운전 달인이 되어주세요!"
+    elif g == "A":
+        return f"*다음 S등급까지 {100 - achieved_pct:.0f}% 남았습니다."
+    elif g == "B":
+        return f"*다음 A등급까지 {95 - achieved_pct:.0f}% 남았습니다."
+    elif g == "C":
+        return f"*다음 B등급까지 {90 - achieved_pct:.0f}% 남았습니다."
+    elif g in ["D", "F"]:
+        return f"*C등급까지 {85 - achieved_pct:.0f}% 남았습니다."
+    else:
+        return ""
+
+notice_text = get_notice_text(this_grade, this_percent)
 
 circle_base64 = draw_grade_progress_ring_base64(
-    grade=grade, label=label, achieved_pct=achieved_pct,
+    grade=grade, achieved_pct=achieved_pct,
     max_pct=max_pct, incentive_won=incentive_won
 )
 
