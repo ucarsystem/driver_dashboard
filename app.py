@@ -202,7 +202,7 @@ company_list = df_company[0].dropna().tolist() if not df_company.empty else []
 df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
 
 # ── 엑셀 로드 & 필터
-df_driver = load_excel(main_path, sheet_name="운전자별")
+df_driver = load_excel(main_path, "운전자별")
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
