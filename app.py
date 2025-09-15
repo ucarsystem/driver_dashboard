@@ -175,6 +175,7 @@ company_file = os.path.join(file_dir, "company_info.xlsx")
 id_check_file = os.path.join(file_dir, "인천ID.xlsx")
 excel_path = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_25년08월.xlsx"
 main_path = os.path.join(file_dir, "인천 개인별 대시보드_25년08월.xlsx")
+day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 
 # 엑셀 파일 로드 함수
 def load_excel(path, sheetname):
@@ -203,6 +204,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 
 # ── 엑셀 로드 & 필터
 df_driver = load_excel(main_path, "운전자별")
+df_day = load_excel(day_path, "일별)차량+운전자")
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
