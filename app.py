@@ -265,8 +265,8 @@ if 조회버튼:
 
                 #값 정의
                 route_number = row['노선번호']         # 1) 상단 표: 노선번호
-                this_grade = math.floor(row['등급']*100)               # 2) 진행링: 등급
-                this_percent = row['가중달성율']        # 2) 진행링: 달성률
+                this_grade = row['등급']              # 2) 진행링: 등급
+                this_percent = int(row['가중달성율']*100)        # 2) 진행링: 달성률
 
                 # 제목
                 st.markdown("""
