@@ -250,9 +250,11 @@ if 조회버튼:
             # 필터링
             filtered = df_driver[
                 (df_driver["운수사"] == company_input) & 
-                (df_driver["운전자ID"] == int(user_id_input))& 
-                (df_driver["년월"] == year_month)
+                (df_driver["운전자ID"] == user_id)& 
+                (df_driver["년월"].astype(str) == year_month)
             ]
+
+            st.write("필터링 결과:")
 
             if not filtered.empty:
                 row = filtered.iloc[0]
