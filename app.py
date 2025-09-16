@@ -237,625 +237,637 @@ year_month = "2508"
 # df_driver["년월"] = df_driver["년월"].astype(str).str.strip()
 # year_month = str(year_month).strip()  # "2508" 형태 유지
 
-# 필터링
-filtered = df_driver[
-    (df_driver["최종코드"] == company_input & int(user_id_input)&year_month)
-]
-
-if not filtered.empty:
-    row = filtered.iloc[0]
-    st.success(f"✅ 운수사 {company_input} (ID: {user_id_input}) 정보 조회 성공")
-
-    st.markdown("---")
-
-    #값 정의
-    route_number = row['노선번호']         # 1) 상단 표: 노선번호
-    this_grade = row['등급']               # 2) 진행링: 등급
-    this_percent = row['가중달성율']        # 2) 진행링: 달성률
-
-    # 제목
-    st.markdown("""
-    <h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h2>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-
-    # 기본 정보
-
-    #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
-    st.markdown(f"""
-    <table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
-    <tr>
-        <td><b>사원ID</b><br>{user_id_input}님</td>
-        <td><b>소속운수사</b><br>{company_input}</td>
-        <td><b>노선</b><br>{route_number}번</td>
-    </tr>
-    </table>
-    """, unsafe_allow_html=True)
-
-    @st.cache_data(show_spinner=False)
-    def draw_grade_progress_ring_base64(
-        grade,               # 등급
-        achieved_pct,         # 현재 달성률(%)
-        max_pct=120,             # 링 100%로 환산하는 최대치(%)
-        incentive_won=280000,    # 예상 월 인센티브(원)
-        figsize=(4.5, 4.5),        # 카드 비율 (두 번째 이미지 느낌)
-        ring_width=0.12,         # 링 두께 (반지름 대비)
-        bg_color="#ffffff",      # 카드 배경
-        fg_base="#e6e7ea",       # 미채움 링 색
-        cmap_name="RdYlGn",      # 진행 링 색상(낮음=적, 높음=초록)
-        start_angle=-90,
-        dpi=200,
-    ):
-        
-        """
-        등급에 따라 링 색상, 라벨 텍스트 다르게 표시
-        """
-        # --- 1. 등급별 링 색상 ---
-        color_map = {
-            "S": "#2e7d32",  # 녹색
-            "A": "#2e7d32",  # 녹색
-            "B": "#1F4AA0",  # 남색
-            "C": "#1F4AA0",  # 남색
-            "D": "#CA0000",  # 적색
-            "F": "#CA0000",  # 적색
-        }
-        prog_color = color_map.get(str(grade).upper(), "#2e7d32")
-
-        # --- 2. 등급별 라벨 ---
-        label_map = {
-            "S": "최우수",
-            "A": "우수",
-            "B": "양호",
-            "C": "중립",
-            "D": "노력",
-            "F": "초보",
-        }
-        label = label_map.get(str(grade).upper(), "")
-
-
-        # 안전 처리
-        max_pct = max(1e-6, float(max_pct))
-        value = max(0.0, float(achieved_pct))
-        frac = min(value / max_pct, 1.0)   # 0~1
-        angle = 360.0 * frac
-
-        fig = plt.figure(figsize=figsize, dpi=dpi)
-        ax = fig.add_axes([0, 0, 1, 1])
-        ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_aspect("equal")
-        ax.axis("off")
-
-        # 둥근 카드 배경
-        card = patches.FancyBboxPatch(
-            (0.02, 0.06), 0.96, 0.88,
-            boxstyle="round,pad=0.02,rounding_size=0.04",
-            linewidth=0.0, facecolor=bg_color)
-        ax.add_patch(card)
-
-        # 링 위치/크기
-        cx, cy = 0.50, 0.50    # 세로 중앙으로 이동
-        r = 0.42               # 원 크기
-        inner_r = r * (1 - ring_width)
-
-        # 기본(미채움) 링
-        base_wedge = patches.Wedge((cx, cy), r, 0, 360, width=r-inner_r,
-                                facecolor=fg_base, linewidth=0)
-        ax.add_patch(base_wedge)
-
-        # 진행 링 (12시부터 시계 방향)
-        cmap = mpl.cm.get_cmap(cmap_name)
-        prog_color = cmap(frac)
-        prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
-                                facecolor=prog_color, linewidth=0, antialiased=True)
-        ax.add_patch(prog_wedge)
-
-        # --- 텍스트: 등급(녹색), 나머지 검정 ---
-        text_color = "#000000"      # 검정
-
-        ax.text(cx, cy + r*0.46, f"{grade}등급({label})",
-                ha="center", va="center", fontsize=18,
-                color=prog_color, fontweight="bold")
-
-        ax.text(cx, cy, f"{int(round(value))}%",
-                ha="center", va="center", fontsize=54,
-                color=text_color, fontweight="bold")
-
-        ax.text(cx, cy - r*0.40, "예상 월 인센티브",
-                ha="center", va="center", fontsize=14, color=text_color)
-
-        ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
-                ha="center", va="center", fontsize=24, color=text_color, fontweight="bold")
-
-
-        # 투명 배경 PNG → base64
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches=None, transparent=True)
-        buf.seek(0)
-        image_base64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-        return image_base64
-
-
-    # --- 여기서부터는 페이지에 출력하는 부분 (기존 테이블 레이아웃 유지) ---
-
-    # 값정의
-    grade = this_grade
-    achieved_pct = this_percent   # 현재 달성률
-    max_pct = 120       # 총 120%를 링 100%로 간주
-    incentive_won = 280000 # 인센티브 금액 (추후 변경)
-
-    # 다음 등급 달성까지 안내문구 함수
-    def get_notice_text(grade, achieved_pct):
-        g = str(grade).upper()
-        if g == "S":
-            return "*S등급 달성중입니다. 이대로 경제운전 달인이 되어주세요!"
-        elif g == "A":
-            return f"*다음 S등급까지 {100 - achieved_pct:.0f}% 남았습니다."
-        elif g == "B":
-            return f"*다음 A등급까지 {95 - achieved_pct:.0f}% 남았습니다."
-        elif g == "C":
-            return f"*다음 B등급까지 {90 - achieved_pct:.0f}% 남았습니다."
-        elif g in ["D", "F"]:
-            return f"*C등급까지 {85 - achieved_pct:.0f}% 남았습니다."
+if 조회버튼:
+    if not user_id_input.strip():
+        st.warning("운전자 ID를 입력해주세요.")
+    else:
+        try:
+            user_id = int(user_id_input)
+        except ValueError:
+            st.warning("운전자 ID는 숫자여야 합니다.")
         else:
-            return ""
 
-    notice_text = get_notice_text(this_grade, this_percent)
+            # 필터링
+            filtered = df_driver[
+                (df_driver["운수사"] == company_input) & 
+                (df_driver["운전자ID"] == int(user_id_input))& 
+                (df_driver["년월"] == year_month)
+            ]
 
-    circle_base64 = draw_grade_progress_ring_base64(
-        grade=grade, achieved_pct=achieved_pct,
-        max_pct=max_pct, incentive_won=incentive_won
-    )
+            if not filtered.empty:
+                row = filtered.iloc[0]
+                st.success(f"✅ 운수사 {company_input} (ID: {user_id_input}) 정보 조회 성공")
 
-    # 이미지 한 줄 전용 + 아래 문구(검정색)
-    st.markdown(f"""
-    <div style="width:100%; text-align:center;">
-    <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
-    <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
-    </div>
-    """, unsafe_allow_html=True)
+                st.markdown("---")
 
-    # 단순 줄바꿈
-    st.markdown("<br><br>", unsafe_allow_html=True)
+                #값 정의
+                route_number = row['노선번호']         # 1) 상단 표: 노선번호
+                this_grade = row['등급']               # 2) 진행링: 등급
+                this_percent = row['가중달성율']        # 2) 진행링: 달성률
 
-    # 참고치 팝업
-    with st.expander("📌 상세보기"):
-                    st.markdown("""
-                    <div style="font-size:15px; line-height:1.6;">
+                # 제목
+                st.markdown("""
+                <h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h2>
+                """, unsafe_allow_html=True)
+
+                st.markdown("---")
+
+
+                # 기본 정보
+
+                #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
+                st.markdown(f"""
+                <table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
+                <tr>
+                    <td><b>사원ID</b><br>{user_id_input}님</td>
+                    <td><b>소속운수사</b><br>{company_input}</td>
+                    <td><b>노선</b><br>{route_number}번</td>
+                </tr>
+                </table>
+                """, unsafe_allow_html=True)
+
+                @st.cache_data(show_spinner=False)
+                def draw_grade_progress_ring_base64(
+                    grade,               # 등급
+                    achieved_pct,         # 현재 달성률(%)
+                    max_pct=120,             # 링 100%로 환산하는 최대치(%)
+                    incentive_won=280000,    # 예상 월 인센티브(원)
+                    figsize=(4.5, 4.5),        # 카드 비율 (두 번째 이미지 느낌)
+                    ring_width=0.12,         # 링 두께 (반지름 대비)
+                    bg_color="#ffffff",      # 카드 배경
+                    fg_base="#e6e7ea",       # 미채움 링 색
+                    cmap_name="RdYlGn",      # 진행 링 색상(낮음=적, 높음=초록)
+                    start_angle=-90,
+                    dpi=200,
+                ):
                     
-                    <div style="margin:15px;">
-                    <span style="font-size:17px;"><b>금월 나의 인센티브 (1개월 추정)</b></span><br>
-                    - 예상 기여액 : 2,800,000원<br>
-                    - 예상 배분액 : 280,000원<br>
-                    <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span>
-                    </div>
+                    """
+                    등급에 따라 링 색상, 라벨 텍스트 다르게 표시
+                    """
+                    # --- 1. 등급별 링 색상 ---
+                    color_map = {
+                        "S": "#2e7d32",  # 녹색
+                        "A": "#2e7d32",  # 녹색
+                        "B": "#1F4AA0",  # 남색
+                        "C": "#1F4AA0",  # 남색
+                        "D": "#CA0000",  # 적색
+                        "F": "#CA0000",  # 적색
+                    }
+                    prog_color = color_map.get(str(grade).upper(), "#2e7d32")
 
-                    <hr style="border: 0.5px solid #ccc;">
-                                
-                    <div style="margin:15px;">
-                    <span style="font-size:17px;"><b>등급 참고치</b></span><br>
-                    - 최우수 S : 100% 이상<br>  
-                    - 우  수 A : 95~100%<br>  
-                    - 양  호 B : 90~95%<br>  
-                    - 중  립 C : 85~90%<br>  
-                    - 노  력 D : 80~85%<br>  
-                    - 초  보 F : 65~80%<br>
-                    이 하 / 평가불가
-                    </div>
-                    
-                    <hr style="border: 0.2px solid #ccc;">
-                                
-                    <div style="margin:15px;">
-                    <span style="font-size:17px;"><b>달성률 참고치</b></span><br>
-                    최하위 75% ~ 최상위 100% 이상<br>
-                    <span style="font-size:15px; color:gray;">* 75% 미만은 연료절감 참여 전 수치</span>
-                    </div>
-                    </div>
-                    """, 
-                    unsafe_allow_html= True)
-
-    if "show_graph" not in st.session_state:
-        st.session_state.show_graph = False
-
-    ##일별/월별 달성률 팝업
-
-    #월별 달성률 및 등급
-
-    df_monthly = df_driver[
-    (df_driver['운수사'] == company_input) &
-    (df_driver['운전자ID'] == int(user_id_input)) &
-    (df_driver['등급'] != "이상")
-]
-
-    # 결과 데이터 가공
-    df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
-    df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
-    df_result = df_result.rename(columns={'가중달성율': '달성률'})
-
-    # 최종 출력 컬럼 순서
-    df_result = df_result[['월', '달성률', '등급']]
-
-    # Altair용 등급 색상 매핑
-    등급색상 = alt.Scale(
-        domain=["S", "A", "B", "C", "D", "F"],
-        range=["#0a860a", "#0a860a", "#007bff", "#007bff", "#CA0000", "#CA0000"]
-    )
-
-    with st.expander("📊 월별 달성률 보기", expanded=True):
-
-        # 막대 차트
-        bar = alt.Chart(df_result).mark_bar().encode(
-            x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
-            y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
-            color=alt.Color("등급", scale=등급색상),
-            tooltip=["월", "달성률", "등급"]
-        )
-
-        text = alt.Chart(df_result).mark_text(
-            dy=-10,
-            fontWeight="bold",
-            fontSize=14,
-        ).encode(
-            x="월",
-            y="달성률",
-            text="등급",
-            color=alt.Color("등급", scale=등급색상, legend=None)
-        )
-
-        chart = alt.layer(bar, text).properties(
-            width=500,
-            height=300
-        ).configure_view(
-            fill='white'  # 바탕 흰색 고정
-        ).configure_axisX(
-            labelColor='black',
-            titleColor='black',
-            tickColor='black'
-        ).configure_axisY(
-            labelColor='black',
-            titleColor='black',
-            tickColor='black'
-        ).configure(
-            background='white'  # 전체 배경 색상 고정!
-        )   
-
-        st.altair_chart(chart, use_container_width=True)
+                    # --- 2. 등급별 라벨 ---
+                    label_map = {
+                        "S": "최우수",
+                        "A": "우수",
+                        "B": "양호",
+                        "C": "중립",
+                        "D": "노력",
+                        "F": "초보",
+                    }
+                    label = label_map.get(str(grade).upper(), "")
 
 
-    # 일별 데이터 팝업
-    def generate_calendar_html_v2(data, year, month):
-        cal = calendar.Calendar()
-        month_days = cal.monthdayscalendar(year, month)
+                    # 안전 처리
+                    max_pct = max(1e-6, float(max_pct))
+                    value = max(0.0, float(achieved_pct))
+                    frac = min(value / max_pct, 1.0)   # 0~1
+                    angle = 360.0 * frac
 
-        grade_color = {
-            "S": "#0a860a",  # 진초록
-            "A": "#0a860a",
-            "B": "#007bff",  # 파랑
-            "C": "#007bff",
-            "D": "#CA0000",
-            "F": "#CA0000"
-        }
+                    fig = plt.figure(figsize=figsize, dpi=dpi)
+                    ax = fig.add_axes([0, 0, 1, 1])
+                    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_aspect("equal")
+                    ax.axis("off")
 
-        # 공통 인라인 스타일
-        wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
-        table_style = (
-            "table-layout:fixed; width:100%; min-width:660px; "
-            "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
-        )
-        thtd_style = (
-            "width:14.2857%; border:1px solid #aaa; padding:4px; "
-            "text-align:center; vertical-align:top;"
-        )
-        th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
-        td_style = thtd_style + "height:80px; font-size:13px;"
+                    # 둥근 카드 배경
+                    card = patches.FancyBboxPatch(
+                        (0.02, 0.06), 0.96, 0.88,
+                        boxstyle="round,pad=0.02,rounding_size=0.04",
+                        linewidth=0.0, facecolor=bg_color)
+                    ax.add_patch(card)
 
-        # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
-        day_cls = "cal-day"
-        grade_cls = "cal-grade"
-        pct_cls = "cal-pct"
+                    # 링 위치/크기
+                    cx, cy = 0.50, 0.50    # 세로 중앙으로 이동
+                    r = 0.42               # 원 크기
+                    inner_r = r * (1 - ring_width)
 
-        # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
-        mobile_css = """
-        <style>
-        @media (max-width: 480px) {
-        .calwrap table { min-width: 0 !important; width: 100% !important; }
-        .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
-        .calwrap .cal-grade { font-size: 14px !important; }
-        .calwrap .cal-pct   { font-size: 12px !important; }
-        .calwrap .cal-day   { font-size: 12px !important; }
-        }
-        </style>
-        """
+                    # 기본(미채움) 링
+                    base_wedge = patches.Wedge((cx, cy), r, 0, 360, width=r-inner_r,
+                                            facecolor=fg_base, linewidth=0)
+                    ax.add_patch(base_wedge)
 
-        html = []
-        html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
-        html.append(f'<div class="calwrap" style="{wrap_style}">')
-        html.append(f'<table style="{table_style}">')
-        html.append("<tr>")
-        html.append(f'<th style="{th_style}color:red">일</th>')
-        for h in ["월","화","수","목","금"]:
-            html.append(f'<th style="{th_style}">{h}</th>')
-        html.append(f'<th style="{th_style}color:blue">토</th>')
-        html.append("</tr>")
+                    # 진행 링 (12시부터 시계 방향)
+                    cmap = mpl.cm.get_cmap(cmap_name)
+                    prog_color = cmap(frac)
+                    prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
+                                            facecolor=prog_color, linewidth=0, antialiased=True)
+                    ax.add_patch(prog_wedge)
 
-        for week in month_days:
-            html.append("<tr>")
-            for day in week:
-                if day == 0:
-                    html.append(f'<td style="{td_style}"></td>')
-                else:
-                    if day in data:
-                        g = data[day]["grade"]
-                        p = data[day]["percent"]
-                        c = grade_color.get(g, "black")
-                        html.append(
-                            f'<td style="{td_style}">'
-                            f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
-                            f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
-                            f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
-                            f'</td>'
-                        )
+                    # --- 텍스트: 등급(녹색), 나머지 검정 ---
+                    text_color = "#000000"      # 검정
+
+                    ax.text(cx, cy + r*0.46, f"{grade}등급({label})",
+                            ha="center", va="center", fontsize=18,
+                            color=prog_color, fontweight="bold")
+
+                    ax.text(cx, cy, f"{int(round(value))}%",
+                            ha="center", va="center", fontsize=54,
+                            color=text_color, fontweight="bold")
+
+                    ax.text(cx, cy - r*0.40, "예상 월 인센티브",
+                            ha="center", va="center", fontsize=14, color=text_color)
+
+                    ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
+                            ha="center", va="center", fontsize=24, color=text_color, fontweight="bold")
+
+
+                    # 투명 배경 PNG → base64
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format="png", bbox_inches=None, transparent=True)
+                    buf.seek(0)
+                    image_base64 = base64.b64encode(buf.read()).decode("utf-8")
+                    plt.close(fig)
+                    return image_base64
+
+
+                # --- 여기서부터는 페이지에 출력하는 부분 (기존 테이블 레이아웃 유지) ---
+
+                # 값정의
+                grade = this_grade
+                achieved_pct = this_percent   # 현재 달성률
+                max_pct = 120       # 총 120%를 링 100%로 간주
+                incentive_won = 280000 # 인센티브 금액 (추후 변경)
+
+                # 다음 등급 달성까지 안내문구 함수
+                def get_notice_text(grade, achieved_pct):
+                    g = str(grade).upper()
+                    if g == "S":
+                        return "*S등급 달성중입니다. 이대로 경제운전 달인이 되어주세요!"
+                    elif g == "A":
+                        return f"*다음 S등급까지 {100 - achieved_pct:.0f}% 남았습니다."
+                    elif g == "B":
+                        return f"*다음 A등급까지 {95 - achieved_pct:.0f}% 남았습니다."
+                    elif g == "C":
+                        return f"*다음 B등급까지 {90 - achieved_pct:.0f}% 남았습니다."
+                    elif g in ["D", "F"]:
+                        return f"*C등급까지 {85 - achieved_pct:.0f}% 남았습니다."
                     else:
-                        html.append(
-                            f'<td style="{td_style}">'
-                            f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
-                            f'</td>'
-                        )
-            html.append("</tr>")
-        html.append("</table></div>")
-        return "".join(html)
-        
+                        return ""
 
-    calendar_data = {
-        2: {"grade": "S", "percent": 100},
-        3: {"grade": "A", "percent": 96},
-        4: {"grade": "B", "percent": 91},
-        5: {"grade": "S", "percent": 101},
-        9: {"grade": "S", "percent": 100},
-        10: {"grade": "A", "percent": 96},
-        11: {"grade": "C", "percent": 89},
-        16: {"grade": "B", "percent": 91},
-        18: {"grade": "A", "percent": 96},
-        19: {"grade": "S", "percent": 101},
-        20: {"grade": "S", "percent": 100},
-        23: {"grade": "S", "percent": 101},
-        24: {"grade": "A", "percent": 96},
-        25: {"grade": "C", "percent": 89},
-        30: {"grade": "S", "percent": 100},
-    }
-    calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
+                notice_text = get_notice_text(this_grade, this_percent)
 
-    with st.expander("📅 7월 일별 달성률 보기", expanded=True):
-        st.markdown(calendar_html, unsafe_allow_html=True)
+                circle_base64 = draw_grade_progress_ring_base64(
+                    grade=grade, achieved_pct=achieved_pct,
+                    max_pct=max_pct, incentive_won=incentive_won
+                )
 
-    st.markdown("---")
+                # 이미지 한 줄 전용 + 아래 문구(검정색)
+                st.markdown(f"""
+                <div style="width:100%; text-align:center;">
+                <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
+                <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-    # --- rank bar 생성 함수 ---
-    @st.cache_data(show_spinner=False)
-    def draw_rank_bar(
-        min_value: int,
-        max_value: int,
-        current_value: int,
-        width=6.0, height=1.15, dpi=220,
-        bar_left=0.12, bar_right=0.88, bar_y=0.55,
-        segments=6,
-        line_color="#9AA3AB",      # 점선 색
-        tick_color="#9AA3AB",      # 눈금 색
-        label_color="#2B2F33",     # 좌/우 라벨 색
-        marker_color="#1F4AA0",    # 삼각형 마커/내 위치 텍스트 색
-        bg="white",
-        # ⬇️ 새 파라미터
-        outside_gap=0.02,          # 바에서 라벨까지 간격(좌/우 동일)
-        end_tick_len=0.08,         # 양 끝(좌/우) 긴 눈금 길이
-        mid_tick_len=0.03,         # 중간 눈금 길이
-        pad_x = 0.06               # 좌우 여백 (텍스트 잘림 방지용)
-    ):
-        """
-        최하위~최상위 사이 점선 바에 현재 값을 삼각형으로 표시한 이미지를 base64로 반환.
-        """
-        # 안전 처리
-        min_v = float(min_value); max_v = float(max_value)
-        cur_v = float(current_value); span = max(max_v - min_v, 1e-6)
+                # 단순 줄바꿈
+                st.markdown("<br><br>", unsafe_allow_html=True)
 
-        # figure
-        fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
-        ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
-        # ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
+                # 참고치 팝업
+                with st.expander("📌 상세보기"):
+                                st.markdown("""
+                                <div style="font-size:15px; line-height:1.6;">
+                                
+                                <div style="margin:15px;">
+                                <span style="font-size:17px;"><b>금월 나의 인센티브 (1개월 추정)</b></span><br>
+                                - 예상 기여액 : 2,800,000원<br>
+                                - 예상 배분액 : 280,000원<br>
+                                <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span>
+                                </div>
 
-        # 👇 좌우로 여유를 줘서 바깥 라벨이 잘리지 않게 함
-        ax.set_xlim(-pad_x, 1 + pad_x)
-        ax.set_ylim(0, 1)
-        ax.axis("off")
+                                <hr style="border: 0.5px solid #ccc;">
+                                            
+                                <div style="margin:15px;">
+                                <span style="font-size:17px;"><b>등급 참고치</b></span><br>
+                                - 최우수 S : 100% 이상<br>  
+                                - 우  수 A : 95~100%<br>  
+                                - 양  호 B : 90~95%<br>  
+                                - 중  립 C : 85~90%<br>  
+                                - 노  력 D : 80~85%<br>  
+                                - 초  보 F : 65~80%<br>
+                                이 하 / 평가불가
+                                </div>
+                                
+                                <hr style="border: 0.2px solid #ccc;">
+                                            
+                                <div style="margin:15px;">
+                                <span style="font-size:17px;"><b>달성률 참고치</b></span><br>
+                                최하위 75% ~ 최상위 100% 이상<br>
+                                <span style="font-size:15px; color:gray;">* 75% 미만은 연료절감 참여 전 수치</span>
+                                </div>
+                                </div>
+                                """, 
+                                unsafe_allow_html= True)
 
-        # 점선 바
-        ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
-                colors=line_color, linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
-        
-        # 끝(좌/우) 긴 눈금
-        ax.vlines(x=bar_left,  ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
-                colors=tick_color, linewidth=1.8, zorder=2)
-        ax.vlines(x=bar_right, ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
-                colors=tick_color, linewidth=1.8, zorder=2)
+                if "show_graph" not in st.session_state:
+                    st.session_state.show_graph = False
 
-        # 눈금 (segments 등분)
-        for i in range(1, segments):
-            x = bar_left + (bar_right - bar_left) * (i / segments)
-            ax.vlines(x=x, ymin=bar_y-mid_tick_len, ymax=bar_y+mid_tick_len,
-                    colors=tick_color, linewidth=1.2, zorder=2)
+                ##일별/월별 달성률 팝업
 
-        # 좌/우 라벨
-        # 왼쪽: 텍스트 오른쪽 정렬(ha='right')로 바 왼쪽 밖에 붙임
-        ax.text(bar_left - outside_gap, bar_y+0.10, "최하위",
-                ha="right", va="center", fontsize=12, color=label_color)
-        ax.text(bar_left - outside_gap, bar_y-0.14, f"{min_v:,.0f}원",
-                ha="right", va="center", fontsize=12, color=label_color)
+                #월별 달성률 및 등급
 
-        # 오른쪽: 텍스트 왼쪽 정렬(ha='left')로 바 오른쪽 밖에 붙임
-        ax.text(bar_right + outside_gap, bar_y+0.10, "최상위",
-                ha="left", va="center", fontsize=12, color=label_color)
-        ax.text(bar_right + outside_gap, bar_y-0.14, f"{max_v:,.0f}원",
-                ha="left", va="center", fontsize=12, color=label_color)
+                df_monthly = df_driver[
+                (df_driver['운수사'] == company_input) &
+                (df_driver['운전자ID'] == int(user_id_input)) &
+                (df_driver['등급'] != "이상")
+            ]
 
-        # 현재 값 위치
-        frac = max(0.0, min(1.0, (cur_v - min_v) / span))
-        x_cur = bar_left + (bar_right - bar_left) * frac
+                # 결과 데이터 가공
+                df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
+                df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
+                df_result = df_result.rename(columns={'가중달성율': '달성률'})
 
-        # 삼각형 마커
-        ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10,
-                color=marker_color, zorder=3)
+                # 최종 출력 컬럼 순서
+                df_result = df_result[['월', '달성률', '등급']]
 
-        # "내 위치 : …원" (바 아래)
-        ax.text(x_cur, bar_y-0.26, f"내 위치 : {cur_v:,.0f}원",
-                ha="center", va="center", fontsize=12, color=marker_color)
+                # Altair용 등급 색상 매핑
+                등급색상 = alt.Scale(
+                    domain=["S", "A", "B", "C", "D", "F"],
+                    range=["#0a860a", "#0a860a", "#007bff", "#007bff", "#CA0000", "#CA0000"]
+                )
 
-        # 저장 → base64
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
-        buf.seek(0)
-        img64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-        return img64
+                with st.expander("📊 월별 달성률 보기", expanded=True):
 
+                    # 막대 차트
+                    bar = alt.Chart(df_result).mark_bar().encode(
+                        x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
+                        y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
+                        color=alt.Color("등급", scale=등급색상),
+                        tooltip=["월", "달성률", "등급"]
+                    )
 
-    # ----------------- 화면 출력 예시 -----------------
-    st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_allow_html=True)
+                    text = alt.Chart(df_result).mark_text(
+                        dy=-10,
+                        fontWeight="bold",
+                        fontSize=14,
+                    ).encode(
+                        x="월",
+                        y="달성률",
+                        text="등급",
+                        color=alt.Color("등급", scale=등급색상, legend=None)
+                    )
 
-    # 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
-    img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
+                    chart = alt.layer(bar, text).properties(
+                        width=500,
+                        height=300
+                    ).configure_view(
+                        fill='white'  # 바탕 흰색 고정
+                    ).configure_axisX(
+                        labelColor='black',
+                        titleColor='black',
+                        tickColor='black'
+                    ).configure_axisY(
+                        labelColor='black',
+                        titleColor='black',
+                        tickColor='black'
+                    ).configure(
+                        background='white'  # 전체 배경 색상 고정!
+                    )   
 
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 인천시 전체 운전자 중 -</div>", unsafe_allow_html=True)
-    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
-
-    # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
-    img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
-
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 운수사 전체 운전자 중 -</div>", unsafe_allow_html=True)
-    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
-
-    # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
-    img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
-
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
-    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
+                    st.altair_chart(chart, use_container_width=True)
 
 
-    # 노선 순위 참고
-    st.markdown("""
-    <div class='line-grade'>
-        <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선: 54위</b> (인천 전체 540개 노선 중)
-    </div>
-    """, unsafe_allow_html=True)
+                # 일별 데이터 팝업
+                def generate_calendar_html_v2(data, year, month):
+                    cal = calendar.Calendar()
+                    month_days = cal.monthdayscalendar(year, month)
 
-    st.markdown("---")
+                    grade_color = {
+                        "S": "#0a860a",  # 진초록
+                        "A": "#0a860a",
+                        "B": "#007bff",  # 파랑
+                        "C": "#007bff",
+                        "D": "#CA0000",
+                        "F": "#CA0000"
+                    }
+
+                    # 공통 인라인 스타일
+                    wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
+                    table_style = (
+                        "table-layout:fixed; width:100%; min-width:660px; "
+                        "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
+                    )
+                    thtd_style = (
+                        "width:14.2857%; border:1px solid #aaa; padding:4px; "
+                        "text-align:center; vertical-align:top;"
+                    )
+                    th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
+                    td_style = thtd_style + "height:80px; font-size:13px;"
+
+                    # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
+                    day_cls = "cal-day"
+                    grade_cls = "cal-grade"
+                    pct_cls = "cal-pct"
+
+                    # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
+                    mobile_css = """
+                    <style>
+                    @media (max-width: 480px) {
+                    .calwrap table { min-width: 0 !important; width: 100% !important; }
+                    .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
+                    .calwrap .cal-grade { font-size: 14px !important; }
+                    .calwrap .cal-pct   { font-size: 12px !important; }
+                    .calwrap .cal-day   { font-size: 12px !important; }
+                    }
+                    </style>
+                    """
+
+                    html = []
+                    html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
+                    html.append(f'<div class="calwrap" style="{wrap_style}">')
+                    html.append(f'<table style="{table_style}">')
+                    html.append("<tr>")
+                    html.append(f'<th style="{th_style}color:red">일</th>')
+                    for h in ["월","화","수","목","금"]:
+                        html.append(f'<th style="{th_style}">{h}</th>')
+                    html.append(f'<th style="{th_style}color:blue">토</th>')
+                    html.append("</tr>")
+
+                    for week in month_days:
+                        html.append("<tr>")
+                        for day in week:
+                            if day == 0:
+                                html.append(f'<td style="{td_style}"></td>')
+                            else:
+                                if day in data:
+                                    g = data[day]["grade"]
+                                    p = data[day]["percent"]
+                                    c = grade_color.get(g, "black")
+                                    html.append(
+                                        f'<td style="{td_style}">'
+                                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                                        f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
+                                        f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
+                                        f'</td>'
+                                    )
+                                else:
+                                    html.append(
+                                        f'<td style="{td_style}">'
+                                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                                        f'</td>'
+                                    )
+                        html.append("</tr>")
+                    html.append("</table></div>")
+                    return "".join(html)
+                    
+
+                calendar_data = {
+                    2: {"grade": "S", "percent": 100},
+                    3: {"grade": "A", "percent": 96},
+                    4: {"grade": "B", "percent": 91},
+                    5: {"grade": "S", "percent": 101},
+                    9: {"grade": "S", "percent": 100},
+                    10: {"grade": "A", "percent": 96},
+                    11: {"grade": "C", "percent": 89},
+                    16: {"grade": "B", "percent": 91},
+                    18: {"grade": "A", "percent": 96},
+                    19: {"grade": "S", "percent": 101},
+                    20: {"grade": "S", "percent": 100},
+                    23: {"grade": "S", "percent": 101},
+                    24: {"grade": "A", "percent": 96},
+                    25: {"grade": "C", "percent": 89},
+                    30: {"grade": "S", "percent": 100},
+                }
+                calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
+
+                with st.expander("📅 7월 일별 달성률 보기", expanded=True):
+                    st.markdown(calendar_html, unsafe_allow_html=True)
+
+                st.markdown("---")
+
+                # --- rank bar 생성 함수 ---
+                @st.cache_data(show_spinner=False)
+                def draw_rank_bar(
+                    min_value: int,
+                    max_value: int,
+                    current_value: int,
+                    width=6.0, height=1.15, dpi=220,
+                    bar_left=0.12, bar_right=0.88, bar_y=0.55,
+                    segments=6,
+                    line_color="#9AA3AB",      # 점선 색
+                    tick_color="#9AA3AB",      # 눈금 색
+                    label_color="#2B2F33",     # 좌/우 라벨 색
+                    marker_color="#1F4AA0",    # 삼각형 마커/내 위치 텍스트 색
+                    bg="white",
+                    # ⬇️ 새 파라미터
+                    outside_gap=0.02,          # 바에서 라벨까지 간격(좌/우 동일)
+                    end_tick_len=0.08,         # 양 끝(좌/우) 긴 눈금 길이
+                    mid_tick_len=0.03,         # 중간 눈금 길이
+                    pad_x = 0.06               # 좌우 여백 (텍스트 잘림 방지용)
+                ):
+                    """
+                    최하위~최상위 사이 점선 바에 현재 값을 삼각형으로 표시한 이미지를 base64로 반환.
+                    """
+                    # 안전 처리
+                    min_v = float(min_value); max_v = float(max_value)
+                    cur_v = float(current_value); span = max(max_v - min_v, 1e-6)
+
+                    # figure
+                    fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
+                    ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
+                    # ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
+
+                    # 👇 좌우로 여유를 줘서 바깥 라벨이 잘리지 않게 함
+                    ax.set_xlim(-pad_x, 1 + pad_x)
+                    ax.set_ylim(0, 1)
+                    ax.axis("off")
+
+                    # 점선 바
+                    ax.hlines(y=bar_y, xmin=bar_left, xmax=bar_right,
+                            colors=line_color, linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+                    
+                    # 끝(좌/우) 긴 눈금
+                    ax.vlines(x=bar_left,  ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
+                            colors=tick_color, linewidth=1.8, zorder=2)
+                    ax.vlines(x=bar_right, ymin=bar_y-end_tick_len, ymax=bar_y+end_tick_len,
+                            colors=tick_color, linewidth=1.8, zorder=2)
+
+                    # 눈금 (segments 등분)
+                    for i in range(1, segments):
+                        x = bar_left + (bar_right - bar_left) * (i / segments)
+                        ax.vlines(x=x, ymin=bar_y-mid_tick_len, ymax=bar_y+mid_tick_len,
+                                colors=tick_color, linewidth=1.2, zorder=2)
+
+                    # 좌/우 라벨
+                    # 왼쪽: 텍스트 오른쪽 정렬(ha='right')로 바 왼쪽 밖에 붙임
+                    ax.text(bar_left - outside_gap, bar_y+0.10, "최하위",
+                            ha="right", va="center", fontsize=12, color=label_color)
+                    ax.text(bar_left - outside_gap, bar_y-0.14, f"{min_v:,.0f}원",
+                            ha="right", va="center", fontsize=12, color=label_color)
+
+                    # 오른쪽: 텍스트 왼쪽 정렬(ha='left')로 바 오른쪽 밖에 붙임
+                    ax.text(bar_right + outside_gap, bar_y+0.10, "최상위",
+                            ha="left", va="center", fontsize=12, color=label_color)
+                    ax.text(bar_right + outside_gap, bar_y-0.14, f"{max_v:,.0f}원",
+                            ha="left", va="center", fontsize=12, color=label_color)
+
+                    # 현재 값 위치
+                    frac = max(0.0, min(1.0, (cur_v - min_v) / span))
+                    x_cur = bar_left + (bar_right - bar_left) * frac
+
+                    # 삼각형 마커
+                    ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10,
+                            color=marker_color, zorder=3)
+
+                    # "내 위치 : …원" (바 아래)
+                    ax.text(x_cur, bar_y-0.26, f"내 위치 : {cur_v:,.0f}원",
+                            ha="center", va="center", fontsize=12, color=marker_color)
+
+                    # 저장 → base64
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
+                    buf.seek(0)
+                    img64 = base64.b64encode(buf.read()).decode("utf-8")
+                    plt.close(fig)
+                    return img64
 
 
-    st.markdown("### 📍 평가 점수 올리기", unsafe_allow_html=True)
+                # ----------------- 화면 출력 예시 -----------------
+                st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_allow_html=True)
 
-    # --- 퍼센트 전용 바그래프(좌: 최하위/우: 최상위) ---
-    @st.cache_data(show_spinner=False)
-    def draw_rank_bar_pct(
-        value_pct: float,                # 내 위치(%)
-        min_pct: float = 0.0,
-        max_pct: float = 100.0,
-        width=6.0, height=1.10, dpi=220,
-        bar_left=0.12, bar_right=0.88, bar_y=0.55,
-        segments=6,
-        line_color="#9AA3AB",            # 점선 색
-        tick_color="#9AA3AB",            # 눈금 색
-        left_label_color="#E53935",      # 최하위(빨강)
-        right_label_color="#1F4AA0",     # 최상위(파랑)
-        marker_color="#1F4AA0",          # 삼각형/내 위치 텍스트
-        text_color="#2B2F33",
-        bg="white",
-        outside_gap=0.02,                # 바와 라벨 간격
-        end_tick_len=0.085,              # 양끝 긴 눈금 길이
-        mid_tick_len=0.032,              # 중간 눈금 길이
-        pad_x=0.07                       # 좌우 여백(텍스트 잘림 방지)
-    ):
-        mn, mx = float(min_pct), float(max_pct)
-        v = float(value_pct)
-        span = max(mx - mn, 1e-6)
-        frac = max(0.0, min(1.0, (v - mn) / span))
-        x_cur = bar_left + (bar_right - bar_left) * frac
+                # 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
+                img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
 
-        fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
-        ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
-        ax.set_xlim(-pad_x, 1 + pad_x); ax.set_ylim(0, 1); ax.axis("off")
+                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 인천시 전체 운전자 중 -</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-        # 점선 바
-        ax.hlines(bar_y, bar_left, bar_right, colors=line_color,
-                linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+                # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
+                img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
 
-        # 양끝 긴 눈금
-        ax.vlines(bar_left,  bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
-        ax.vlines(bar_right, bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
+                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 운수사 전체 운전자 중 -</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-        # 중간 눈금
-        for i in range(1, segments):
-            x = bar_left + (bar_right - bar_left) * (i / segments)
-            ax.vlines(x, bar_y-mid_tick_len, bar_y+mid_tick_len, colors=tick_color, linewidth=1.2, zorder=2)
+                # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
+                img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
 
-        # 좌/우 라벨(바 밖)
-        ax.text(bar_left - outside_gap,  bar_y+0.10, "최하위", ha="right", va="center", fontsize=12, color=left_label_color)
-        ax.text(bar_right + outside_gap, bar_y+0.10, "최상위", ha="left",  va="center", fontsize=12, color=right_label_color)
-
-        # 내 위치 마커/텍스트
-        ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10, color=marker_color, zorder=3)
-        ax.text(x_cur, bar_y-0.26, f"내 위치 ({int(round(v))}%)", ha="center", va="center",
-                fontsize=12, color=marker_color)
-
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
-        buf.seek(0)
-        img64 = base64.b64encode(buf.read()).decode("utf-8")
-        plt.close(fig)
-        return img64
+                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
 
+                # 노선 순위 참고
+                st.markdown("""
+                <div class='line-grade'>
+                    <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선: 54위</b> (인천 전체 540개 노선 중)
+                </div>
+                """, unsafe_allow_html=True)
 
-    items = [
-        ("월엽(관리, 환경)", 20),
-        ("공회전(관리, 환경)", 43),
-        ("급가속(안전, 경제)", 73),
-        ("급감속(안전, 경제)", 38),
-        ("평균속도(안전, 경제)", 62),
-    ]
-
-    for idx, (title, pct) in enumerate(items):
-        # 제목(가운데 정렬, 굵게)
-        st.markdown(f"<div style='text-align:center; font-weight:700; font-size:20px;'>{title}</div>", unsafe_allow_html=True)
-
-        # 바그래프
-        img64 = draw_rank_bar_pct(pct, min_pct=0, max_pct=100)
-        st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img64}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
-
-        # 항목 사이 구분선
-        if idx < len(items) - 1:
-            st.markdown("<hr style='border:0; border-top:1px solid #d9dbe0; margin:8px 0 14px 0;'>", unsafe_allow_html=True)
+                st.markdown("---")
 
 
+                st.markdown("### 📍 평가 점수 올리기", unsafe_allow_html=True)
+
+                # --- 퍼센트 전용 바그래프(좌: 최하위/우: 최상위) ---
+                @st.cache_data(show_spinner=False)
+                def draw_rank_bar_pct(
+                    value_pct: float,                # 내 위치(%)
+                    min_pct: float = 0.0,
+                    max_pct: float = 100.0,
+                    width=6.0, height=1.10, dpi=220,
+                    bar_left=0.12, bar_right=0.88, bar_y=0.55,
+                    segments=6,
+                    line_color="#9AA3AB",            # 점선 색
+                    tick_color="#9AA3AB",            # 눈금 색
+                    left_label_color="#E53935",      # 최하위(빨강)
+                    right_label_color="#1F4AA0",     # 최상위(파랑)
+                    marker_color="#1F4AA0",          # 삼각형/내 위치 텍스트
+                    text_color="#2B2F33",
+                    bg="white",
+                    outside_gap=0.02,                # 바와 라벨 간격
+                    end_tick_len=0.085,              # 양끝 긴 눈금 길이
+                    mid_tick_len=0.032,              # 중간 눈금 길이
+                    pad_x=0.07                       # 좌우 여백(텍스트 잘림 방지)
+                ):
+                    mn, mx = float(min_pct), float(max_pct)
+                    v = float(value_pct)
+                    span = max(mx - mn, 1e-6)
+                    frac = max(0.0, min(1.0, (v - mn) / span))
+                    x_cur = bar_left + (bar_right - bar_left) * frac
+
+                    fig = plt.figure(figsize=(width, height), dpi=dpi, facecolor=bg)
+                    ax = fig.add_axes([0, 0, 1, 1], facecolor=bg)
+                    ax.set_xlim(-pad_x, 1 + pad_x); ax.set_ylim(0, 1); ax.axis("off")
+
+                    # 점선 바
+                    ax.hlines(bar_y, bar_left, bar_right, colors=line_color,
+                            linestyles=(0, (6, 6)), linewidth=2.0, zorder=1)
+
+                    # 양끝 긴 눈금
+                    ax.vlines(bar_left,  bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
+                    ax.vlines(bar_right, bar_y-end_tick_len, bar_y+end_tick_len, colors=tick_color, linewidth=1.8, zorder=2)
+
+                    # 중간 눈금
+                    for i in range(1, segments):
+                        x = bar_left + (bar_right - bar_left) * (i / segments)
+                        ax.vlines(x, bar_y-mid_tick_len, bar_y+mid_tick_len, colors=tick_color, linewidth=1.2, zorder=2)
+
+                    # 좌/우 라벨(바 밖)
+                    ax.text(bar_left - outside_gap,  bar_y+0.10, "최하위", ha="right", va="center", fontsize=12, color=left_label_color)
+                    ax.text(bar_right + outside_gap, bar_y+0.10, "최상위", ha="left",  va="center", fontsize=12, color=right_label_color)
+
+                    # 내 위치 마커/텍스트
+                    ax.plot([x_cur], [bar_y+0.02], marker="v", markersize=10, color=marker_color, zorder=3)
+                    ax.text(x_cur, bar_y-0.26, f"내 위치 ({int(round(v))}%)", ha="center", va="center",
+                            fontsize=12, color=marker_color)
+
+                    buf = io.BytesIO()
+                    fig.savefig(buf, format="png", bbox_inches=None, pad_inches=0.05, facecolor=bg)
+                    buf.seek(0)
+                    img64 = base64.b64encode(buf.read()).decode("utf-8")
+                    plt.close(fig)
+                    return img64
 
 
-    st.markdown("---")  # 구분선
 
-    # ✨ 슬로건
-    st.markdown("""
-    <div style='text-align: center; font-size: 20px; font-weight: bold; color: #2E7D32;'>
-        🌿 오늘도 경제운전, 내일은 더 안전하게! 🌿
-    </div>
-    """, unsafe_allow_html=True)
+                items = [
+                    ("월엽(관리, 환경)", 20),
+                    ("공회전(관리, 환경)", 43),
+                    ("급가속(안전, 경제)", 73),
+                    ("급감속(안전, 경제)", 38),
+                    ("평균속도(안전, 경제)", 62),
+                ]
 
-    # ▶️ 교육 영상 버튼
-    st.markdown("""
-    <div style='text-align: center; margin-top: 20px;'>
-        <a href='https://www.youtube.com/watch?v=tIJCvwWXGpE' target='_blank'>
-            <button style='padding: 10px 25px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;'>
-                🎥 교육 동영상 보러가기
-            </button>
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
+                for idx, (title, pct) in enumerate(items):
+                    # 제목(가운데 정렬, 굵게)
+                    st.markdown(f"<div style='text-align:center; font-weight:700; font-size:20px;'>{title}</div>", unsafe_allow_html=True)
+
+                    # 바그래프
+                    img64 = draw_rank_bar_pct(pct, min_pct=0, max_pct=100)
+                    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img64}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
+
+                    # 항목 사이 구분선
+                    if idx < len(items) - 1:
+                        st.markdown("<hr style='border:0; border-top:1px solid #d9dbe0; margin:8px 0 14px 0;'>", unsafe_allow_html=True)
+
+
+
+
+                st.markdown("---")  # 구분선
+
+                # ✨ 슬로건
+                st.markdown("""
+                <div style='text-align: center; font-size: 20px; font-weight: bold; color: #2E7D32;'>
+                    🌿 오늘도 경제운전, 내일은 더 안전하게! 🌿
+                </div>
+                """, unsafe_allow_html=True)
+
+                # ▶️ 교육 영상 버튼
+                st.markdown("""
+                <div style='text-align: center; margin-top: 20px;'>
+                    <a href='https://www.youtube.com/watch?v=tIJCvwWXGpE' target='_blank'>
+                        <button style='padding: 10px 25px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer;'>
+                            🎥 교육 동영상 보러가기
+                        </button>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
