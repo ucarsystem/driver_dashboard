@@ -359,8 +359,8 @@ if 조회버튼:
                     ax.add_patch(base_wedge)
 
                     # 진행 링 (12시부터 시계 방향)
-                    cmap = mpl.cm.get_cmap(cmap_name)
-                    prog_color = cmap(frac)
+                    # cmap = mpl.cm.get_cmap(cmap_name)
+                    # prog_color = cmap(frac)
                     prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
                                             facecolor=prog_color, linewidth=0, antialiased=True)
                     ax.add_patch(prog_wedge)
