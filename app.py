@@ -233,25 +233,13 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 year_month = "2508" 
 조회버튼 = st.button("조회하기")
 
-# 안전 변환
-df_driver["운전자ID"] = df_driver["운전자ID"].astype(str).str.strip()
-if "운수사" in df_driver.columns:
-    df_driver["운수사"] = df_driver["운수사"].astype(str).str.strip()
-elif "운수사코드" in df_driver.columns:
-    # 파일마다 '운수사' 대신 '운수사코드'일 수 있어 대체 사용
-    df_driver["운수사"] = df_driver["운수사코드"].astype(str).str.strip()
-else:
-    df_driver["운수사"] = ""
-
 # 🟢 타입만 맞춰서 비교 (정규화 X, 문자열 비교만)
-df_driver["년월"] = df_driver["년월"].astype(str).str.strip()
-year_month = str(year_month).strip()  # "2508" 형태 유지
+# df_driver["년월"] = df_driver["년월"].astype(str).str.strip()
+# year_month = str(year_month).strip()  # "2508" 형태 유지
 
 # 필터링
 filtered = df_driver[
-    (df_driver["운수사"] == _to_str(company_input)) &
-    (df_driver["운전자ID"] == _to_str(user_id_input)) &
-    (df_driver["년월"] == year_month)
+    (df_driver["최종코드"] == company_input & int(user_id_input)&year_month)
 ]
 
 if not filtered.empty:
@@ -395,8 +383,9 @@ if not filtered.empty:
     grade = this_grade
     achieved_pct = this_percent   # 현재 달성률
     max_pct = 120       # 총 120%를 링 100%로 간주
-    incentive_won = 280000
+    incentive_won = 280000 # 인센티브 금액 (추후 변경)
 
+    # 다음 등급 달성까지 안내문구 함수
     def get_notice_text(grade, achieved_pct):
         g = str(grade).upper()
         if g == "S":
@@ -469,13 +458,23 @@ if not filtered.empty:
     if "show_graph" not in st.session_state:
         st.session_state.show_graph = False
 
-    #일별/월별 달성률 팝업
-    # 예시 데이터 (월별)
-    data = pd.DataFrame({
-        "월": ["1월", "2월", "3월", "4월", "5월", "6월", "7월(예상)"],
-        "달성률": [92, 97, 89.1, 91.8, 82.4, 100, 95],
-        "등급": ["B", "A", "C", "B", "D", "S", "A"]
-    })
+    ##일별/월별 달성률 팝업
+
+    #월별 달성률 및 등급
+
+    df_monthly = df_driver[
+    (df_driver['운수사'] == company_input) &
+    (df_driver['운전자ID'] == int(user_id_input)) &
+    (df_driver['등급'] != "이상")
+]
+
+    # 결과 데이터 가공
+    df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
+    df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
+    df_result = df_result.rename(columns={'가중달성율': '달성률'})
+
+    # 최종 출력 컬럼 순서
+    df_result = df_result[['월', '달성률', '등급']]
 
     # Altair용 등급 색상 매핑
     등급색상 = alt.Scale(
@@ -486,14 +485,14 @@ if not filtered.empty:
     with st.expander("📊 월별 달성률 보기", expanded=True):
 
         # 막대 차트
-        bar = alt.Chart(data).mark_bar().encode(
+        bar = alt.Chart(df_result).mark_bar().encode(
             x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
             y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
             color=alt.Color("등급", scale=등급색상),
             tooltip=["월", "달성률", "등급"]
         )
 
-        text = alt.Chart(data).mark_text(
+        text = alt.Chart(df_result).mark_text(
             dy=-10,
             fontWeight="bold",
             fontSize=14,
@@ -555,10 +554,6 @@ if not filtered.empty:
         day_cls = "cal-day"
         grade_cls = "cal-grade"
         pct_cls = "cal-pct"
-
-        # day_style = "font-weight:bold;"
-        # grade_style = "font-weight:bold; font-size:18px;"
-        # pct_style = "font-size:15px; margin-top:2px;"
 
         # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
         mobile_css = """
