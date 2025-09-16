@@ -7,6 +7,7 @@ import base64
 import requests
 import numpy as np
 from PIL import Image, ImageOps
+import math
 import matplotlib as mpl 
 import matplotlib.pyplot as plt 
 import matplotlib.patches as patches
@@ -264,7 +265,7 @@ if 조회버튼:
 
                 #값 정의
                 route_number = row['노선번호']         # 1) 상단 표: 노선번호
-                this_grade = row['등급']               # 2) 진행링: 등급
+                this_grade = math.floor(row['등급']*100)               # 2) 진행링: 등급
                 this_percent = row['가중달성율']        # 2) 진행링: 달성률
 
                 # 제목
@@ -485,7 +486,7 @@ if 조회버튼:
                 # 결과 데이터 가공
                 df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
                 df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
-                df_result = df_result.rename(columns={'가중달성율': '달성률'})
+                df_result['달성률'] = df_result['가중달성율'].apply(lambda x: f"{int(x * 100)}%")
 
                 # 최종 출력 컬럼 순서
                 df_result = df_result[['월', '달성률', '등급']]
