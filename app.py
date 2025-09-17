@@ -486,7 +486,7 @@ if 조회버튼:
                 # 결과 데이터 가공
                 df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
                 df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
-                df_result['달성률'] = int(df_result['가중달성율']*100)
+                df_result['달성률'] = (df_result['가중달성율']*100).astype(int)
 
                 # 최종 출력 컬럼 순서
                 df_result = df_result[['월', '달성률', '등급']]
