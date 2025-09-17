@@ -621,27 +621,65 @@ if 조회버튼:
                     html.append("</table></div>")
                     return "".join(html)
                     
+                def calc_grade(percent):
+                    if percent >= 100:
+                        return "S"
+                    elif percent >= 95:
+                        return "A"
+                    elif percent >= 90:
+                        return "B"
+                    elif percent >= 85:
+                        return "C"
+                    elif percent >= 80:
+                        return "D"
+                    else:
+                        return "F"
+                    
+                #월
+                month_int = int(year_month[-2:])
 
+                #조건 필터링
+                day_filtered = df_day[
+                    (df_day["운수사"] == company_input) &
+                    (df_day["운전자ID"] == user_id) &
+                    (df_day["월"] == month_int) &
+                    (df_day["최종평가"] == "최종")
+                ]
+
+                # ✅ 일자별 가중평균달성율 합산
+                day_grouped = day_filtered.groupby("일")["가중평균달성율"].sum().reset_index()
+                day_grouped["달성률"] = (day_grouped["가중평균달성율"] * 100).round(0).astype(int)
+                day_grouped["등급"] = day_grouped["달성률"].apply(calc_grade)
+
+                # ✅ calendar_data 생성
                 calendar_data = {
-                    2: {"grade": "S", "percent": 100},
-                    3: {"grade": "A", "percent": 96},
-                    4: {"grade": "B", "percent": 91},
-                    5: {"grade": "S", "percent": 101},
-                    9: {"grade": "S", "percent": 100},
-                    10: {"grade": "A", "percent": 96},
-                    11: {"grade": "C", "percent": 89},
-                    16: {"grade": "B", "percent": 91},
-                    18: {"grade": "A", "percent": 96},
-                    19: {"grade": "S", "percent": 101},
-                    20: {"grade": "S", "percent": 100},
-                    23: {"grade": "S", "percent": 101},
-                    24: {"grade": "A", "percent": 96},
-                    25: {"grade": "C", "percent": 89},
-                    30: {"grade": "S", "percent": 100},
-                }
-                calendar_html = generate_calendar_html_v2(calendar_data, 2025, 7)
+                    int(day_grouped["일"]): {
+                        "grade": day_grouped["등급"],
+                        "percent": day_grouped["달성률"]
+                    }
+                    for _, row in day_grouped.iterrows()
+}
 
-                with st.expander("📅 7월 일별 달성률 보기", expanded=True):
+                # calendar_data = {
+                #     2: {"grade": "S", "percent": 100},
+                #     3: {"grade": "A", "percent": 96},
+                #     4: {"grade": "B", "percent": 91},
+                #     5: {"grade": "S", "percent": 101},
+                #     9: {"grade": "S", "percent": 100},
+                #     10: {"grade": "A", "percent": 96},
+                #     11: {"grade": "C", "percent": 89},
+                #     16: {"grade": "B", "percent": 91},
+                #     18: {"grade": "A", "percent": 96},
+                #     19: {"grade": "S", "percent": 101},
+                #     20: {"grade": "S", "percent": 100},
+                #     23: {"grade": "S", "percent": 101},
+                #     24: {"grade": "A", "percent": 96},
+                #     25: {"grade": "C", "percent": 89},
+                #     30: {"grade": "S", "percent": 100},
+                # }
+                calendar_html = generate_calendar_html_v2(calendar_data, 2025, month_int)
+
+                with st.expander(f"📅 {month_int}월 일별 달성률 보기", expanded=True):
                     st.markdown(calendar_html, unsafe_allow_html=True)
 
                 st.markdown("---")
