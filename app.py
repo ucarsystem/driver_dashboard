@@ -653,7 +653,7 @@ if 조회버튼:
 
                 # ✅ calendar_data 생성
                 calendar_data = {
-                    int(day_grouped["일"]): {
+                    (day_grouped["일"]).astype(int): {
                         "grade": day_grouped["등급"],
                         "percent": day_grouped["달성률"]
                     }
