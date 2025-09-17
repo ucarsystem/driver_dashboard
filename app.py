@@ -174,9 +174,10 @@ st.markdown("""
 file_dir = "./file"
 company_file = os.path.join(file_dir, "company_info.xlsx")
 id_check_file = os.path.join(file_dir, "인천ID.xlsx")
-excel_path = "https://github.com/ucarsystem/driver_dashboard/file/인천%20개인별%20대시보드_25년08월.xlsx"
-main_path = os.path.join(file_dir, "인천 개인별 대시보드_25년08월.xlsx")
+excel_path = "https://github.com/ucarsystem/driver_dashboard/file/인천%운전자별.xlsx"
+main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
+car_path = os.path.join(file_dir, "인천 차량별.xlsx")
 
 # 엑셀 파일 로드 함수
 def load_excel(path, sheetname):
@@ -206,6 +207,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 # ── 엑셀 로드 & 필터
 df_driver = load_excel(main_path, "운전자별")
 df_day = load_excel(day_path, "일별)차량+운전자")
+df_car = load_excel(car_path, "차량별데이터")
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
@@ -537,89 +539,6 @@ if 조회버튼:
 
                     st.altair_chart(chart, use_container_width=True)
 
-
-                # 일별 데이터 팝업
-                # def generate_calendar_html_v2(data, year, month):
-                #     cal = calendar.Calendar(firstweekday=6)
-                #     month_days = cal.monthdayscalendar(year, month)
-
-                #     grade_color = {
-                #         "S": "#0a860a",  # 진초록
-                #         "A": "#0a860a",
-                #         "B": "#007bff",  # 파랑
-                #         "C": "#007bff",
-                #         "D": "#CA0000",
-                #         "F": "#CA0000"
-                #     }
-
-                #     # 공통 인라인 스타일
-                #     wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
-                #     table_style = (
-                #         "table-layout:fixed; width:100%; min-width:660px; "
-                #         "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
-                #     )
-                #     thtd_style = (
-                #         "width:14.2857%; border:1px solid #aaa; padding:4px; "
-                #         "text-align:center; vertical-align:top;"
-                #     )
-                #     th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
-                #     td_style = thtd_style + "height:80px; font-size:13px;"
-
-                #     # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
-                #     day_cls = "cal-day"
-                #     grade_cls = "cal-grade"
-                #     pct_cls = "cal-pct"
-
-                #     # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
-                #     mobile_css = """
-                #     <style>
-                #     @media (max-width: 480px) {
-                #     .calwrap table { min-width: 0 !important; width: 100% !important; }
-                #     .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
-                #     .calwrap .cal-grade { font-size: 14px !important; }
-                #     .calwrap .cal-pct   { font-size: 12px !important; }
-                #     .calwrap .cal-day   { font-size: 12px !important; }
-                #     }
-                #     </style>
-                #     """
-
-                #     html = []
-                #     html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
-                #     html.append(f'<div class="calwrap" style="{wrap_style}">')
-                #     html.append(f'<table style="{table_style}">')
-                #     html.append("<tr>")
-                #     html.append(f'<th style="{th_style}color:red">일</th>')
-                #     for h in ["월","화","수","목","금"]:
-                #         html.append(f'<th style="{th_style}">{h}</th>')
-                #     html.append(f'<th style="{th_style}color:blue">토</th>')
-                #     html.append("</tr>")
-
-                #     for week in month_days:
-                #         html.append("<tr>")
-                #         for day in week:
-                #             if day == 0:
-                #                 html.append(f'<td style="{td_style}"></td>')
-                #             else:
-                #                 if day in data:
-                #                     g = data[day]["grade"]
-                #                     p = data[day]["percent"]
-                #                     c = grade_color.get(g, "black")
-                #                     html.append(
-                #                         f'<td style="{td_style}">'
-                #                         f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
-                #                         f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
-                #                         f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
-                #                         f'</td>'
-                #                     )
-                #                 else:
-                #                     html.append(
-                #                         f'<td style="{td_style}">'
-                #                         f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
-                #                         f'</td>'
-                #                     )
-                #         html.append("</tr>")
-                #     html.append("</table></div>")
-                #     return "".join(html)
                 def generate_calendar_html_v2(data, year, month):
                     # 요일 색상 및 스타일 설정
                     day_color = {0: "red", 6: "blue"}  # 일요일, 토요일
@@ -863,18 +782,51 @@ if 조회버튼:
                 st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
+                # 노선 순위 추출 (인천 차량별.xlsx 데이터 사용)
+                # 1. 조건 정의 (참고용)
+                int(year_month) # 년월
+                company_input #운수사
+                route_number # 주노선
 
-                # 노선 순위 참고
-                st.markdown("""
-                <div class='line-grade'>
-                    <b>📌 참고)</b> 노선별 순위 >> <b>302번 노선: 54위</b> (인천 전체 540개 노선 중)
-                </div>
-                """, unsafe_allow_html=True)
+                df_car
+
+                # 2. 노선별 가중달성률 합산 및 순위 계산
+                route_rank_df = (
+                    df_car[df_car["년월"] == int(year_month)]
+                    .groupby(["년월", "운수사", "노선번호"])["노선내가중달성률"]
+                    .sum()
+                    .reset_index()
+                    .sort_values(by="노선내가중달성률", ascending=False)
+                )
+
+                # 3. 순위 부여 (1위가 가장 높은 달성률)
+                route_rank_df["순위"] = route_rank_df["노선내가중달성률"].rank(method="min", ascending=False).astype(int)
+
+                # 4. 전체 노선 개수
+                total_routes = route_rank_df.shape[0]
+
+                # 5. 해당 운수사의 특정 노선 찾기
+                target_row = route_rank_df[
+                    (route_rank_df["운수사"] == company_input) &
+                    (route_rank_df["노선번호"] == route_number)
+                ]
+
+                # 6. 결과 텍스트 생성
+                if not target_row.empty:
+                    this_rank = target_row.iloc[0]["순위"]
+                    markdown_text = f"""
+                    <div class='line-grade'>
+                        <b>📌 참고)</b> 노선별 순위 >> <b>{route_number}번 노선: {this_rank}위</b> (인천 전체 {total_routes}개 노선 중)
+                    </div>
+                    """
+                    st.markdown(markdown_text, unsafe_allow_html=True)
+                else:
+                    st.markdown("")
 
                 st.markdown("---")
 
-
-                st.markdown("### 📍 평가 점수 올리기", unsafe_allow_html=True)
+                ### 항목별 위치 ###
+                st.markdown("### 📍 항목별 위치", unsafe_allow_html=True)
 
                 # --- 퍼센트 전용 바그래프(좌: 최하위/우: 최상위) ---
                 @st.cache_data(show_spinner=False)
@@ -935,17 +887,45 @@ if 조회버튼:
                     img64 = base64.b64encode(buf.read()).decode("utf-8")
                     plt.close(fig)
                     return img64
+                
 
+                # 데이터 정의 (인천 운전자별.xlsx의 운전자별 시트)
+                
+                # 1) 필요 데이터 추출
+                # 월별 데이터(전체 운전자별 항목별 비율 구하기위한 데이터)
+                month_data = df_driver[df_driver["년월"] == int(year_month)].copy()
 
+                # 내 데이터
+                my_row = month_data[
+                    (month_data["운수사"] == company_input) &
+                    (month_data["운전자ID"] == user_id)]
+                
+                # 2) 백분율 계산 함수 (값이 낮을수록 우수 → 높은 퍼센트)
+                def get_percentile_reversed(df, col, value):
+                    df_sorted = df[col].dropna().sort_values().reset_index(drop=True)
+                    total = len(df_sorted)
+                    rank = (df_sorted > value).sum() + 1
+                    percentile = round(rank / total * 100)
+                    return percentile
+                
+                # 3) 결과 추출
+                items = []
+                
+                #항목별 매핑
+                metric_map = {
+                    "웜업비율(%)": "월업(관리, 환경)",
+                    "공회전비율(%)": "공회전(관리, 환경)",
+                    "급가속(회)/100km": "급가속(안전, 경제)",
+                    "급감속(회)/100km": "급감속(안전, 경제)",
+                    "평균속도": "평균속도(안전, 경제)"
+                }
 
-                items = [
-                    ("월엽(관리, 환경)", 20),
-                    ("공회전(관리, 환경)", 43),
-                    ("급가속(안전, 경제)", 73),
-                    ("급감속(안전, 경제)", 38),
-                    ("평균속도(안전, 경제)", 62),
-                ]
+                for col, label in metric_map.items():
+                    value = my_row[col]
+                    percentile = get_percentile_reversed(month_data, col, value)
+                    items.append((label, percentile))
 
+                # 최종 출력 (제목, 바그래프)
                 for idx, (title, pct) in enumerate(items):
                     # 제목(가운데 정렬, 굵게)
                     st.markdown(f"<div style='text-align:center; font-weight:700; font-size:20px;'>{title}</div>", unsafe_allow_html=True)
