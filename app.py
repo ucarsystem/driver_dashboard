@@ -648,7 +648,7 @@ if 조회버튼:
 
                 # ✅ 일자별 가중평균달성율 합산
                 day_grouped = day_filtered.groupby("일")["가중평균달성율"].sum().reset_index()
-                day_grouped["달성률"] = (day_grouped["가중평균달성율"] * 100).round(0).astype(int)
+                day_grouped["달성률"] = (day_grouped["가중평균달성율"] * 100).astype(int)
                 day_grouped["등급"] = day_grouped["달성률"].apply(calc_grade)
 
                 # ✅ calendar_data 생성
