@@ -539,64 +539,149 @@ if 조회버튼:
 
 
                 # 일별 데이터 팝업
+                # def generate_calendar_html_v2(data, year, month):
+                #     cal = calendar.Calendar(firstweekday=6)
+                #     month_days = cal.monthdayscalendar(year, month)
+
+                #     grade_color = {
+                #         "S": "#0a860a",  # 진초록
+                #         "A": "#0a860a",
+                #         "B": "#007bff",  # 파랑
+                #         "C": "#007bff",
+                #         "D": "#CA0000",
+                #         "F": "#CA0000"
+                #     }
+
+                #     # 공통 인라인 스타일
+                #     wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
+                #     table_style = (
+                #         "table-layout:fixed; width:100%; min-width:660px; "
+                #         "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
+                #     )
+                #     thtd_style = (
+                #         "width:14.2857%; border:1px solid #aaa; padding:4px; "
+                #         "text-align:center; vertical-align:top;"
+                #     )
+                #     th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
+                #     td_style = thtd_style + "height:80px; font-size:13px;"
+
+                #     # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
+                #     day_cls = "cal-day"
+                #     grade_cls = "cal-grade"
+                #     pct_cls = "cal-pct"
+
+                #     # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
+                #     mobile_css = """
+                #     <style>
+                #     @media (max-width: 480px) {
+                #     .calwrap table { min-width: 0 !important; width: 100% !important; }
+                #     .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
+                #     .calwrap .cal-grade { font-size: 14px !important; }
+                #     .calwrap .cal-pct   { font-size: 12px !important; }
+                #     .calwrap .cal-day   { font-size: 12px !important; }
+                #     }
+                #     </style>
+                #     """
+
+                #     html = []
+                #     html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
+                #     html.append(f'<div class="calwrap" style="{wrap_style}">')
+                #     html.append(f'<table style="{table_style}">')
+                #     html.append("<tr>")
+                #     html.append(f'<th style="{th_style}color:red">일</th>')
+                #     for h in ["월","화","수","목","금"]:
+                #         html.append(f'<th style="{th_style}">{h}</th>')
+                #     html.append(f'<th style="{th_style}color:blue">토</th>')
+                #     html.append("</tr>")
+
+                #     for week in month_days:
+                #         html.append("<tr>")
+                #         for day in week:
+                #             if day == 0:
+                #                 html.append(f'<td style="{td_style}"></td>')
+                #             else:
+                #                 if day in data:
+                #                     g = data[day]["grade"]
+                #                     p = data[day]["percent"]
+                #                     c = grade_color.get(g, "black")
+                #                     html.append(
+                #                         f'<td style="{td_style}">'
+                #                         f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                #                         f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
+                #                         f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
+                #                         f'</td>'
+                #                     )
+                #                 else:
+                #                     html.append(
+                #                         f'<td style="{td_style}">'
+                #                         f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                #                         f'</td>'
+                #                     )
+                #         html.append("</tr>")
+                #     html.append("</table></div>")
+                #     return "".join(html)
                 def generate_calendar_html_v2(data, year, month):
-                    cal = calendar.Calendar()
-                    month_days = cal.monthdayscalendar(year, month)
-
+                    # 요일 색상 및 스타일 설정
+                    day_color = {0: "red", 6: "blue"}  # 일요일, 토요일
                     grade_color = {
-                        "S": "#0a860a",  # 진초록
-                        "A": "#0a860a",
+                        "S": "#0a860a",  # 초록
+                        "A": "#0a860a",  # 초록
                         "B": "#007bff",  # 파랑
-                        "C": "#007bff",
-                        "D": "#CA0000",
-                        "F": "#CA0000"
+                        "C": "#007bff",  # 파랑
+                        "D": "#CA0000",  # 빨강
+                        "F": "#CA0000",  # 빨강
                     }
 
-                    # 공통 인라인 스타일
-                    wrap_style = "max-width:100%; overflow-x:auto; margin:0 auto;"
-                    table_style = (
-                        "table-layout:fixed; width:100%; min-width:660px; "
-                        "border-collapse:collapse; font-family:'Malgun Gothic', sans-serif;"
-                    )
-                    thtd_style = (
-                        "width:14.2857%; border:1px solid #aaa; padding:4px; "
-                        "text-align:center; vertical-align:top;"
-                    )
-                    th_style = thtd_style + "background:#f0f0f0; font-weight:bold; font-size:15px;"
-                    td_style = thtd_style + "height:80px; font-size:13px;"
-
-                    # 텍스트 스타일용 클래스 (모바일에서만 크기 줄일 거라 class를 같이 넣어둡니다)
-                    day_cls = "cal-day"
-                    grade_cls = "cal-grade"
-                    pct_cls = "cal-pct"
-
-                    # ✅ 모바일(<=480px)일 때만 min-width 해제 + 폰트/높이 축소 (스크롤 제거)
-                    mobile_css = """
+                    # 테이블 헤더
+                    html = [f"""
                     <style>
-                    @media (max-width: 480px) {
-                    .calwrap table { min-width: 0 !important; width: 100% !important; }
-                    .calwrap th, .calwrap td { padding: 2px !important; height: 60px !important; }
-                    .calwrap .cal-grade { font-size: 14px !important; }
-                    .calwrap .cal-pct   { font-size: 12px !important; }
-                    .calwrap .cal-day   { font-size: 12px !important; }
-                    }
+                    .calendar-container {{
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        padding: 10px;
+                        background-color: white;
+                    }}
+                    table.calendar {{
+                        border-collapse: collapse;
+                        width: 100%;
+                        text-align: center;
+                        font-size: 16px;
+                    }}
+                    table.calendar th {{
+                        padding: 6px;
+                        background-color: #f5f5f5;
+                    }}
+                    table.calendar td {{
+                        padding: 10px;
+                        height: 80px;
+                        vertical-align: top;
+                    }}
                     </style>
-                    """
+                    <div class="calendar-container">
+                    <table class="calendar">
+                        <thead>
+                            <tr>
+                                <th style='color:red;'>일</th>
+                                <th>월</th>
+                                <th>화</th>
+                                <th>수</th>
+                                <th>목</th>
+                                <th>금</th>
+                                <th style='color:blue;'>토</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    """]
 
-                    html = []
-                    html.append(mobile_css)  # 모바일 오버라이드 CSS 추가
-                    html.append(f'<div class="calwrap" style="{wrap_style}">')
-                    html.append(f'<table style="{table_style}">')
-                    html.append("<tr>")
-                    html.append(f'<th style="{th_style}color:red">일</th>')
-                    for h in ["월","화","수","목","금"]:
-                        html.append(f'<th style="{th_style}">{h}</th>')
-                    html.append(f'<th style="{th_style}color:blue">토</th>')
-                    html.append("</tr>")
+                    cal = calendar.Calendar(firstweekday=6)  # 일요일 시작
+                    month_days = cal.monthdayscalendar(year, month)
 
                     for week in month_days:
                         html.append("<tr>")
-                        for day in week:
+                        for i, day in enumerate(week):
+                            color = day_color.get(i, "black")
+                            td_style = f"color:{color}; border:1px solid #eee; vertical-align:top;"
+
                             if day == 0:
                                 html.append(f'<td style="{td_style}"></td>')
                             else:
@@ -606,19 +691,19 @@ if 조회버튼:
                                     c = grade_color.get(g, "black")
                                     html.append(
                                         f'<td style="{td_style}">'
-                                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
-                                        f'<div class="{grade_cls}" style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
-                                        f'<div class="{pct_cls}"   style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
+                                        f'<div style="font-weight:bold;">{day}</div>'
+                                        f'<div style="font-weight:bold; font-size:18px; color:{c}">{g}등급</div>'
+                                        f'<div style="font-size:15px; margin-top:2px; color:{c}">({p}%)</div>'
                                         f'</td>'
                                     )
                                 else:
                                     html.append(
                                         f'<td style="{td_style}">'
-                                        f'<div class="{day_cls}" style="font-weight:bold;">{day}</div>'
+                                        f'<div style="font-weight:bold;">{day}</div>'
                                         f'</td>'
                                     )
                         html.append("</tr>")
-                    html.append("</table></div>")
+                    html.append("</tbody></table></div>")
                     return "".join(html)
                     
                 def calc_grade(percent):
@@ -658,26 +743,8 @@ if 조회버튼:
                         "grade": row["등급"],
                         "percent": row["달성률"]
                     }
-                    for _, row in day_grouped.iterrows()
-}
+                    for _, row in day_grouped.iterrows()}
 
-                # calendar_data = {
-                #     2: {"grade": "S", "percent": 100},
-                #     3: {"grade": "A", "percent": 96},
-                #     4: {"grade": "B", "percent": 91},
-                #     5: {"grade": "S", "percent": 101},
-                #     9: {"grade": "S", "percent": 100},
-                #     10: {"grade": "A", "percent": 96},
-                #     11: {"grade": "C", "percent": 89},
-                #     16: {"grade": "B", "percent": 91},
-                #     18: {"grade": "A", "percent": 96},
-                #     19: {"grade": "S", "percent": 101},
-                #     20: {"grade": "S", "percent": 100},
-                #     23: {"grade": "S", "percent": 101},
-                #     24: {"grade": "A", "percent": 96},
-                #     25: {"grade": "C", "percent": 89},
-                #     30: {"grade": "S", "percent": 100},
-                # }
                 calendar_html = generate_calendar_html_v2(calendar_data, 2025, month_int)
 
                 with st.expander(f"📅 {month_int}월 일별 달성률 보기", expanded=True):
