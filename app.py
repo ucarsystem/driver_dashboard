@@ -784,11 +784,11 @@ if 조회버튼:
 
                 # 노선 순위 추출 (인천 차량별.xlsx 데이터 사용)
                 # 1. 조건 정의 (참고용)
-                int(year_month) # 년월
-                company_input #운수사
-                route_number # 주노선
+                # int(year_month) # 년월
+                # company_input #운수사
+                # route_number # 주노선
 
-                df_car
+                # df_car
 
                 # 2. 노선별 가중달성률 합산 및 순위 계산
                 route_rank_df = (
