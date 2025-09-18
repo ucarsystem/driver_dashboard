@@ -891,27 +891,8 @@ if 조회버튼:
 
                 # 데이터 정의 (인천 운전자별.xlsx의 운전자별 시트)
                 
-                # 1) 필요 데이터 추출
-                # 월별 데이터(전체 운전자별 항목별 비율 구하기위한 데이터)
-                month_data = df_driver[df_driver["년월"] == int(year_month)].copy()
+                # 1) 사용할 컬럼들 정의
 
-                # 내 데이터
-                my_row = month_data[
-                    (month_data["운수사"] == company_input) &
-                    (month_data["운전자ID"] == user_id)]
-                
-                # 2) 백분율 계산 함수 (값이 낮을수록 우수 → 높은 퍼센트)
-                def get_percentile_reversed(df, col, value):
-                    df_sorted = df[col].dropna().sort_values().reset_index(drop=True)
-                    total = len(df_sorted)
-                    rank = (df_sorted > value).sum() + 1
-                    percentile = round(rank / total * 100)
-                    return percentile
-                
-                # 3) 결과 추출
-                items = []
-                
-                #항목별 매핑
                 metric_map = {
                     "웜업비율(%)": "월업(관리, 환경)",
                     "공회전비율(%)": "공회전(관리, 환경)",
@@ -920,10 +901,44 @@ if 조회버튼:
                     "평균속도": "평균속도(안전, 경제)"
                 }
 
-                for col, label in metric_map.items():
-                    value = float(my_row[col].values[0]) if isinstance(my_row[col], pd.Series) else float(my_row[col])
-                    percentile = get_percentile_reversed(month_data, col, value)
-                    items.append((label, percentile))
+                # 2) 데이터 정의
+                # 월별 데이터(전체 운전자별 항목별 비율 구하기위한 데이터)
+                month_data = df_driver[df_driver["년월"] == int(year_month)].copy()
+
+                # 오류 방지를 위해 문자열 -> 숫자변환
+                for col in metric_map.keys():
+                    month_data[col] = pd.to_numeric(month_data[col], errors='coerce')
+
+                # 내 데이터
+                my_row = month_data[
+                    (month_data["운수사"] == company_input) &
+                    (month_data["운전자ID"] == user_id)]
+                
+                
+                # 3) 백분율 계산 함수 (값이 낮을수록 우수 → 높은 퍼센트)
+                def get_percentile_reversed(df, col, value):
+                    df_sorted = df[col].dropna().sort_values().reset_index(drop=True)
+                    total = len(df_sorted)
+                    if total == 0:
+                        return None # 비교 대상 없음
+                    rank = (df_sorted > value).sum() + 1
+                    percentile = round(rank / total * 100)
+                    return percentile
+                
+                # 4) 결과 추출
+                items = []
+
+                if not my_row.empty:
+                    for col, label in metric_map.items():
+                        try:
+                            val = float(my_row.iloc[0][col])  # .iloc[0]로 Series 에러 방지
+                            percentile = get_percentile_reversed(month_data, col, val)
+                            if percentile is not None:
+                                items.append((label, percentile))
+                            else:
+                                items.append((label, "-"))  # 데이터가 없는 경우
+                        except Exception as e:
+                            items.append((label, "-"))  # 에러 처리 (예: NaN 등)
 
                 # 최종 출력 (제목, 바그래프)
                 for idx, (title, pct) in enumerate(items):
