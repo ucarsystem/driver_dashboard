@@ -921,7 +921,7 @@ if 조회버튼:
                 }
 
                 for col, label in metric_map.items():
-                    value = my_row[col]
+                    value = float(my_row[col].values[0]) if isinstance(my_row[col], pd.Series) else float(my_row[col])
                     percentile = get_percentile_reversed(month_data, col, value)
                     items.append((label, percentile))
 
