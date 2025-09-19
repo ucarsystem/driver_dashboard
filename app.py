@@ -172,9 +172,9 @@ st.markdown("""
 
 # 기본 경로 설정
 file_dir = "./file"
+# 각 파일 위치
 company_file = os.path.join(file_dir, "company_info.xlsx")
 id_check_file = os.path.join(file_dir, "인천ID.xlsx")
-excel_path = "https://github.com/ucarsystem/driver_dashboard/file/인천%운전자별.xlsx"
 main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 car_path = os.path.join(file_dir, "인천 차량별.xlsx")
@@ -186,18 +186,6 @@ def load_excel(path, sheetname):
     except Exception as e:
         st.error(f"엑셀 파일 로드 오류: {e}")
         return None
-
-# 
-def _to_str(x):
-    return "" if pd.isna(x) else str(x).strip()
-
-def _to_float(x, default=None):
-    try:
-        if pd.isna(x): return default
-        return float(x)
-    except Exception:
-        return default
-
     
 # 📂 운수사 목록 불러오기
 df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os.path.exists(company_file) else pd.DataFrame()
@@ -225,22 +213,30 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# 운수사 선택박스
 company_list = ["운수사를 선택하세요"] + company_list[1:]
-# company_input = st.selectbox("운수사를 입력하세요", options=company_list, index=company_list.index(st.session_state.get("company_input", company_list[0])) if "company_input" in st.session_state else None)
 company_input = st.selectbox(
     "운수사를 입력하세요",
     options=company_list,
     index=0  # 기본으로 안내 문구 선택되게
 )
+
+# 운전자ID 입력칸
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
+
+# 조회할 년월 
 year_month = "2508" 
-조회버튼 = st.button("조회하기")
 
-# 🟢 타입만 맞춰서 비교 (정규화 X, 문자열 비교만)
-# df_driver["년월"] = df_driver["년월"].astype(str).str.strip()
-# year_month = str(year_month).strip()  # "2508" 형태 유지
+# 조회 버튼 클릭 상태 세션 초기화 ('조회하기' 버튼 눌렀을땐 데이터 조회되게끔 하기위해)
+if '조회버튼_클릭' not in st.session_state:
+    st.session_state['조회버튼_클릭'] = False
 
-if 조회버튼:
+# 버튼 클릭 처리 
+if st.button("조회하기"):
+    st.session_state['조회버튼_클릭'] = True
+
+# 버튼 클릭 시에만 필터링 실행
+if st.session_state['조회버튼_클릭']:
     if not user_id_input.strip():
         st.warning("운전자 ID를 입력해주세요.")
     else:
@@ -249,19 +245,20 @@ if 조회버튼:
         except ValueError:
             st.warning("운전자 ID는 숫자여야 합니다.")
         else:
-
-            # 필터링
+            # 필터링 실행
             filtered = df_driver[
-                (df_driver["운수사"] == company_input) & 
-                (df_driver["운전자ID"] == user_id)& 
+                (df_driver["운수사"] == company_input) &
+                (df_driver["운전자ID"] == user_id) &
                 (df_driver["년월"].astype(str) == year_month)
             ]
 
             st.write("필터링 결과:")
 
-            if not filtered.empty:
+            if filtered.empty:
+                st.warning("조건에 맞는 데이터가 없습니다.")
+            else:
                 row = filtered.iloc[0]
-                st.success(f"✅ 운수사 {company_input} (ID: {user_id_input}) 정보 조회 성공")
+                st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
 
                 st.markdown("---")
 
@@ -361,8 +358,6 @@ if 조회버튼:
                     ax.add_patch(base_wedge)
 
                     # 진행 링 (12시부터 시계 방향)
-                    # cmap = mpl.cm.get_cmap(cmap_name)
-                    # prog_color = cmap(frac)
                     prog_wedge = patches.Wedge((cx, cy), r, -90, -90+angle, width=r-inner_r,
                                             facecolor=prog_color, linewidth=0, antialiased=True)
                     ax.add_patch(prog_wedge)
@@ -559,21 +554,34 @@ if 조회버튼:
                         border-radius: 5px;
                         padding: 10px;
                         background-color: white;
+                        overflow-x: auto;  /* 모바일 가로 스크롤 대비 */
                     }}
                     table.calendar {{
                         border-collapse: collapse;
                         width: 100%;
+                        table-layout: fixed;  /* 💡 균일한 열 폭 보장 */
                         text-align: center;
                         font-size: 16px;
                     }}
                     table.calendar th {{
                         padding: 6px;
                         background-color: #f5f5f5;
+                        font-size: 16px;
                     }}
                     table.calendar td {{
-                        padding: 10px;
-                        height: 80px;
+                        padding: 8px 4px;
+                        height: 85px;
                         vertical-align: top;
+                        word-wrap: break-word;
+                    }}
+                    @media (max-width: 480px) {{
+                        table.calendar {{
+                            font-size: 13px;
+                        }}
+                        table.calendar td {{
+                            padding: 6px 2px;
+                            height: 75px;
+                        }}
                     }}
                     </style>
                     <div class="calendar-container">
@@ -670,6 +678,8 @@ if 조회버튼:
                     st.markdown(calendar_html, unsafe_allow_html=True)
 
                 st.markdown("---")
+
+                ### 인센티브 바그래프 ###
 
                 # --- rank bar 생성 함수 ---
                 @st.cache_data(show_spinner=False)
@@ -782,13 +792,11 @@ if 조회버튼:
                 st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-                # 노선 순위 추출 (인천 차량별.xlsx 데이터 사용)
+                # 노선 순위 추출 (인천 차량별.xlsx 데이터 사용>df_car)
                 # 1. 조건 정의 (참고용)
                 # int(year_month) # 년월
                 # company_input #운수사
                 # route_number # 주노선
-
-                # df_car
 
                 # 2. 노선별 가중달성률 합산 및 순위 계산
                 route_rank_df = (
