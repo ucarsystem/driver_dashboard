@@ -231,7 +231,7 @@ year_month = "2508"
 조회버튼_클릭 = st.button("조회하기")
 
 
-if '조회버튼_클릭' :
+if 조회버튼_클릭 :
     if not user_id_input.strip():
         st.warning("운전자 ID를 입력해주세요.")
     else:
