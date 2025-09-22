@@ -227,16 +227,11 @@ user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.sessio
 # 조회할 년월 
 year_month = "2508" 
 
-# 조회 버튼 클릭 상태 세션 초기화 ('조회하기' 버튼 눌렀을땐 데이터 조회되게끔 하기위해)
-if '조회버튼_클릭' not in st.session_state:
-    st.session_state['조회버튼_클릭'] = False
+# '조회하기' 버튼 눌렀을때만 데이터 조회되게끔 하기위해
+조회버튼_클릭 = st.button("조회하기")
 
-# 버튼 클릭 처리 
-if st.button("조회하기"):
-    st.session_state['조회버튼_클릭'] = True
 
-# 버튼 클릭 시에만 필터링 실행
-if st.session_state['조회버튼_클릭']:
+if '조회버튼_클릭' :
     if not user_id_input.strip():
         st.warning("운전자 ID를 입력해주세요.")
     else:
@@ -244,6 +239,7 @@ if st.session_state['조회버튼_클릭']:
             user_id = int(user_id_input)
         except ValueError:
             st.warning("운전자 ID는 숫자여야 합니다.")
+
         else:
             # 필터링 실행
             filtered = df_driver[
@@ -252,6 +248,7 @@ if st.session_state['조회버튼_클릭']:
                 (df_driver["년월"].astype(str) == year_month)
             ]
 
+            # 조회 결과
             st.write("필터링 결과:")
 
             if filtered.empty:
