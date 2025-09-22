@@ -622,7 +622,7 @@ if 조회버튼_클릭 :
                                     html.append(
                                         f'<td style="{td_style}">'
                                         f'<div style="font-weight:bold;">{day}</div>'
-                                        f'<div style="font-weight:bold; font-size:15px; color:{c}">{g}등급</div>'
+                                        f'<div style="font-weight:bold; font-size:12px; color:{c}">{g}등급</div>'
                                         f'<div style="font-size:13px; margin-top:2px; color:{c}">({p}%)</div>'
                                         f'</td>'
                                     )
