@@ -479,7 +479,13 @@ if 조회버튼_클릭 :
 
                 # 결과 데이터 가공
                 df_result = df_monthly[['년월', '가중달성율', '등급']].copy()
-                df_result['월'] = df_result['년월'].astype(str).str[-2:].astype(int).astype(str) + "월"
+
+                # 안전하게 숫자 변환 (NaN이 있는 경우에도 오류 발생 안 함)
+                df_result['년월'] = pd.to_numeric(df_result['년월'], errors='coerce')
+                # NaN 값 제거
+                df_result = df_result.dropna(subset=['년월'])
+                # 월 추출 후 "월" 붙이기
+                df_result['월'] = df_result['년월'].astype(int).astype(str).str[-2:] + "월"
                 df_result['달성률'] = (df_result['가중달성율']*100).astype(int)
 
                 # 최종 출력 컬럼 순서
