@@ -595,6 +595,13 @@ if 조회버튼_클릭 :
                             padding: 6px 2px;
                             height: 75px;
                         }}
+                        .grade-text {{
+                            font-size: 12px;
+                            font-weight:bold;
+                        }}
+                        .percent-text {{
+                            font-size: 13px;
+                        }}
                     }}
                     </style>
                     <div class="calendar-container">
