@@ -292,13 +292,13 @@ if 조회버튼_클릭 :
                     achieved_pct,         # 현재 달성률(%)
                     max_pct=120,             # 링 100%로 환산하는 최대치(%)
                     incentive_won=280000,    # 예상 월 인센티브(원)
-                    figsize=(4.5, 4.5),        # 카드 비율 (두 번째 이미지 느낌)
+                    figsize=(3.8, 3.8),        # 카드 비율 (두 번째 이미지 느낌)
                     ring_width=0.12,         # 링 두께 (반지름 대비)
                     bg_color="#ffffff",      # 카드 배경
                     fg_base="#e6e7ea",       # 미채움 링 색
                     cmap_name="RdYlGn",      # 진행 링 색상(낮음=적, 높음=초록)
                     start_angle=-90,
-                    dpi=200,
+                    dpi=110,
                 ):
                     
                     """
@@ -863,7 +863,7 @@ if 조회버튼_클릭 :
                     value_pct: float,                # 내 위치(%)
                     min_pct: float = 0.0,
                     max_pct: float = 100.0,
-                    width=6.0, height=1.10, dpi=220,
+                    width=5.5, height=1.0, dpi=110,
                     bar_left=0.12, bar_right=0.88, bar_y=0.55,
                     segments=6,
                     line_color="#9AA3AB",            # 점선 색
