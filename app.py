@@ -179,6 +179,7 @@ main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 car_path = os.path.join(file_dir, "인천 차량별.xlsx")
 
+@st.cache_data
 # 엑셀 파일 로드 함수
 def load_excel(path, sheetname):
     try:
@@ -707,7 +708,7 @@ if 조회버튼_클릭 :
                     min_value: int,
                     max_value: int,
                     current_value: int,
-                    width=6.0, height=1.15, dpi=220,
+                    width=5.5, height=1.0, dpi=110,
                     bar_left=0.12, bar_right=0.88, bar_y=0.55,
                     segments=6,
                     line_color="#9AA3AB",      # 점선 색
