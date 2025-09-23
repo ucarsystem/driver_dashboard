@@ -537,6 +537,7 @@ if 조회버튼_클릭 :
 
                     st.altair_chart(chart, use_container_width=True)
 
+                # 일별 등급 팝업
                 def generate_calendar_html_v2(data, year, month):
                     # 요일 색상 및 스타일 설정
                     day_color = {0: "red", 6: "blue"}  # 일요일, 토요일
@@ -577,6 +578,15 @@ if 조회버튼_클릭 :
                         vertical-align: top;
                         word-wrap: break-word;
                     }}
+                    .grade-text {{
+                        font-size: 17px;
+                        font-weight: bold;
+                    }}
+                    .percent-text {{
+                        font-size: 15px;
+                        margin-top: 2px;
+                    }}
+                            
                     @media (max-width: 480px) {{
                         table.calendar {{
                             font-size: 13px;
@@ -622,8 +632,8 @@ if 조회버튼_클릭 :
                                     html.append(
                                         f'<td style="{td_style}">'
                                         f'<div style="font-weight:bold;">{day}</div>'
-                                        f'<div style="font-weight:bold; font-size:12px; color:{c}">{g}등급</div>'
-                                        f'<div style="font-size:13px; margin-top:2px; color:{c}">({p}%)</div>'
+                                        f'<div class="grade-text" style="color:{c}">{g}등급</div>'
+                                        f'<div class="percent-text" style="color:{c}">({p}%)</div>'
                                         f'</td>'
                                     )
                                 else:
