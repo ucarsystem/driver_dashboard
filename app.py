@@ -214,6 +214,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# ✅ 맨 위 제목
+st.markdown(
+    """
+    <h1 style='text-align:center; font-size:32px; font-weight:bold; color:#1F4AA0;'>
+        🚍 굿드라이버
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+
 # 운수사 선택박스
 company_list = ["운수사를 선택하세요"] + company_list[1:]
 company_input = st.selectbox(
@@ -226,7 +236,7 @@ company_input = st.selectbox(
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 
 # 조회할 년월 
-year_month = "2508" 
+year_month = "2509" 
 
 # '조회하기' 버튼 눌렀을때만 데이터 조회되게끔 하기위해
 조회버튼_클릭 = st.button("조회하기")
@@ -267,7 +277,7 @@ if 조회버튼_클릭 :
 
                 # 제목
                 st.markdown("""
-                <h2 style='text-align: center;'>나의 ECO 주행성과, 이번 달엔 어땠을까요?</h2>
+                <h2 style='text-align: center;'>굿 드라이버 : 내 운전 리포트를 한눈에</h2>
                 """, unsafe_allow_html=True)
 
                 st.markdown("---")
@@ -312,6 +322,7 @@ if 조회버튼_클릭 :
                         "C": "#1F4AA0",  # 남색
                         "D": "#CA0000",  # 적색
                         "F": "#CA0000",  # 적색
+                        "판단불가": "#000000" #검정색
                     }
                     prog_color = color_map.get(str(grade).upper(), "#2e7d32")
 
@@ -323,6 +334,7 @@ if 조회버튼_클릭 :
                         "C": "중립",
                         "D": "노력",
                         "F": "초보",
+                        "판단불가": "주의"
                     }
                     label = label_map.get(str(grade).upper(), "")
 
@@ -370,8 +382,12 @@ if 조회버튼_클릭 :
                     ax.text(cx, cy, f"{int(round(value))}%",
                             ha="center", va="center", fontsize=54,
                             color=text_color, fontweight="bold")
+                    
+                    ax.text(cx, cy, "(달성률)",
+                            ha="center", va="center", fontsize=12,
+                            color=text_color, fontweight="bold")
 
-                    ax.text(cx, cy - r*0.40, "예상 월 인센티브",
+                    ax.text(cx, cy - r*0.40, f"예상 {int(str(year_month)[-2:])}월 인센티브",
                             ha="center", va="center", fontsize=14, color=text_color)
 
                     ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
@@ -450,8 +466,8 @@ if 조회버튼_클릭 :
                                 - 양  호 B : 90~95%<br>  
                                 - 중  립 C : 85~90%<br>  
                                 - 노  력 D : 80~85%<br>  
-                                - 초  보 F : 65~80%<br>
-                                이 하 / 평가불가
+                                - 초  보 F : 75~80%<br>
+                                - 판단 불가 : 75% 미만
                                 </div>
                                 
                                 <hr style="border: 0.2px solid #ccc;">
@@ -485,30 +501,42 @@ if 조회버튼_클릭 :
                 df_result['년월'] = pd.to_numeric(df_result['년월'], errors='coerce')
                 # NaN 값 제거
                 df_result = df_result.dropna(subset=['년월'])
+                # 월 추출
+                df_result['월(숫자)'] = df_result['년월'].astype(int).astype(str).str[-2:].astype(int)
                 # 월 추출 후 "월" 붙이기
                 df_result['월'] = df_result['년월'].astype(int).astype(str).str[-2:] + "월"
                 df_result['달성률'] = (df_result['가중달성율']*100).astype(int)
 
+                # ✅ 전체 월(1~현재월) 생성 후 merge
+                last_month = int(str(year_month)[-2:])
+                all_months = pd.DataFrame({'월(숫자)': range(1, last_month+1)})
+                df_full = all_months.merge(df_result, on='월(숫자)', how='left')
+
+                # 비어있는 값 채우기
+                df_full['월'] = df_full['월(숫자)'].astype(str) + "월"
+                df_full['달성률'] = df_full['달성률'].fillna(0).astype(int)
+                df_full['등급'] = df_full['등급'].fillna("-")
+
                 # 최종 출력 컬럼 순서
-                df_result = df_result[['월', '달성률', '등급']]
+                df_final = df_full[['월', '달성률', '등급']]
 
                 # Altair용 등급 색상 매핑
                 등급색상 = alt.Scale(
-                    domain=["S", "A", "B", "C", "D", "F"],
-                    range=["#0a860a", "#0a860a", "#007bff", "#007bff", "#CA0000", "#CA0000"]
+                    domain=["S", "A", "B", "C", "D", "F", "판단불가", "-"],
+                    range=["#0a860a", "#0a860a", "#007bff", "#007bff", "#CA0000", "#CA0000", "#000000", "#999999"]
                 )
 
                 with st.expander("📊 월별 달성률 보기", expanded=True):
 
                     # 막대 차트
-                    bar = alt.Chart(df_result).mark_bar().encode(
+                    bar = alt.Chart(df_final).mark_bar().encode(
                         x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
                         y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
                         color=alt.Color("등급", scale=등급색상),
                         tooltip=["월", "달성률", "등급"]
                     )
 
-                    text = alt.Chart(df_result).mark_text(
+                    text = alt.Chart(df_final).mark_text(
                         dy=-10,
                         fontWeight="bold",
                         fontSize=14,
@@ -537,6 +565,13 @@ if 조회버튼_클릭 :
                     )   
 
                     st.altair_chart(chart, use_container_width=True)
+
+                    st.markdown("""
+                    <div style="font-size:14px; color:gray; margin-top:5px;">
+                    <b>* 판단불가</b> : 달성률이 75% 미만인 운전자<br>
+                    <b>* 달성률이 없는 경우</b> : 주행기록이 없거나 400km 미만 운행 시
+                    </div>
+                    """, unsafe_allow_html=True)
 
                 # 일별 등급 팝업
                 def generate_calendar_html_v2(data, year, month):
@@ -699,6 +734,9 @@ if 조회버튼_클릭 :
                     st.markdown(calendar_html, unsafe_allow_html=True)
 
                 st.markdown("---")
+
+                # if this_grade == "판단불가" :
+
 
                 ### 인센티브 바그래프 ###
 
