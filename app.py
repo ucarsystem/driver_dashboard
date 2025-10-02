@@ -1055,7 +1055,6 @@ if os.path.exists(pdf_path):
         pdf_data = f.read()
 
     st.markdown("---")  # 구분선
-    st.markdown("### 📎 개인정보 보호정책")
     st.download_button(
         label="📥 개인정보 보호정책 다운로드 (PDF)",
         data=pdf_data,
@@ -1063,5 +1062,3 @@ if os.path.exists(pdf_path):
         mime="application/pdf",
         use_container_width=True
     )
-else:
-    st.error("❗ 개인정보 보호정책 PDF 파일이 존재하지 않습니다.")
