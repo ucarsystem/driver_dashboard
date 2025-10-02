@@ -256,7 +256,7 @@ if 조회버튼_클릭 :
             filtered = df_driver[
                 (df_driver["운수사"] == company_input) &
                 (df_driver["운전자ID"] == user_id) &
-                (df_driver["년월"] == year_month)
+                (df_driver["년월"] == int(year_month))
             ]
 
             # 조회 결과
