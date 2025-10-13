@@ -454,7 +454,7 @@ if 조회버튼_클릭 :
                                 - 예상 당월 배분액(해당 월 기준) : 20,000원<br>
                                 - 예상 총 배분액(이번 인센티브 기준) : 120.000원<br>
                                 <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span><br>
-                                * 해당 금액은 예상 금액으로 실제와 다를 수 있음 *
+                                <span style="font-size:15px; color:gray;">* 해당 금액은 예상 금액으로 실제와 다를 수 있음 *</span>
                                 </div>
 
                                 <hr style="border: 0.5px solid #ccc;">
