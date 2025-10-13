@@ -381,7 +381,7 @@ if 조회버튼_클릭 :
                             ha="center", va="center", fontsize=54,
                             color=text_color, fontweight="bold")
                     
-                    ax.text(cx, cy - r*0.35, "(달성률)",
+                    ax.text(cx, cy - r*0.30, "(달성률)",
                             ha="center", va="center", fontsize=12,
                             color=text_color, fontweight="bold")
 
