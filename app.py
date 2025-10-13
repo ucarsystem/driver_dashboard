@@ -450,7 +450,7 @@ if 조회버튼_클릭 :
                                 <div style="font-size:15px; line-height:1.6;">
                                 
                                 <div style="margin:15px;">
-                                <span style="font-size:17px;"><b>금월 나의 인센티브 (1개월 추정)</b></span><br>
+                                <span style="font-size:17px;"><b>금월 나의 인센티브(예상)</b></span><br>
                                 - 예상 당월 배분액(해당 월 기준) : 20,000원<br>
                                 - 예상 총 배분액(이번 인센티브 기준) : 120.000원<br>
                                 <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span><br>
