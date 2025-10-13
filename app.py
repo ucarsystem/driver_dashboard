@@ -261,7 +261,7 @@ if 조회버튼_클릭 :
 
 
             if filtered.empty:
-                st.warning(f"{int(year_month[:-2])}월 수집된 데이터가 없습니다.")
+                st.warning(f"{int(year_month[2:])}월 수집된 데이터가 없습니다.")
             else:
                 row = filtered.iloc[0]
                 st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
