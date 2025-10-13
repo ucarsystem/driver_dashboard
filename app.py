@@ -520,7 +520,7 @@ if 조회버튼_클릭 :
                 df_full['월'] = df_full['월(숫자)'].astype(str) + "월"
                 df_full['달성률'] = df_full['달성률'].fillna(0).astype(int)
                 df_full['등급'] = df_full['등급'].fillna("-")
-                df_full.loc[df_full['달성률'] < 75, '등급'] = '판단불가'
+                df_full.loc[(df_full['달성률'] > 0) & (df_full['달성률'] < 75), '등급'] = '판단불가'
 
                 # 최종 출력 컬럼 순서
                 df_final = df_full[['월', '달성률', '등급']]
