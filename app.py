@@ -261,7 +261,7 @@ if 조회버튼_클릭 :
 
 
             if filtered.empty:
-                st.warning(f"{int(year_month[2:])}월 수집된 데이터가 없습니다.")
+                st.warning(f"{int(year_month[2:])}월에 수집된 데이터가 없습니다.")
             else:
                 row = filtered.iloc[0]
                 st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
@@ -437,6 +437,7 @@ if 조회버튼_클릭 :
                 <div style="width:100%; text-align:center;">
                 <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
                 <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
+                <div style="margin-top:3px; color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>
                 </div>
                 """, unsafe_allow_html=True)
 
