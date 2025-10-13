@@ -267,6 +267,10 @@ if 조회버튼_클릭 :
                 st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
 
                 st.markdown("---")
+                
+                # F등급 중 75% 미만인 경우 '판단불가'로 표시
+                if int(row['가중달성율'] * 100) < 75:
+                    row['등급'] = '판단불가'
 
                 #값 정의
                 route_number = row['노선번호']         # 1) 상단 표: 노선번호
