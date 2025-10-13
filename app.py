@@ -261,7 +261,7 @@ if 조회버튼_클릭 :
 
 
             if filtered.empty:
-                st.warning("조건에 맞는 데이터가 없습니다.")
+                st.warning(f"{int(year_month[:2])}월 수집된 데이터가 없습니다.")
             else:
                 row = filtered.iloc[0]
                 st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
@@ -381,7 +381,7 @@ if 조회버튼_클릭 :
                             ha="center", va="center", fontsize=54,
                             color=text_color, fontweight="bold")
                     
-                    ax.text(cx, cy - r*0.30, "(달성률)",
+                    ax.text(cx, cy - r*0.25, "(달성률)",
                             ha="center", va="center", fontsize=12,
                             color=text_color, fontweight="bold")
 
