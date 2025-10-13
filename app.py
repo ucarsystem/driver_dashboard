@@ -259,17 +259,6 @@ if 조회버튼_클릭 :
                 (df_driver["년월"] == int(year_month))
             ]
 
-            # 조회 결과
-            st.write("필터링 결과:")
-            # 👉 디버깅용: 현재 필터 값 확인
-            st.write("▶️ 입력값 확인")
-            st.write("운수사 (입력값):", company_input)
-            st.write("운전자ID (입력값):", user_id)
-            st.write("년월 (입력값):", int(year_month))
-
-            # 👉 운수사 값 실제 존재 확인
-            st.write("▶️ 운수사 값별 unique 리스트:")
-            st.write(df_driver["운수사"].unique())
 
             if filtered.empty:
                 st.warning("조건에 맞는 데이터가 없습니다.")
@@ -294,7 +283,7 @@ if 조회버튼_클릭 :
 
                 # 기본 정보
 
-                #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성율
+                #왼쪽: 이름/ID / 가운데: 등급 원형 / 오른쪽: 달성률
                 st.markdown(f"""
                 <table style='width: 100%; table-layout: fixed; text-align: center; font-size: 16px; border-collapse: collapse; border: none;'>
                 <tr>
@@ -392,7 +381,7 @@ if 조회버튼_클릭 :
                             ha="center", va="center", fontsize=54,
                             color=text_color, fontweight="bold")
                     
-                    ax.text(cx, cy, "(달성률)",
+                    ax.text(cx, cy - r*0.35, "(달성률)",
                             ha="center", va="center", fontsize=12,
                             color=text_color, fontweight="bold")
 
