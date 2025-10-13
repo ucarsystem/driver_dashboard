@@ -615,7 +615,7 @@ if 조회버튼_클릭 :
                         word-wrap: break-word;
                     }}
                     .grade-text {{
-                        font-size: 17px;
+                        font-size: 19px;
                         font-weight: bold;
                     }}
                     .percent-text {{
@@ -675,7 +675,7 @@ if 조회버튼_클릭 :
                                     html.append(
                                         f'<td style="{td_style}">'
                                         f'<div style="font-weight:bold;">{day}</div>'
-                                        f'<div class="grade-text" style="color:{c}">{g}등급</div>'
+                                        f'<div class="grade-text" style="color:{c}">{g}</div>'
                                         f'<div class="percent-text" style="color:{c}">({p}%)</div>'
                                         f'</td>'
                                     )
