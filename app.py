@@ -615,12 +615,12 @@ if 조회버튼_클릭 :
                         word-wrap: break-word;
                     }}
                     .grade-text {{
-                        font-size: 19px;
+                        font-size: 25px;
                         font-weight: bold;
                     }}
                     .percent-text {{
                         font-size: 15px;
-                        margin-top: 2px;
+                        margin-top: 1px;
                     }}
                             
                     @media (max-width: 480px) {{
