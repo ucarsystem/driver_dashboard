@@ -480,6 +480,7 @@ if 조회버튼_클릭 :
                 st.markdown("---")
 
                 st.markdown("""<div style="width:100%; text-align:center; color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>""", unsafe_allow_html=True)
+                st.markdown("""<div style="width:100%; text-align:center; color:#000000; font-size:15px;">*📢인센티브 금액이 없는 경우 운수사에 문의하세요*</div>""", unsafe_allow_html=True)
 
                 # 단순 줄바꿈
                 st.markdown("<br><br>", unsafe_allow_html=True)
