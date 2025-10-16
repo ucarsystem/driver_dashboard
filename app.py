@@ -371,7 +371,6 @@ if 조회버튼_클릭 :
                     if incentive_won is not None and incentive_won > 0:
                         incentive_text = f"{int(incentive_won):,}원"
 
-                    elif
                     else:
                         incentive_text = "-"
 
