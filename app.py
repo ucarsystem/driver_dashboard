@@ -270,10 +270,10 @@ if 조회버튼_클릭 :
             ]
 
             # 기본값은 None (없음 표시용)
-            incentive_won = None
-            incentive_total = None
-            incentive_text = "-" #당월인센티브
-            incentive_total_text = "-" #6개월간인센티브
+            incentive_won = None #당월인센티브
+            incentive_total = None #6개월간인센티브
+            incentive_text = "-" #당월인센티브 표기
+            incentive_total_text = "-" #6개월간인센티브 표기
 
             # 값이 있을 경우만 계산
             if not incentive_row.empty:
@@ -286,7 +286,6 @@ if 조회버튼_클릭 :
                         if val > 0 :
                             incentive_total = val
                             incentive_won = val / 6
-                            incentive_total = val
                             incentive_text = f"{int(incentive_won):,}원"
                             incentive_total_text = f"{int(incentive_total):,}원"
 
@@ -372,15 +371,6 @@ if 조회버튼_클릭 :
                         "판단불가": "주의"
                     }
                     label = label_map.get(str(grade).upper(), "")
-
-                    # # --- 3. 인센티브 예외 처리---
-                    # if incentive_won is not None and incentive_won > 0:
-                    #     incentive_text = f"{int(incentive_won):,}원"
-                    #     total_incentive_text = f"{int(incentive_total):,}원"
-
-                    # else:
-                    #     incentive_text = "-"
-                    #     total_incentive_text = "-"
 
 
                     # 안전 처리
@@ -882,22 +872,62 @@ if 조회버튼_클릭 :
                 # ----------------- 화면 출력 예시 -----------------
                 st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_allow_html=True)
 
-                # 1) 인천시 전체 운전자 중 (예: 최하위 1,000원, 최상위 100,000원, 내 위치 20,000원)
-                img_city = draw_rank_bar(min_value=1_000, max_value=100_000, current_value=20_000)
+                target_route = None
+                if not incentive_row.empty:
+                    target_route = incentive_row.iloc[0]["노선번호"]
+
+                current_value = incentive_won if incentive_won else 0  # 또는 None 처리 가능
+
+                # 1) 인천시 전체 운전자
+                city_df = df_incentive.copy()
+                city_df = city_df[pd.to_numeric(city_df["예상인센티브"], errors='coerce').notna()]
+                city_df = city_df[city_df["예상인센티브"] > 0]
+
+                city_min = city_df["예상인센티브"].min()
+                city_max = city_df["예상인센티브"].max()
+
+                if city_min and city_max:
+
+                    img_city = draw_rank_bar(min_value=city_min, max_value=city_max, current_value=current_value)
 
                 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
                 st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 인천시 전체 운전자 중 -</div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-                # 2) 운수사 전체 운전자 중 (예: 최하위 1,000원, 최상위 80,000원, 내 위치 20,000원)
-                img_company = draw_rank_bar(min_value=1_000, max_value=80_000, current_value=20_000)
+                # 2) 운수사 전체 운전자 중
+                company_df = df_incentive[df_incentive["운수사"] == company_input].copy()
+                company_df = company_df[pd.to_numeric(company_df["예상인센티브"], errors='coerce').notna()]
+                company_df = company_df[company_df["예상인센티브"] > 0]
+
+                company_min = company_df["예상인센티브"].min()
+                company_max = company_df["예상인센티브"].max()
+
+                if company_min and company_max:
+                    img_company = draw_rank_bar(min_value=company_min, max_value=company_max, current_value=current_value)
 
                 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
                 st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 운수사 전체 운전자 중 -</div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-                # 3) 동일노선 운전자 중 (예: 최하위 10,000원, 최상위 60,000원, 내 위치 20,000원)
-                img_route = draw_rank_bar(min_value=10_000, max_value=60_000, current_value=20_000)
+                # 3) 동일노선 운전자 중 
+
+                route_min = None
+                route_max = None
+
+                if target_route is not None:
+                    route_df = df_incentive[
+                        (df_incentive["운수사"] == company_input) &
+                        (df_incentive["년월"] == int(year_month)) &
+                        (df_incentive["노선번호"] == target_route)
+                    ]
+                    route_df = route_df[pd.to_numeric(route_df["예상인센티브"], errors='coerce').notna()]
+                    route_df = route_df[route_df["예상인센티브"] > 0]
+
+                    route_min = route_df["예상인센티브"].min()
+                    route_max = route_df["예상인센티브"].max()
+
+                if route_min and route_max:
+                    img_route = draw_rank_bar(min_value=route_min, max_value=route_max, current_value=current_value)
 
                 st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
                 st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
