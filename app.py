@@ -275,14 +275,17 @@ if 조회버튼_클릭 :
             # 값이 있을 경우만 계산
             if not incentive_row.empty:
                 raw_value = incentive_row.iloc[0].get("예상인센티브", None)
+
                 if pd.notna(raw_value):
                     try:
-                        incentive_won = float(raw_value) / 6
-                        incentive_total = raw_value
+                        val = float(raw_value)
+                        # 0도 표기 안함
+                        if val > 0 :
+                            incentive_won = val / 6
+                            incentive_total = val
                     except:
                         incentive_won = None  # 숫자 변환 실패 시도도 무시
                         incentive_total = None
-
 
             if filtered.empty:
                 st.warning(f"{int(year_month[2:])}월에 수집된 데이터가 없습니다.")
@@ -365,8 +368,10 @@ if 조회버튼_클릭 :
                     label = label_map.get(str(grade).upper(), "")
 
                     # --- 3. 인센티브 예외 처리---
-                    if incentive_won is not None:
+                    if incentive_won is not None and incentive_won > 0:
                         incentive_text = f"{int(incentive_won):,}원"
+
+                    elif
                     else:
                         incentive_text = "-"
 
@@ -482,11 +487,12 @@ if 조회버튼_클릭 :
                 st.markdown("<br><br>", unsafe_allow_html=True)
 
                 # --- 인센티브 예외 처리---
-                if incentive_won is not None:
+                if incentive_won is not None and incentive_won > 0:
                     incentive_text = f"{int(incentive_won):,}원"
                     total_incentive_text =f"{int(incentive_total):,}원" 
                 else:
                     incentive_text = "-"
+                    total_incentive_text = "-"
 
                 # 참고치 팝업
                 with st.expander("📌 상세보기"):
