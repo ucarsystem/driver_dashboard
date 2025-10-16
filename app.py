@@ -178,6 +178,7 @@ id_check_file = os.path.join(file_dir, "인천ID.xlsx")
 main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 car_path = os.path.join(file_dir, "인천 차량별.xlsx")
+incentive_path = os.path.join(file_dir, "인천 인센티브.xlsx")
 
 @st.cache_data
 # 엑셀 파일 로드 함수
@@ -197,6 +198,7 @@ df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(compa
 df_driver = load_excel(main_path, "운전자별")
 df_day = load_excel(day_path, "일별)차량+운전자")
 df_car = load_excel(car_path, "차량별데이터")
+df_incentive = load_excel(incentive_path, "최종운전자")
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
@@ -253,11 +255,33 @@ if 조회버튼_클릭 :
 
         else:
             # 필터링 실행
+            # 운전자별 시트
             filtered = df_driver[
                 (df_driver["운수사"] == company_input) &
                 (df_driver["운전자ID"] == user_id) &
                 (df_driver["년월"] == int(year_month))
             ]
+
+            # 인센티브 시트
+            incentive_row = df_incentive[
+                (df_incentive["운수사"] == company_input) &
+                (df_incentive["운전자ID"] == user_id) &
+                (df_incentive["년월"] == int(year_month))
+            ]
+
+            # 기본값은 None (없음 표시용)
+            incentive_won = None
+
+            # 값이 있을 경우만 계산
+            if not incentive_row.empty:
+                raw_value = incentive_row.iloc[0].get("예상인센티브", None)
+                if pd.notna(raw_value):
+                    try:
+                        incentive_won = float(raw_value) / 6
+                        incentive_total = raw_value
+                    except:
+                        incentive_won = None  # 숫자 변환 실패 시도도 무시
+                        incentive_total = None
 
 
             if filtered.empty:
@@ -303,7 +327,7 @@ if 조회버튼_클릭 :
                     grade,               # 등급
                     achieved_pct,         # 현재 달성률(%)
                     max_pct=120,             # 링 100%로 환산하는 최대치(%)
-                    incentive_won=280000,    # 예상 월 인센티브(원)
+                    incentive_won = incentive_won,    # 예상 월 인센티브(원)
                     figsize=(3.8, 3.8),        # 카드 비율 (두 번째 이미지 느낌)
                     ring_width=0.12,         # 링 두께 (반지름 대비)
                     bg_color="#ffffff",      # 카드 배경
@@ -340,6 +364,11 @@ if 조회버튼_클릭 :
                     }
                     label = label_map.get(str(grade).upper(), "")
 
+                    # --- 3. 인센티브 예외 처리---
+                    if incentive_won is not None:
+                        incentive_text = f"{int(incentive_won):,}원"
+                    else:
+                        incentive_text = "-"
 
                     # 안전 처리
                     max_pct = max(1e-6, float(max_pct))
@@ -392,7 +421,7 @@ if 조회버튼_클릭 :
                     ax.text(cx, cy - r*0.40, f"예상 {int(str(year_month)[-2:])}월 인센티브",
                             ha="center", va="center", fontsize=14, color=text_color)
 
-                    ax.text(cx, cy - r*0.60, f"{int(incentive_won):,}원",
+                    ax.text(cx, cy - r*0.60, incentive_text,
                             ha="center", va="center", fontsize=24, color=text_color, fontweight="bold")
 
 
@@ -411,7 +440,7 @@ if 조회버튼_클릭 :
                 grade = this_grade
                 achieved_pct = this_percent   # 현재 달성률
                 max_pct = 120       # 총 120%를 링 100%로 간주
-                incentive_won = 280000 # 인센티브 금액 (추후 변경)
+                incentive_won = incentive_won # 인센티브 금액 (당월)
 
                 # 다음 등급 달성까지 안내문구 함수
                 def get_notice_text(grade, achieved_pct):
@@ -441,22 +470,33 @@ if 조회버튼_클릭 :
                 <div style="width:100%; text-align:center;">
                 <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
                 <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
-                <div style="margin-top:3px; color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>
-                </div>
+                <div style="margin-top:10px; color:#000000; font-size:15px;">**6개월 합산 예상 인센티브 : {int(incentive_total):,}원</div>
                 """, unsafe_allow_html=True)
+
+                # 선표기
+                st.markdown("---")
+
+                st.markdown("""<div style="color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>""")
 
                 # 단순 줄바꿈
                 st.markdown("<br><br>", unsafe_allow_html=True)
 
+                # --- 인센티브 예외 처리---
+                if incentive_won is not None:
+                    incentive_text = f"{int(incentive_won):,}원"
+                    total_incentive_text =f"{int(incentive_total):,}원" 
+                else:
+                    incentive_text = "-"
+
                 # 참고치 팝업
                 with st.expander("📌 상세보기"):
-                                st.markdown("""
+                                st.markdown(f"""
                                 <div style="font-size:15px; line-height:1.6;">
                                 
                                 <div style="margin:15px;">
                                 <span style="font-size:17px;"><b>금월 나의 인센티브(예상)</b></span><br>
-                                - 예상 당월 배분액(해당 월 기준) : 20,000원<br>
-                                - 예상 총 배분액(이번 인센티브 기준) : 120.000원<br>
+                                - 예상 당월 배분액(해당 월 기준) : {incentive_text}<br>
+                                - 예상 총 배분액(이번 인센티브 기준) : {incentive_total}<br>
                                 <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span><br>
                                 <span style="font-size:15px; color:gray;">* 해당 금액은 예상 금액으로 실제와 다를 수 있음 *</span>
                                 </div>
