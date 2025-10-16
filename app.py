@@ -883,8 +883,8 @@ if 조회버튼_클릭 :
                 city_df = city_df[pd.to_numeric(city_df["예상인센티브"], errors='coerce').notna()]
                 city_df = city_df[city_df["예상인센티브"] > 0]
 
-                city_min = city_df["예상인센티브"].min()
-                city_max = city_df["예상인센티브"].max()
+                city_min = int(city_df["예상인센티브"].min()/6)
+                city_max = int(city_df["예상인센티브"].max()/6)
 
                 if city_min and city_max:
 
@@ -899,8 +899,8 @@ if 조회버튼_클릭 :
                 company_df = company_df[pd.to_numeric(company_df["예상인센티브"], errors='coerce').notna()]
                 company_df = company_df[company_df["예상인센티브"] > 0]
 
-                company_min = company_df["예상인센티브"].min()
-                company_max = company_df["예상인센티브"].max()
+                company_min = int(company_df["예상인센티브"].min()/6)
+                company_max = int(company_df["예상인센티브"].max()/6)
 
                 if company_min and company_max:
                     img_company = draw_rank_bar(min_value=company_min, max_value=company_max, current_value=current_value)
@@ -923,8 +923,8 @@ if 조회버튼_클릭 :
                     route_df = route_df[pd.to_numeric(route_df["예상인센티브"], errors='coerce').notna()]
                     route_df = route_df[route_df["예상인센티브"] > 0]
 
-                    route_min = route_df["예상인센티브"].min()
-                    route_max = route_df["예상인센티브"].max()
+                    route_min = int(route_df["예상인센티브"].min()/6)
+                    route_max = int(route_df["예상인센티브"].max()/6)
 
                 if route_min and route_max:
                     img_route = draw_rank_bar(min_value=route_min, max_value=route_max, current_value=current_value)
