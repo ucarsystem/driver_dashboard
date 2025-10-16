@@ -878,60 +878,66 @@ if 조회버튼_클릭 :
 
                 current_value = incentive_won if incentive_won else 0  # 또는 None 처리 가능
 
-                # 1) 인천시 전체 운전자
-                city_df = df_incentive.copy()
-                city_df = city_df[pd.to_numeric(city_df["예상인센티브"], errors='coerce').notna()]
-                city_df = city_df[city_df["예상인센티브"] > 0]
+                # 인센티브 금액이 0원일 때
+                if current_value > 0:
 
-                city_min = int(city_df["예상인센티브"].min()/6)
-                city_max = int(city_df["예상인센티브"].max()/6)
+                    st.markdown("### 📍 나의 경제운전 위치(인센티브 기준)", unsafe_allow_html=True)
 
-                if city_min and city_max:
+                    # 1) 인천시 전체 운전자
+                    city_df = df_incentive.copy()
+                    city_df = city_df[pd.to_numeric(city_df["예상인센티브"], errors='coerce').notna()]
+                    city_df = city_df[city_df["예상인센티브"] > 0]
 
-                    img_city = draw_rank_bar(min_value=city_min, max_value=city_max, current_value=current_value)
+                    city_min = int(city_df["예상인센티브"].min()/6)
+                    city_max = int(city_df["예상인센티브"].max()/6)
+                    
 
-                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 인천시 전체 운전자 중 -</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
+                    if city_min and city_max:
 
-                # 2) 운수사 전체 운전자 중
-                company_df = df_incentive[df_incentive["운수사"] == company_input].copy()
-                company_df = company_df[pd.to_numeric(company_df["예상인센티브"], errors='coerce').notna()]
-                company_df = company_df[company_df["예상인센티브"] > 0]
+                        img_city = draw_rank_bar(min_value=city_min, max_value=city_max, current_value=current_value)
 
-                company_min = int(company_df["예상인센티브"].min()/6)
-                company_max = int(company_df["예상인센티브"].max()/6)
+                    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 인천시 전체 운전자 중 -</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_city}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-                if company_min and company_max:
-                    img_company = draw_rank_bar(min_value=company_min, max_value=company_max, current_value=current_value)
+                    # 2) 운수사 전체 운전자 중
+                    company_df = df_incentive[df_incentive["운수사"] == company_input].copy()
+                    company_df = company_df[pd.to_numeric(company_df["예상인센티브"], errors='coerce').notna()]
+                    company_df = company_df[company_df["예상인센티브"] > 0]
 
-                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 운수사 전체 운전자 중 -</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
+                    company_min = int(company_df["예상인센티브"].min()/6)
+                    company_max = int(company_df["예상인센티브"].max()/6)
 
-                # 3) 동일노선 운전자 중 
+                    if company_min and company_max:
+                        img_company = draw_rank_bar(min_value=company_min, max_value=company_max, current_value=current_value)
 
-                route_min = None
-                route_max = None
+                    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 운수사 전체 운전자 중 -</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_company}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
-                if target_route is not None:
-                    route_df = df_incentive[
-                        (df_incentive["운수사"] == company_input) &
-                        (df_incentive["년월"] == int(year_month)) &
-                        (df_incentive["노선번호"] == target_route)
-                    ]
-                    route_df = route_df[pd.to_numeric(route_df["예상인센티브"], errors='coerce').notna()]
-                    route_df = route_df[route_df["예상인센티브"] > 0]
+                    # 3) 동일노선 운전자 중 
 
-                    route_min = int(route_df["예상인센티브"].min()/6)
-                    route_max = int(route_df["예상인센티브"].max()/6)
+                    route_min = None
+                    route_max = None
 
-                if route_min and route_max:
-                    img_route = draw_rank_bar(min_value=route_min, max_value=route_max, current_value=current_value)
+                    if target_route is not None:
+                        route_df = df_incentive[
+                            (df_incentive["운수사"] == company_input) &
+                            (df_incentive["년월"] == int(year_month)) &
+                            (df_incentive["노선번호"] == target_route)
+                        ]
+                        route_df = route_df[pd.to_numeric(route_df["예상인센티브"], errors='coerce').notna()]
+                        route_df = route_df[route_df["예상인센티브"] > 0]
 
-                st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-                st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
+                        route_min = int(route_df["예상인센티브"].min()/6)
+                        route_max = int(route_df["예상인센티브"].max()/6)
+
+                    if route_min and route_max:
+                        img_route = draw_rank_bar(min_value=route_min, max_value=route_max, current_value=current_value)
+
+                    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='text-align:center; font-weight:700; font-size:20px;'>- 동일노선 운전자 중 -</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align:center;'><img src='data:image/png;base64,{img_route}' style='width:100%; max-width:560px;'></div>", unsafe_allow_html=True)
 
                 # 노선 순위 추출 (인천 차량별.xlsx 데이터 사용>df_car)
                 # 1. 조건 정의 (참고용)
