@@ -470,13 +470,13 @@ if 조회버튼_클릭 :
                 <div style="width:100%; text-align:center;">
                 <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
                 <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
-                <div style="margin-top:10px; color:#000000; font-size:15px;">**6개월 합산 예상 인센티브 : {int(incentive_total):,}원</div>
+                <div style="margin-top:10px; color:#000000; font-size:17px;">**6개월 합산 예상 인센티브 : {int(incentive_total):,}원</div>
                 """, unsafe_allow_html=True)
 
                 # 선표기
                 st.markdown("---")
 
-                st.markdown("""<div style="color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>""")
+                st.markdown("""<div style="color:#000000; font-size:15px;">*표시된 인센티브는 예상 금액으로 데이터 수집현황에 따라 실수령 금액과는 다를 수 있습니다.*</div>""", unsafe_allow_html=True)
 
                 # 단순 줄바꿈
                 st.markdown("<br><br>", unsafe_allow_html=True)
@@ -496,7 +496,7 @@ if 조회버튼_클릭 :
                                 <div style="margin:15px;">
                                 <span style="font-size:17px;"><b>금월 나의 인센티브(예상)</b></span><br>
                                 - 예상 당월 배분액(해당 월 기준) : {incentive_text}<br>
-                                - 예상 총 배분액(이번 인센티브 기준) : {incentive_total}<br>
+                                - 예상 총 배분액(이번 인센티브 기준) : {total_incentive_text}<br>
                                 <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span><br>
                                 <span style="font-size:15px; color:gray;">* 해당 금액은 예상 금액으로 실제와 다를 수 있음 *</span>
                                 </div>
