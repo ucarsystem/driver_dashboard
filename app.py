@@ -271,6 +271,9 @@ if 조회버튼_클릭 :
 
             # 기본값은 None (없음 표시용)
             incentive_won = None
+            incentive_total = None
+            incentive_text = "-" #당월인센티브
+            incentive_total_text = "-" #6개월간인센티브
 
             # 값이 있을 경우만 계산
             if not incentive_row.empty:
@@ -281,11 +284,14 @@ if 조회버튼_클릭 :
                         val = float(raw_value)
                         # 0도 표기 안함
                         if val > 0 :
+                            incentive_total = val
                             incentive_won = val / 6
                             incentive_total = val
+                            incentive_text = f"{int(incentive_won):,}원"
+                            incentive_total_text = f"{int(incentive_total):,}원"
+
                     except:
-                        incentive_won = None  # 숫자 변환 실패 시도도 무시
-                        incentive_total = None
+                        pass
 
             if filtered.empty:
                 st.warning(f"{int(year_month[2:])}월에 수집된 데이터가 없습니다.")
@@ -367,12 +373,15 @@ if 조회버튼_클릭 :
                     }
                     label = label_map.get(str(grade).upper(), "")
 
-                    # --- 3. 인센티브 예외 처리---
-                    if incentive_won is not None and incentive_won > 0:
-                        incentive_text = f"{int(incentive_won):,}원"
+                    # # --- 3. 인센티브 예외 처리---
+                    # if incentive_won is not None and incentive_won > 0:
+                    #     incentive_text = f"{int(incentive_won):,}원"
+                    #     total_incentive_text = f"{int(incentive_total):,}원"
 
-                    else:
-                        incentive_text = "-"
+                    # else:
+                    #     incentive_text = "-"
+                    #     total_incentive_text = "-"
+
 
                     # 안전 처리
                     max_pct = max(1e-6, float(max_pct))
@@ -474,7 +483,7 @@ if 조회버튼_클릭 :
                 <div style="width:100%; text-align:center;">
                 <img src="data:image/png;base64,{circle_base64}" style="width:420px; max-width:92vw;">
                 <div style="margin-top:10px; color:#000000; font-size:20px;">{notice_text}</div>
-                <div style="margin-top:10px; color:#000000; font-size:17px;">**6개월 합산 예상 인센티브 : {int(incentive_total):,}원</div>
+                <div style="margin-top:10px; color:#000000; font-size:17px;">**6개월 합산 예상 인센티브 : {incentive_total_text}</div>
                 """, unsafe_allow_html=True)
 
                 # 선표기
@@ -485,13 +494,6 @@ if 조회버튼_클릭 :
                 # 단순 줄바꿈
                 st.markdown("<br><br>", unsafe_allow_html=True)
 
-                # --- 인센티브 예외 처리---
-                if incentive_won is not None and incentive_won > 0:
-                    incentive_text = f"{int(incentive_won):,}원"
-                    total_incentive_text =f"{int(incentive_total):,}원" 
-                else:
-                    incentive_text = "-"
-                    total_incentive_text = "-"
 
                 # 참고치 팝업
                 with st.expander("📌 상세보기"):
@@ -501,7 +503,7 @@ if 조회버튼_클릭 :
                                 <div style="margin:15px;">
                                 <span style="font-size:17px;"><b>금월 나의 인센티브(예상)</b></span><br>
                                 - 예상 당월 배분액(해당 월 기준) : {incentive_text}<br>
-                                - 예상 총 배분액(이번 인센티브 기준) : {total_incentive_text}<br>
+                                - 예상 총 배분액(이번 인센티브 기준) : {incentive_total_text}<br>
                                 <span style="font-size:15px; color:gray;">(현재의 실적으로 1개월 추정)</span><br>
                                 <span style="font-size:15px; color:gray;">* 해당 금액은 예상 금액으로 실제와 다를 수 있음 *</span>
                                 </div>
