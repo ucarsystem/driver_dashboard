@@ -178,7 +178,7 @@ id_check_file = os.path.join(file_dir, "인천ID.xlsx")
 main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 car_path = os.path.join(file_dir, "인천 차량별.xlsx")
-incentive_path = os.path.join(file_dir, "인천 인센티브.xlsx")
+incentive_path = os.path.join(file_dir, "인천 인센티브데이터.xlsx")
 
 @st.cache_data
 # 엑셀 파일 로드 함수
