@@ -30,7 +30,7 @@ plt.rcParams['axes.unicode_minus'] = False
 
 # st.set_page_config(layout="wide")
 
-# 🌈 라이트 모드 강제 적용 CSS
+# 🌈 라이트 모드 강제 적용 CSS (스타일)
 st.markdown("""
     <style>
     body, .stApp {
@@ -174,7 +174,6 @@ st.markdown("""
 file_dir = "./file"
 # 각 파일 위치
 company_file = os.path.join(file_dir, "company_info.xlsx")
-id_check_file = os.path.join(file_dir, "인천ID.xlsx")
 main_path = os.path.join(file_dir, "인천 운전자별.xlsx")
 day_path = os.path.join(file_dir, "인천 일별데이터.xlsx")
 car_path = os.path.join(file_dir, "인천 차량별.xlsx")
@@ -194,11 +193,11 @@ df_company = pd.read_excel(company_file, sheet_name="Sheet1", header=None) if os
 company_list = df_company[0].dropna().tolist() if not df_company.empty else []
 df_code = pd.read_excel(company_file, sheet_name="code") if os.path.exists(company_file) else pd.DataFrame()
 
-# ── 엑셀 로드 & 필터
-df_driver = load_excel(main_path, "운전자별")
-df_day = load_excel(day_path, "일별)차량+운전자")
-df_car = load_excel(car_path, "차량별데이터")
-df_incentive = load_excel(incentive_path, "최종운전자")
+# ── 엑셀 로드 & 시트명
+df_driver = load_excel(main_path, "운전자별") #인천 운전자.xlsx
+df_day = load_excel(day_path, "일별)차량+운전자") #인천 일별데이터.xlsx
+df_car = load_excel(car_path, "차량별데이터") #인천 차량별.xlsx
+df_incentive = load_excel(incentive_path, "최종운전자") #인천 인센티브데이터.xlsx
 
 # Streamlit UI 구성🚍
 st.set_page_config(page_title="나의 ECO 주행성과 보러가기")
@@ -226,7 +225,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 운수사 선택박스
+## 입력값 ##
+# 운수사 선택박스 (1. 입력값)
 company_list = ["운수사를 선택하세요"] + company_list[1:]
 company_input = st.selectbox(
     "운수사를 입력하세요",
@@ -234,11 +234,11 @@ company_input = st.selectbox(
     index=0  # 기본으로 안내 문구 선택되게
 )
 
-# 운전자ID 입력칸
+# 운전자ID 입력칸 (2. 입력값)
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 
 # 조회할 년월 
-year_month = "2509" 
+year_month = "2509" # 년월 데이터 수정
 
 # '조회하기' 버튼 눌렀을때만 데이터 조회되게끔 하기위해
 조회버튼_클릭 = st.button("조회하기")
@@ -1073,12 +1073,12 @@ if 조회버튼_클릭 :
                 
                 # 3) 백분율 계산 함수 (값이 낮을수록 우수 → 높은 퍼센트)
                 def get_percentile_reversed(df, col, value):
-                    df_sorted = df[col].dropna().sort_values().reset_index(drop=True)
-                    total = len(df_sorted)
+                    df_sorted = df[col].dropna().sort_values().reset_index(drop=True) #dropna : 결측치 제거, sort_values : 오름차순정렬(작은값->큰값)
+                    total = len(df_sorted) # 전체 운전자수(결측치 제거한)
                     if total == 0:
                         return None # 비교 대상 없음
-                    rank = (df_sorted > value).sum() + 1
-                    percentile = round(rank / total * 100)
+                    rank = (df_sorted > value).sum() + 1 # 전체 값(df_sorted) > 현재값(value) => 현재값보다 큰 값들의 개수의 합 (value보다 큰값을 많이 가진 사람일수록 순위가 작아짐)
+                    percentile = round(rank / total * 100) #크기순위/전체운전자수*100 (순위의 백분율)
                     return percentile
                 
                 # 4) 결과 추출
