@@ -551,7 +551,7 @@ if 조회버튼_클릭 :
 
                 # ✅ 전체 월(1~현재월) 생성 후 merge
                 last_month = int(str(year_month)[-2:])
-                all_months = pd.DataFrame({'월(숫자)': range(1, last_month)+1})
+                all_months = pd.DataFrame({'월(숫자)': range(1, last_month+1)})
                 df_full = all_months.merge(df_result, on='월(숫자)', how='left')
 
                 # 비어있는 값 채우기
