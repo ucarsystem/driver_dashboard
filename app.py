@@ -238,7 +238,7 @@ company_input = st.selectbox(
 user_id_input = st.text_input("운전자 ID를 입력하세요", value=st.session_state.get("user_id_input", ""))
 
 # 조회할 년월 
-year_month = "2509" # 년월 데이터 수정
+year_month = "2510" # 년월 데이터 수정
 
 # '조회하기' 버튼 눌렀을때만 데이터 조회되게끔 하기위해
 조회버튼_클릭 = st.button("조회하기")
@@ -285,7 +285,7 @@ if 조회버튼_클릭 :
                         # 0도 표기 안함
                         if val > 0 :
                             incentive_total = val
-                            incentive_won = val / 6
+                            incentive_won = val / 6 # 총 6개월치라 1개월분으로 나눔
                             incentive_text = f"{int(incentive_won):,}원"
                             incentive_total_text = f"{int(incentive_total):,}원"
 
@@ -298,7 +298,7 @@ if 조회버튼_클릭 :
                 row = filtered.iloc[0]
                 st.success(f"✅ {company_input} 운수사, ID {user_id_input} 데이터 조회 완료")
 
-                st.markdown("---")
+                st.markdown("---") # 구분선
                 
                 # F등급 중 75% 미만인 경우 '판단불가'로 표시
                 if int(row['가중달성율'] * 100) < 75:
@@ -573,7 +573,7 @@ if 조회버튼_클릭 :
 
                     # 막대 차트
                     bar = alt.Chart(df_final).mark_bar().encode(
-                        x=alt.X("월", title="월", axis=alt.Axis(labelAngle=0)),  # ⬅️ 제목 명시!
+                        x=alt.X("월", sort='ascending', title="월", axis=alt.Axis(labelAngle=0, labelExpr="datum.value + '월'")),  # ⬅️ 제목 명시!
                         y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
                         color=alt.Color("등급", scale=등급색상),
                         tooltip=["월", "달성률", "등급"]
@@ -584,7 +584,7 @@ if 조회버튼_클릭 :
                         fontWeight="bold",
                         fontSize=14,
                     ).encode(
-                        x="월",
+                        x=alt.X("월(숫자):O", sort='ascending', axis=alt.Axis(labelExpr="datum.value + '월'")),
                         y="달성률",
                         text="등급",
                         color=alt.Color("등급", scale=등급색상, legend=None)
