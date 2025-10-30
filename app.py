@@ -561,7 +561,7 @@ if 조회버튼_클릭 :
                 df_full.loc[(df_full['달성률'] > 0) & (df_full['달성률'] < 75), '등급'] = '판단불가'
 
                 # 최종 출력 컬럼 순서
-                df_final = df_full[['월', '달성률', '등급']]
+                df_final = df_full[['월(숫자)', '달성률', '등급']]
 
                 # Altair용 등급 색상 매핑
                 등급색상 = alt.Scale(
@@ -573,10 +573,10 @@ if 조회버튼_클릭 :
 
                     # 막대 차트
                     bar = alt.Chart(df_final).mark_bar().encode(
-                        x=alt.X("월", sort='ascending', title="월", axis=alt.Axis(labelAngle=0, labelExpr="datum.value + '월'")),  # ⬅️ 제목 명시!
+                        x=alt.X("월(숫자)", sort='ascending', title="월", axis=alt.Axis(labelAngle=0, labelExpr="datum.value + '월'")),  # ⬅️ 제목 명시!
                         y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
                         color=alt.Color("등급", scale=등급색상),
-                        tooltip=["월", "달성률", "등급"]
+                        tooltip=[alt.Tooltip("월(숫자)", title="월"), "달성률", "등급"]
                     )
 
                     text = alt.Chart(df_final).mark_text(
@@ -584,7 +584,7 @@ if 조회버튼_클릭 :
                         fontWeight="bold",
                         fontSize=14,
                     ).encode(
-                        x=alt.X("월(숫자):O", sort='ascending', axis=alt.Axis(labelExpr="datum.value + '월'")),
+                        x=alt.X("월(숫자)", sort='ascending', axis=alt.Axis(labelExpr="datum.value + '월'")),
                         y="달성률",
                         text="등급",
                         color=alt.Color("등급", scale=등급색상, legend=None)
