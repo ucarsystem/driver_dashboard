@@ -551,7 +551,7 @@ if 조회버튼_클릭 :
 
                 # ✅ 전체 월(1~현재월) 생성 후 merge
                 last_month = int(str(year_month)[-2:])
-                all_months = pd.DataFrame({'월(숫자)': range(1, last_month)})
+                all_months = pd.DataFrame({'월(숫자)': range(1, last_month)+1})
                 df_full = all_months.merge(df_result, on='월(숫자)', how='left')
 
                 # 비어있는 값 채우기
@@ -573,10 +573,10 @@ if 조회버튼_클릭 :
 
                     # 막대 차트
                     bar = alt.Chart(df_final).mark_bar().encode(
-                        x=alt.X("월(숫자)", sort='ascending', title="월", axis=alt.Axis(labelAngle=0, labelExpr="datum.value + '월'")),  # ⬅️ 제목 명시!
-                        y=alt.Y("달성률", scale=alt.Scale(domain=[0, 120]), title="달성률"),
-                        color=alt.Color("등급", scale=등급색상),
-                        tooltip=[alt.Tooltip("월(숫자)", title="월"), "달성률", "등급"]
+                        x=alt.X("월(숫자):O", sort='ascending', title="월", axis=alt.Axis(labelAngle=0, labelExpr="datum.value + '월'")),  # ⬅️ 제목 명시!
+                        y=alt.Y("달성률:Q", scale=alt.Scale(domain=[0, 120]), title="달성률"),
+                        color=alt.Color("등급:N", scale=등급색상),
+                        tooltip=[alt.Tooltip("월(숫자):O", title="월"), "달성률", "등급"]
                     )
 
                     text = alt.Chart(df_final).mark_text(
@@ -584,10 +584,10 @@ if 조회버튼_클릭 :
                         fontWeight="bold",
                         fontSize=14,
                     ).encode(
-                        x=alt.X("월(숫자)", sort='ascending', axis=alt.Axis(labelExpr="datum.value + '월'")),
-                        y="달성률",
+                        x=alt.X("월(숫자):O", sort='ascending', axis=alt.Axis(labelExpr="datum.value + '월'")),
+                        y="달성률:Q",
                         text="등급",
-                        color=alt.Color("등급", scale=등급색상, legend=None)
+                        color=alt.Color("등급:N", scale=등급색상, legend=None)
                     )
 
                     chart = alt.layer(bar, text).properties(
